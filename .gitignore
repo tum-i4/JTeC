@@ -216,6 +216,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+*.iml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -268,9 +269,5 @@ tags
 .vs
 .vscode
 
-# gradle
-!gradle/wrapper/gradle-wrapper.jar
-
-
-# npm
-inst/cypress-listener/node_modules
+# Maven
+target

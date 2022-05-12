@@ -14,6 +14,14 @@ JTeC is mainly developed by Raphael Noemmer and Daniel Elsner.
 
 TBD
 
+## Structure
+
+```
+├── jtec-agent          <- The JTeC agent is a simple Java agent that can be parameterized and attached to a JVM process.
+├── jtec-core           <- The JTeC core package contains instrumentation and auxiliary code.
+└── jtec-maven-plugin   <- The JTeC maven plugin provides a utility to attach the agent to the tests of a Maven project.
+```
+
 ## Setup
 
 TBD
