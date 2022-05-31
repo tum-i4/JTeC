@@ -1,24 +1,34 @@
 package edu.tum.sse.jtec.testlistener;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AgentOptions {
-    private Path outputPath;
+    private final boolean traceTestEvents = false;
+    private Path testEventOutputPath;
 
-    public static AgentOptions fromString(String options) {
-        AgentOptions result = new AgentOptions();
-        String[] optionParts = options.split(",");
-        result.outputPath = Paths.get(optionParts[0]);
-        if (!result.outputPath.toFile().exists()) {
-            try {
-                Files.createFile(result.outputPath);
-            } catch (IOException exception) {
-                throw new RuntimeException("Failed to open or create output file.", exception);
+    public static AgentOptions fromString(final String options) {
+        final AgentOptions result = new AgentOptions();
+
+        final String[] optionParts = options.split(",");
+        final Map<String, String> presentOptions = new HashMap<>();
+        for (final String part : optionParts) {
+            final String[] keyValue = part.trim().split("=");
+            if (keyValue.length != 2) {
+                throw new IllegalArgumentException(part + " is not in the right format of key=value");
             }
+            presentOptions.put(keyValue[0], keyValue[1]);
         }
+
         return result;
+    }
+
+    public Path getTestEventOutputPath() {
+        return testEventOutputPath;
+    }
+
+    public boolean getTraceTestEvents() {
+        return traceTestEvents;
     }
 }
