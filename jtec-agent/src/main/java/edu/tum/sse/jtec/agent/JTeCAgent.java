@@ -5,7 +5,7 @@ import edu.tum.sse.jtec.testlistener.Tracer;
 
 import java.lang.instrument.Instrumentation;
 
-public class PreMain {
+public class JTeCAgent {
     public static void premain(String arguments, Instrumentation instrumentation) {
         if (arguments == null) {
             throw new RuntimeException("Missing arguments with log file path for instrumentation.");

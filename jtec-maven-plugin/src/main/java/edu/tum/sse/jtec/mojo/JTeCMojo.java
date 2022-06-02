@@ -1,5 +1,7 @@
 package edu.tum.sse.jtec.mojo;
 
+import edu.tum.sse.jtec.agent.JTeCAgent;
+import edu.tum.sse.jtec.testlistener.AgentOptions;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -8,20 +10,33 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import java.util.List;
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
-@Mojo(name = "jtec", defaultPhase = LifecyclePhase.PROCESS_TEST_SOURCES)
+/**
+ * This Mojo is used to attach the JTeC agent before tests are executed in a Surefire or Failsafe project.
+ * It does so by adding the -javaagent runtime option to each JVM that executes tests.
+ * Notably, we do not mess with the `argLine` option, but rather use the
+ * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#debugForkedProcess">Surefire</a> or
+ * <a href="https://maven.apache.org/surefire/maven-failsafe-plugin/integration-test-mojo.html#debugForkedProcess">Failsafe</a> debug option.
+ */
+@Mojo(name = "jtec", defaultPhase = LifecyclePhase.PROCESS_TEST_CLASSES)
 public class JTeCMojo extends AbstractMojo {
 
-    private static final String SUREFIRE_ARG_LINE_PARAMETER = "argLine";
-    private static final String SUREFIRE_PLUGIN_KEY = "org.apache.maven.plugins:maven-surefire-plugin";
+    private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
+    private static final String FAILSAFE_DEBUG_OPTION = "maven.failsafe.debug";
 
     /**
-     * A new argLine to append to Maven Surefire plugin in multi-module Maven projects.
+     * JTeC options passed to the JTeC agent.
      */
-    @Parameter(property = "jtec.argLine", readonly = true, required = true)
-    String argLine;
+    @Parameter(property = "jtec.opts", readonly = true)
+    String agentOpts;
 
     /**
      * The current project.
@@ -31,10 +46,27 @@ public class JTeCMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Properties properties = project.getProperties();
-        String oldValue = properties.getProperty(SUREFIRE_ARG_LINE_PARAMETER);
-        String newValue = argLine + " " + (oldValue == null ? "" : oldValue);
-        properties.setProperty(SUREFIRE_ARG_LINE_PARAMETER, newValue);
-        getLog().info(String.format("Changing argLine in properties to %s.", newValue));
+        try {
+            if (agentOpts == null) {
+                agentOpts = AgentOptions.DEFAULT_OPTIONS.toAgentString();
+            }
+            getLog().info("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
+            Path agentJar = locateAgentJar();
+            Properties properties = project.getProperties();
+            for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
+                String oldValue = properties.getProperty(property);
+                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), agentOpts, (oldValue == null ? "" : " " + oldValue));
+                properties.setProperty(property, newValue);
+                getLog().info(String.format("Changing Maven property %s to %s.", property, newValue));
+            }
+        } catch (Exception exception) {
+            getLog().error("Failed to find JTeC agent JAR, skipping instrumentation.");
+        }
+    }
+
+    private Path locateAgentJar() throws IOException, URISyntaxException {
+        URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
+        URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
+        return Paths.get(jarURL.getSchemeSpecificPart());
     }
 }

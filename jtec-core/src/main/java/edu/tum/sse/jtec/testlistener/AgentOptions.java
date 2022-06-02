@@ -8,8 +8,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AgentOptions {
+
+    public final static AgentOptions DEFAULT_OPTIONS = new AgentOptions(
+            false,
+            Paths.get("").toAbsolutePath()
+    );
     private boolean traceTestEvents = false;
     private Path testEventOutputPath;
+
+    private AgentOptions() {
+    }
+
+    private AgentOptions(boolean traceTestEvents, Path testEventOutputPath) {
+        this.traceTestEvents = traceTestEvents;
+        this.testEventOutputPath = testEventOutputPath;
+    }
 
     public static AgentOptions fromString(final String options) {
         final AgentOptions result = new AgentOptions();
@@ -40,6 +53,11 @@ public class AgentOptions {
         }
 
         return result;
+    }
+
+    public String toAgentString() {
+        return "traceTestEvents=" + traceTestEvents +
+                ",testEventOutputPath=" + testEventOutputPath;
     }
 
     public Path getTestEventOutputPath() {

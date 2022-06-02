@@ -7,19 +7,19 @@
     <parent>
         <groupId>edu.tum.sse</groupId>
         <artifactId>jtec</artifactId>
-        <version>${revision}</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>jtec-agent</artifactId>
-    <version>${revision}</version>
+    <version>0.1-SNAPSHOT</version>
     <name>JTeC Agent</name>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>edu.tum.sse</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jtec-core</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -49,7 +49,7 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>edu.tum.sse.jtec.agent.PreMain</Premain-Class>
+                            <Premain-Class>edu.tum.sse.jtec.agent.JTeCAgent</Premain-Class>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
                     </archive>
