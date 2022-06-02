@@ -14,13 +14,27 @@ public class AgentOptions {
     public static final String SYS_EVENT_OUT = "sysEventOut";
     public static final String DEFAULT_TEST_EVENT_OUT = "./testEvents.log";
     public static final String DEFAULT_SYS_EVENT_OUT = "./sysEvents.log";
-
+    public final static AgentOptions DEFAULT_OPTIONS = new AgentOptions(
+            false,
+            Paths.get("").toAbsolutePath(),
+            false,
+            Paths.get("").toAbsolutePath()
+    );
     private boolean traceSystemEvents = false;
-
     private boolean traceTestEvents = false;
     private Path testEventOutputPath;
 
     private Path systemEventOutputPath;
+
+    private AgentOptions() {
+    }
+
+    private AgentOptions(final boolean traceTestEvents, final Path testEventOutputPath, final boolean traceSystemEvents, final Path systemEventOutputPath) {
+        this.traceTestEvents = traceTestEvents;
+        this.testEventOutputPath = testEventOutputPath;
+        this.traceSystemEvents = traceSystemEvents;
+        this.systemEventOutputPath = systemEventOutputPath;
+    }
 
     public static AgentOptions fromString(final String options) {
         final AgentOptions result = new AgentOptions();
@@ -70,6 +84,13 @@ public class AgentOptions {
                 exception.printStackTrace();
             }
         }
+    }
+
+    public String toAgentString() {
+        return TRACE_TEST_EVENTS + "=" + traceTestEvents +
+                "," + TEST_EVENT_OUT + "=" + testEventOutputPath +
+                "," + TRACE_SYS_EVENTS + "=" + traceSystemEvents +
+                "," + SYS_EVENT_OUT + "=" + systemEventOutputPath;
     }
 
     public Path getTestEventOutputPath() {
