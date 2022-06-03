@@ -1,8 +1,5 @@
 package edu.tum.sse.jtec.agent;
 
-import edu.tum.sse.jtec.instrumentation.AgentOptions;
-import edu.tum.sse.jtec.instrumentation.Tracer;
-
 import java.lang.instrument.Instrumentation;
 
 public class JTeCAgent {
