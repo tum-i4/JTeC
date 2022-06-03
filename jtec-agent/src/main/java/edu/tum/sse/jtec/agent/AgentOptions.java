@@ -15,8 +15,8 @@ public class AgentOptions {
     public static final String TEST_EVENT_OUT = "testEventOut";
     public static final String TRACE_SYS_EVENTS = "traceSysEvents";
     public static final String SYS_EVENT_OUT = "sysEventOut";
-    public static final String DEFAULT_TEST_EVENT_OUT = "./testEvents.log";
-    public static final String DEFAULT_SYS_EVENT_OUT = "./sysEvents.log";
+    public static final String DEFAULT_TEST_EVENT_OUT = "testEvents.log";
+    public static final String DEFAULT_SYS_EVENT_OUT = "sysEvents.log";
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
             Paths.get(DEFAULT_TEST_EVENT_OUT).toAbsolutePath(),
