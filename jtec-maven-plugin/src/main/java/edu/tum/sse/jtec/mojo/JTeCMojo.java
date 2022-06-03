@@ -1,7 +1,7 @@
 package edu.tum.sse.jtec.mojo;
 
 import edu.tum.sse.jtec.agent.JTeCAgent;
-import edu.tum.sse.jtec.instrumentation.AgentOptions;
+import edu.tum.sse.jtec.agent.AgentOptions;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
