@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.testlistener;
+package edu.tum.sse.jtec.instr;
 
 import java.io.IOException;
 import java.nio.file.Files;

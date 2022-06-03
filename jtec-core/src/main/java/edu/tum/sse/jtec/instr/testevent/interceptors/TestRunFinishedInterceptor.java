@@ -1,6 +1,6 @@
-package edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors;
+package edu.tum.sse.jtec.instr.testevent.interceptors;
 
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.TestEventInterceptorUtility;
+import edu.tum.sse.jtec.instr.testevent.TestEventInterceptorUtility;
 import net.bytebuddy.asm.Advice;
 import org.junit.runner.Result;
 

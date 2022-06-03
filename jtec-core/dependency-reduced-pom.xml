@@ -34,8 +34,8 @@
     </plugins>
   </build>
   <properties>
-    <bytebuddy.version>1.12.10</bytebuddy.version>
     <junit-platform.version>1.7.0</junit-platform.version>
+    <bytebuddy.version>1.12.10</bytebuddy.version>
     <junit.version>4.13</junit.version>
   </properties>
 </project>

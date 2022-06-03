@@ -1,11 +1,11 @@
-package edu.tum.sse.jtec.testlistener.testruninstrumentation;
+package edu.tum.sse.jtec.instr.testevent;
 
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.ExecutionFinishedInterceptor;
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.ExecutionStartedInterceptor;
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.TestEndInterceptor;
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.TestRunFinishedInterceptor;
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.TestRunStartedInterceptor;
-import edu.tum.sse.jtec.testlistener.testruninstrumentation.interceptors.TestStartInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.ExecutionFinishedInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.ExecutionStartedInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.TestEndInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.TestRunFinishedInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.TestRunStartedInterceptor;
+import edu.tum.sse.jtec.instr.testevent.interceptors.TestStartInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
