@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.instrumentation.testevent;
+package edu.tum.sse.jtec.instrumentation.test;
 
 public enum TestTracingEvent {
     SUITE_STARTED("Test suite started"),

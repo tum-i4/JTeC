@@ -1,11 +1,11 @@
-package edu.tum.sse.jtec.instrumentation.sysevent;
+package edu.tum.sse.jtec.instrumentation.system;
 
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ClassLoaderInterceptor;
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.PathInterceptor;
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ProcessStartInterceptor;
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.SocketInterceptor;
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.StringPathInterceptor;
-import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ThreadStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.ClassLoaderInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.PathInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.ProcessStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.SocketInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.StringPathInterceptor;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.ThreadStartInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;

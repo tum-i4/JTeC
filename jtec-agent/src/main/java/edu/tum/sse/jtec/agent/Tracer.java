@@ -1,7 +1,7 @@
 package edu.tum.sse.jtec.agent;
 
-import edu.tum.sse.jtec.instrumentation.sysevent.SysEventInstrumentation;
-import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.system.SysEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.test.TestEventInstrumentation;
 
 import java.lang.instrument.Instrumentation;
 

@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.instrumentation.testevent;
+package edu.tum.sse.jtec.instrumentation.test;
 
 public class TestRunResult {
     private final String testId;
