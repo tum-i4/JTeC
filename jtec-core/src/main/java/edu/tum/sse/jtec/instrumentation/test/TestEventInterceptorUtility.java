@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.getCurrentPid;
+
 public class TestEventInterceptorUtility {
 
     public static String testingLogFilePath;
@@ -22,7 +24,7 @@ public class TestEventInterceptorUtility {
 
     public static boolean inTestSuite = false;
 
-    public static String currentPid = java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+    public static String currentPid = getCurrentPid();
 
 
     /**

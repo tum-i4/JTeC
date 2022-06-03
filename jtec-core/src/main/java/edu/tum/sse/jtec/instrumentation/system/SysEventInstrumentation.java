@@ -1,11 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.system;
 
-import edu.tum.sse.jtec.instrumentation.system.interceptors.ClassLoaderInterceptor;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.PathInterceptor;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.ProcessStartInterceptor;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.SocketInterceptor;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.StringPathInterceptor;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.ThreadStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
+import edu.tum.sse.jtec.instrumentation.system.interceptors.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -15,12 +11,11 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.*;
 
-public class SysEventInstrumentation {
+public class SysEventInstrumentation extends AbstractInstrumentation<SysEventInstrumentation> {
 
-    public static final String TYPES_TO_TRACE = "(" +
+    private static final String TYPES_TO_TRACE = "(" +
             "java.io.FileInputStream|" +
             "java.io.FileOutputStream|" +
             "sun.nio.fs.UnixFileSystemProvider|" +
@@ -48,11 +43,19 @@ public class SysEventInstrumentation {
     private static final String THREAD_CREATION_METHODS = "start";
     private static final String PROCESS_CREATION_METHODS = "start";
 
+    private Instrumentation instrumentation;
+    private ResettableClassFileTransformer transformer;
+
+    public SysEventInstrumentation(final String outputPath) {
+        super(outputPath);
+    }
+
     /**
-     * Adds tracing for the desired non-code Interactions.
+     * Adds tracing for the desired non-code interactions.
      */
-    public static ResettableClassFileTransformer attachTracer(final Instrumentation instrumentation, final String outputPath) {
-        return new AgentBuilder.Default()
+    public SysEventInstrumentation attach(final Instrumentation instrumentation) {
+        this.instrumentation = instrumentation;
+        this.transformer = new AgentBuilder.Default()
                 .disableClassFormatChanges()
                 .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
@@ -62,10 +65,13 @@ public class SysEventInstrumentation {
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(TYPES_TO_TRACE))
                 .transform(systemEventTransformer(outputPath)).installOn(instrumentation);
+        return this;
     }
 
-    private static String getCurrentPid() {
-        return java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+    public void reset() {
+        if (instrumentation != null && transformer != null) {
+            instrumentation.removeTransformer(transformer);
+        }
     }
 
     /**

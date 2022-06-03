@@ -1,11 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.test;
 
-import edu.tum.sse.jtec.instrumentation.test.interceptors.ExecutionFinishedInterceptor;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.ExecutionStartedInterceptor;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.TestEndInterceptor;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.TestRunFinishedInterceptor;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.TestRunStartedInterceptor;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.TestStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
+import edu.tum.sse.jtec.instrumentation.test.interceptors.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -16,7 +12,7 @@ import java.lang.instrument.Instrumentation;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
 
-public class TestEventInstrumentation {
+public class TestEventInstrumentation extends AbstractInstrumentation<TestEventInstrumentation> {
 
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
     public static final String TEST_EXECUTION_LISTENER_JUNIT5 = "org.junit.platform.launcher.TestExecutionListener";
@@ -32,9 +28,17 @@ public class TestEventInstrumentation {
     public static final String TEST_RUN_STARTED = "testRunStarted";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
 
-    public static ResettableClassFileTransformer attachTracer(final Instrumentation instrumentation, final String outputPath) {
+    private Instrumentation instrumentation;
+    private ResettableClassFileTransformer transformer;
+
+    public TestEventInstrumentation(final String outputPath) {
+        super(outputPath);
+    }
+
+    public TestEventInstrumentation attach(final Instrumentation instrumentation) {
+        this.instrumentation = instrumentation;
         TestEventInterceptorUtility.testingLogFilePath = outputPath;
-        return new AgentBuilder.Default()
+        transformer = new AgentBuilder.Default()
                 .disableClassFormatChanges()
                 .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
@@ -46,6 +50,7 @@ public class TestEventInstrumentation {
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_SPRING))))
                 .transform(systemEventTransformer()).installOn(instrumentation);
+        return this;
     }
 
     /**
@@ -71,5 +76,10 @@ public class TestEventInstrumentation {
                         .visit(Advice.withCustomMapping()
                                 .to(TestRunFinishedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(TEST_RUN_FINISHED)));
+    }
+
+    @Override
+    public void reset() {
+        instrumentation.removeTransformer(transformer);
     }
 }
