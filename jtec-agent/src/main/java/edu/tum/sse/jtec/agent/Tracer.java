@@ -1,8 +1,8 @@
 package edu.tum.sse.jtec.agent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.system.SysEventInstrumentation;
-import edu.tum.sse.jtec.instrumentation.test.TestEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.systemevent.SysEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 
 import java.lang.instrument.Instrumentation;
 import java.util.ArrayList;

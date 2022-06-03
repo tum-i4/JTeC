@@ -1,7 +1,7 @@
-package edu.tum.sse.jtec.instrumentation.test;
+package edu.tum.sse.jtec.instrumentation.testevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.test.interceptors.*;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -12,6 +12,9 @@ import java.lang.instrument.Instrumentation;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
 
+/**
+ * Adds test event instrumentation for the JUnit testing framework.
+ */
 public class TestEventInstrumentation extends AbstractInstrumentation<TestEventInstrumentation> {
 
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
@@ -35,6 +38,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
         super(outputPath);
     }
 
+    @Override
     public TestEventInstrumentation attach(final Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
         TestEventInterceptorUtility.testingLogFilePath = outputPath;
@@ -49,14 +53,11 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                 .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_SPRING))))
-                .transform(systemEventTransformer()).installOn(instrumentation);
+                .transform(testEventTransformer()).installOn(instrumentation);
         return this;
     }
 
-    /**
-     * Adds visitors to the methods for tracing system events.
-     */
-    private static AgentBuilder.Transformer systemEventTransformer() {
+    private AgentBuilder.Transformer testEventTransformer() {
         return (builder, typeDescription, classLoader, module) ->
                 builder.visit(Advice.withCustomMapping()
                                 .to(TestStartInterceptor.class)
@@ -80,6 +81,8 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
 
     @Override
     public void reset() {
-        instrumentation.removeTransformer(transformer);
+        if (instrumentation != null && transformer != null) {
+            instrumentation.removeTransformer(transformer);
+        }
     }
 }

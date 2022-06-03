@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.instrumentation.system;
+package edu.tum.sse.jtec.instrumentation.systemevent;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

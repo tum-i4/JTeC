@@ -1,7 +1,7 @@
-package edu.tum.sse.jtec.instrumentation.system.interceptors;
+package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
-import edu.tum.sse.jtec.instrumentation.system.AdviceOutput;
-import edu.tum.sse.jtec.instrumentation.system.AdvicePid;
+import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
+import edu.tum.sse.jtec.instrumentation.systemevent.AdvicePid;
 import net.bytebuddy.asm.Advice;
 
 import java.nio.file.Files;

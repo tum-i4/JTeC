@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.instrumentation.test;
+package edu.tum.sse.jtec.instrumentation.testevent;
 
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;

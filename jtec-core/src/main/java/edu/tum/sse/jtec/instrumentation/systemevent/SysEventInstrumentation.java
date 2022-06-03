@@ -1,7 +1,7 @@
-package edu.tum.sse.jtec.instrumentation.system;
+package edu.tum.sse.jtec.instrumentation.systemevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.system.interceptors.*;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -13,6 +13,9 @@ import java.nio.file.Path;
 
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.*;
 
+/**
+ * Adds system event instrumentation for files, resources (from JARs), libraries (e.g., native DLLs), sockets, threads, and processes.
+ */
 public class SysEventInstrumentation extends AbstractInstrumentation<SysEventInstrumentation> {
 
     private static final String TYPES_TO_TRACE = "(" +
@@ -50,9 +53,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
         super(outputPath);
     }
 
-    /**
-     * Adds tracing for the desired non-code interactions.
-     */
+    @Override
     public SysEventInstrumentation attach(final Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
         this.transformer = new AgentBuilder.Default()
@@ -64,7 +65,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
                 .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(TYPES_TO_TRACE))
-                .transform(systemEventTransformer(outputPath)).installOn(instrumentation);
+                .transform(systemEventTransformer()).installOn(instrumentation);
         return this;
     }
 
@@ -77,7 +78,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
     /**
      * Adds visitors to the methods for tracing system events.
      */
-    private static AgentBuilder.Transformer systemEventTransformer(final String outputPath) {
+    private AgentBuilder.Transformer systemEventTransformer() {
         final String currentPid = getCurrentPid();
         return (builder, typeDescription, classLoader, module) ->
                 builder.visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
