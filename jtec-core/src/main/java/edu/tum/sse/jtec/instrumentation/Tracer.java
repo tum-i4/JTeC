@@ -1,7 +1,7 @@
-package edu.tum.sse.jtec.instr;
+package edu.tum.sse.jtec.instrumentation;
 
-import edu.tum.sse.jtec.instr.sysevent.SysEventInstrumentation;
-import edu.tum.sse.jtec.instr.testevent.TestEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.sysevent.SysEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 
 import java.lang.instrument.Instrumentation;

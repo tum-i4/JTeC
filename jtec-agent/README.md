@@ -7,7 +7,7 @@ connect), and coverage (e.g., class-level coverage).
 ## Options
 
 To set up the agent that is attached to a JVM via `-javaagent:/path/to/agent.jar`, several runtime options can be
-provided as key value pairs `-javaagent:/path/to/agent.jar:key1=val1,key2=val2,...`:
+provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,...`:
 
 | Key             | Type    | Default value    |
 |-----------------|---------|------------------|

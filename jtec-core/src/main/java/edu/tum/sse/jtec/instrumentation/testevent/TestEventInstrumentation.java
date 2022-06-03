@@ -1,11 +1,11 @@
-package edu.tum.sse.jtec.instr.testevent;
+package edu.tum.sse.jtec.instrumentation.testevent;
 
-import edu.tum.sse.jtec.instr.testevent.interceptors.ExecutionFinishedInterceptor;
-import edu.tum.sse.jtec.instr.testevent.interceptors.ExecutionStartedInterceptor;
-import edu.tum.sse.jtec.instr.testevent.interceptors.TestEndInterceptor;
-import edu.tum.sse.jtec.instr.testevent.interceptors.TestRunFinishedInterceptor;
-import edu.tum.sse.jtec.instr.testevent.interceptors.TestRunStartedInterceptor;
-import edu.tum.sse.jtec.instr.testevent.interceptors.TestStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.ExecutionFinishedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.ExecutionStartedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.TestEndInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.TestRunFinishedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.TestRunStartedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.TestStartInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -13,10 +13,10 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.instrument.Instrumentation;
 
-public class TestEventInstrumentation {
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
 
-    public static final String BYTEBUDDY_PACKAGE = "net.bytebuddy";
-    public static final String SYSRTP_PACKAGE = "edu.sysrtp";
+public class TestEventInstrumentation {
 
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
     public static final String TEST_EXECUTION_LISTENER_JUNIT5 = "org.junit.platform.launcher.TestExecutionListener";
@@ -40,7 +40,7 @@ public class TestEventInstrumentation {
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
                 .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
                 .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
-                .ignore(ElementMatchers.nameStartsWith(SYSRTP_PACKAGE))
+                .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))

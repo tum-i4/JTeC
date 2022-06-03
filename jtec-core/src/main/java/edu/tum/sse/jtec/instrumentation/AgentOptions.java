@@ -1,4 +1,4 @@
-package edu.tum.sse.jtec.instr;
+package edu.tum.sse.jtec.instrumentation;
 
 import java.io.IOException;
 import java.nio.file.Files;

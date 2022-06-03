@@ -1,7 +1,7 @@
-package edu.tum.sse.jtec.instr.sysevent.interceptors;
+package edu.tum.sse.jtec.instrumentation.sysevent.interceptors;
 
-import edu.tum.sse.jtec.instr.sysevent.AdviceOutput;
-import edu.tum.sse.jtec.instr.sysevent.AdvicePid;
+import edu.tum.sse.jtec.instrumentation.sysevent.AdviceOutput;
+import edu.tum.sse.jtec.instrumentation.sysevent.AdvicePid;
 import net.bytebuddy.asm.Advice;
 
 import java.net.SocketAddress;

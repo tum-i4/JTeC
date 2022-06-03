@@ -1,11 +1,11 @@
-package edu.tum.sse.jtec.instr.sysevent;
+package edu.tum.sse.jtec.instrumentation.sysevent;
 
-import edu.tum.sse.jtec.instr.sysevent.interceptors.ClassLoaderInterceptor;
-import edu.tum.sse.jtec.instr.sysevent.interceptors.PathInterceptor;
-import edu.tum.sse.jtec.instr.sysevent.interceptors.ProcessStartInterceptor;
-import edu.tum.sse.jtec.instr.sysevent.interceptors.SocketInterceptor;
-import edu.tum.sse.jtec.instr.sysevent.interceptors.StringPathInterceptor;
-import edu.tum.sse.jtec.instr.sysevent.interceptors.ThreadStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ClassLoaderInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.PathInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ProcessStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.SocketInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.StringPathInterceptor;
+import edu.tum.sse.jtec.instrumentation.sysevent.interceptors.ThreadStartInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -15,10 +15,11 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
+
 public class SysEventInstrumentation {
 
-    public static final String BYTEBUDDY_PACKAGE = "net.bytebuddy";
-    public static final String SYSRTP_PACKAGE = "edu.tum.sse.jtec";
     public static final String TYPES_TO_TRACE = "(java.io.FileInputStream|java.io.FileOutputStream|sun.nio.fs.UnixFileSystemProvider|java.nio.file.spi.FileSystemProvider|sun.nio.fs.WindowsFileSystemProvider|java.io.RandomAccessFile|java.net.Socket|java.lang.ClassLoader|java.lang.Thread|java.lang.ProcessBuilder)";
 
     private static final String CLASS_LOADER_TRACED_METHODS = "(getResource|findLibrary)";
@@ -38,7 +39,7 @@ public class SysEventInstrumentation {
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
                 .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
                 .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
-                .ignore(ElementMatchers.nameStartsWith(SYSRTP_PACKAGE))
+                .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(TYPES_TO_TRACE))
                 .transform(systemEventTransformer(outputPath)).installOn(instrumentation);

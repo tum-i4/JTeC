@@ -1,7 +1,7 @@
 package edu.tum.sse.jtec.agent;
 
-import edu.tum.sse.jtec.instr.AgentOptions;
-import edu.tum.sse.jtec.instr.Tracer;
+import edu.tum.sse.jtec.instrumentation.AgentOptions;
+import edu.tum.sse.jtec.instrumentation.Tracer;
 
 import java.lang.instrument.Instrumentation;
 
