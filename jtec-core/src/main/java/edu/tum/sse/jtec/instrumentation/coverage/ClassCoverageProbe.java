@@ -12,9 +12,4 @@ public class ClassCoverageProbe extends CoverageProbe {
     public String getProbeId() {
         return className;
     }
-
-    @Override
-    public String getCoverageRunId() {
-        return null;
-    }
 }
