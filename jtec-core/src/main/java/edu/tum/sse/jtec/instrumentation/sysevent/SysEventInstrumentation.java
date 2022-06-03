@@ -20,12 +20,31 @@ import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE
 
 public class SysEventInstrumentation {
 
-    public static final String TYPES_TO_TRACE = "(java.io.FileInputStream|java.io.FileOutputStream|sun.nio.fs.UnixFileSystemProvider|java.nio.file.spi.FileSystemProvider|sun.nio.fs.WindowsFileSystemProvider|java.io.RandomAccessFile|java.net.Socket|java.lang.ClassLoader|java.lang.Thread|java.lang.ProcessBuilder)";
-
-    private static final String CLASS_LOADER_TRACED_METHODS = "(getResource|findLibrary)";
+    public static final String TYPES_TO_TRACE = "(" +
+            "java.io.FileInputStream|" +
+            "java.io.FileOutputStream|" +
+            "sun.nio.fs.UnixFileSystemProvider|" +
+            "java.nio.file.spi.FileSystemProvider|" +
+            "sun.nio.fs.WindowsFileSystemProvider|" +
+            "java.io.RandomAccessFile|" +
+            "java.net.Socket|" +
+            "java.lang.ClassLoader|" +
+            "java.lang.Thread|" +
+            "java.lang.ProcessBuilder" +
+            ")";
+    private static final String CLASS_LOADER_TRACED_METHODS = "(" +
+            "getResource|" +
+            "findLibrary" +
+            ")";
     private static final String STRING_PARAMETER_TRACED_METHODS = "open";
     private static final String SOCKET_ADDRESS_PARAMETER_TRACED_METHODS = "connect";
-    private static final String PATH_PARAMETER_TRACED_METHODS = "(newFileChannel|newAsynchronousFileChannel|newByteChannel|copy|move)";
+    private static final String PATH_PARAMETER_TRACED_METHODS = "(" +
+            "newFileChannel|" +
+            "newAsynchronousFileChannel|" +
+            "newByteChannel|" +
+            "copy|" +
+            "move" +
+            ")";
     private static final String THREAD_CREATION_METHODS = "start";
     private static final String PROCESS_CREATION_METHODS = "start";
 

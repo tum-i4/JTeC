@@ -21,7 +21,7 @@ public class TestEventInstrumentation {
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
     public static final String TEST_EXECUTION_LISTENER_JUNIT5 = "org.junit.platform.launcher.TestExecutionListener";
     public static final String TEST_EXECUTION_LISTENER_SPRING = "org.springframework.test.context.TestExecutionListener";
-    //public static final String TEST_RESULT = "junit.framework.TestResult";
+    // public static final String TEST_RESULT = "junit.framework.TestResult";
     // junit 5 org.junit.platform.engine.support.hierarchicalNode might be an option
 
     // TODO use RunNotifier instead of runListener perhaps
