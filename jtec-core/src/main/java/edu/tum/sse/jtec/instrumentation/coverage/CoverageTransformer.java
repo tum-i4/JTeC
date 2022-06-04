@@ -47,13 +47,13 @@ public class CoverageTransformer implements AgentBuilder.Transformer {
             return builder;
         }
 
-        if (coverageLevel == CoverageLevel.METHOD_LEVEL) {
+        if (coverageLevel == CoverageLevel.METHOD) {
             return builder.visit(
                     Advice.withCustomMapping()
                             .bind(ClassName.class, typeDescription.getName())
                             .to(MethodCoverageAdvice.class)
                             .on(ElementMatchers.isMethod().or(ElementMatchers.isConstructor())));
-        } else if (coverageLevel == CoverageLevel.CLASS_LEVEL) {
+        } else if (coverageLevel == CoverageLevel.CLASS) {
             return builder.visit(
                     Advice.withCustomMapping()
                             .bind(ClassName.class, typeDescription.getName())

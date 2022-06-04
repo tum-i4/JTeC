@@ -1,6 +1,17 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 public enum CoverageLevel {
-    CLASS_LEVEL,
-    METHOD_LEVEL
+    CLASS("CLASS"),
+    METHOD("METHOD");
+
+    private final String coverageLevel;
+
+    CoverageLevel(final String coverageLevel) {
+        this.coverageLevel = coverageLevel;
+    }
+
+    @Override
+    public String toString() {
+        return coverageLevel;
+    }
 }

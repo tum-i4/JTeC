@@ -3,8 +3,9 @@ package edu.tum.sse.jtec.instrumentation.coverage;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.writeToFileLocking;
+import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
 
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
@@ -34,7 +35,7 @@ public class CoverageMonitor {
 
     public void dumpCoverage(String outputPath) throws IOException {
         String json = new Gson().toJson(coverageMap.getCollectedProbes());
-        writeToFileLocking(outputPath, json);
+        appendToFile(Paths.get(outputPath), json, true);
         clearCoverage();
     }
 }
