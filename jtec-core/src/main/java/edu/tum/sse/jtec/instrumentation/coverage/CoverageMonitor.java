@@ -24,7 +24,7 @@ public class CoverageMonitor {
     }
 
     private void registerProbe(CoverageProbe probe) {
-        if (!coverageMap.contains(probe.getCoverageRunId(), probe.getProbeId())) {
+        if (probe != null && !coverageMap.contains(probe.getCoverageRunId(), probe.getProbeId())) {
             coverageMap.put(probe.getCoverageRunId(), probe.getProbeId());
         }
     }

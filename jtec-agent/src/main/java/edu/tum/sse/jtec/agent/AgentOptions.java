@@ -144,7 +144,11 @@ public class AgentOptions {
         result.coverageOutputPath = Paths.get(optionsInput.getOrDefault(COVERAGE_OUT, DEFAULT_COVERAGE_OUT)).toAbsolutePath();
         createFileAndEnclosingDir(result.coverageOutputPath);
         result.coverageLevel = CoverageLevel.valueOf(optionsInput.getOrDefault(COVERAGE_LEVEL, DEFAULT_COVERAGE_LEVEL.toString()).toUpperCase());
-        result.instrumentCoverage = Boolean.parseBoolean(optionsInput.get(COVERAGE_INSTRUMENT));
+        if (result.coverageLevel == CoverageLevel.METHOD) {
+            result.instrumentCoverage = true;
+        } else {
+            result.instrumentCoverage = Boolean.parseBoolean(optionsInput.get(COVERAGE_INSTRUMENT));
+        }
         result.coverageIncludes = optionsInput.getOrDefault(COVERAGE_INCLUDES, DEFAULT_COVERAGE_INCLUDES);
         result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES);
     }

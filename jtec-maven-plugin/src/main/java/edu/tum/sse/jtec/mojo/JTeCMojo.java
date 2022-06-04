@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.mojo;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import edu.tum.sse.jtec.agent.JTeCAgent;
 import edu.tum.sse.jtec.agent.AgentOptions;
 import org.apache.maven.plugin.AbstractMojo;
@@ -41,8 +42,8 @@ public class JTeCMojo extends AbstractMojo {
     /**
      * Enable debug output.
      */
-    @Parameter(property = "jtec.debug", readonly = true)
-    Boolean debug;
+    @Parameter(property = "jtec.debug", readonly = true, defaultValue = "false")
+    boolean debug;
 
     /**
      * The current project.
