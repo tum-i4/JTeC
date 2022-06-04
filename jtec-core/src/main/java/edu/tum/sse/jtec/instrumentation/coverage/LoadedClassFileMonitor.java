@@ -27,7 +27,7 @@ public class LoadedClassFileMonitor implements ClassFileTransformer {
         }
 
         if (includePattern.matcher(className).matches() && !excludePattern.matcher(className).matches()) {
-            GlobalCoverageMonitor.get().registerClass(className);
+            GlobalCoverageMonitor.get().registerClass(className.replace("/", "."));
         }
         return null;
     }

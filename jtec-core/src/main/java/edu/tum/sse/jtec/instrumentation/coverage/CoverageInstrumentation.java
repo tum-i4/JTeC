@@ -59,6 +59,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
         } else {
             // In case we do not instrument, we can still track all loaded class files without modifying them.
             transformer = new LoadedClassFileMonitor(includePattern, excludePattern);
+            instrumentation.addTransformer(transformer);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::dumpCoverage));

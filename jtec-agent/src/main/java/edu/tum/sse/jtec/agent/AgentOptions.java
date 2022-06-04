@@ -33,7 +33,7 @@ public class AgentOptions {
     public static final String DEFAULT_COVERAGE_OUT = "coverage.log";
     public static final CoverageLevel DEFAULT_COVERAGE_LEVEL = CoverageLevel.CLASS;
     public static final String DEFAULT_COVERAGE_INCLUDES = ".*";
-    public static final String DEFAULT_COVERAGE_EXCLUDES = "";
+    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk).*";
 
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,

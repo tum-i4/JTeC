@@ -39,6 +39,12 @@ public class JTeCMojo extends AbstractMojo {
     String agentOpts;
 
     /**
+     * Enable debug output.
+     */
+    @Parameter(property = "jtec.debug", readonly = true)
+    Boolean debug;
+
+    /**
      * The current project.
      */
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
@@ -50,14 +56,14 @@ public class JTeCMojo extends AbstractMojo {
             if (agentOpts == null) {
                 agentOpts = AgentOptions.DEFAULT_OPTIONS.toAgentString();
             }
-            getLog().info("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
+            log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
             Path agentJar = locateAgentJar();
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
                 String oldValue = properties.getProperty(property);
                 String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), agentOpts, (oldValue == null ? "" : " " + oldValue));
                 properties.setProperty(property, newValue);
-                getLog().info(String.format("Changing Maven property %s to %s.", property, newValue));
+                log(String.format("Changing Maven property %s to %s.", property, newValue));
             }
         } catch (Exception exception) {
             getLog().error("Failed to find JTeC agent JAR, skipping instrumentation.");
@@ -68,5 +74,13 @@ public class JTeCMojo extends AbstractMojo {
         URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
         URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
         return Paths.get(jarURL.getSchemeSpecificPart());
+    }
+
+    private void log(String message) {
+        if (debug) {
+            getLog().warn(message);
+        } else {
+            getLog().info(message);
+        }
     }
 }
