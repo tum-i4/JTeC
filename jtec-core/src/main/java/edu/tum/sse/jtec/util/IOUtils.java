@@ -39,7 +39,7 @@ public class IOUtils {
             } catch (Exception exception) {
                 throw new IOException("Problem with locking when writing to file: " + exception.getMessage());
             } finally {
-                if (fileLock != null) {
+                if (fileLock != null && fileLock.isValid()) {
                     fileLock.release();
                 }
             }
