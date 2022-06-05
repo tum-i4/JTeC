@@ -43,7 +43,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     @Override
     public CoverageInstrumentation attach(Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
-        coverageMonitor = new CoverageMonitor(createCoverageProbeFactory());
+        coverageMonitor = CoverageMonitor.create(createCoverageProbeFactory());
         GlobalCoverageMonitor.set(coverageMonitor);
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()

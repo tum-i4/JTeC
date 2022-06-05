@@ -1,6 +1,8 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.instrumentation.InstrumentationUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -14,11 +16,22 @@ import static org.mockito.Mockito.mockStatic;
 
 class CoverageMonitorTest {
 
+    private Path output;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        output = Files.createTempFile("cov", ".log");
+    }
+
+    @AfterEach
+    void tearDown() {
+        output.toFile().delete();
+    }
+
     @Test
     void shouldDumpCoverage() throws IOException {
         // given
-        Path output = Files.createTempFile("cov", ".log");
-        CoverageMonitor coverageMonitor = new CoverageMonitor(new ProcessCoverageProbeFactory());
+        CoverageMonitor coverageMonitor = CoverageMonitor.create(new ProcessCoverageProbeFactory());
         try (MockedStatic<InstrumentationUtils> utilities = mockStatic(InstrumentationUtils.class)) {
             utilities.when(InstrumentationUtils::getCurrentPid).thenReturn("123");
             coverageMonitor.registerClass("Foo");

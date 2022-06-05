@@ -3,16 +3,22 @@ package edu.tum.sse.jtec.instrumentation.coverage;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
+import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
 
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
     private final CoverageProbeFactory coverageProbeFactory;
 
-    public CoverageMonitor(CoverageProbeFactory coverageProbeFactory) {
+    private CoverageMonitor(CoverageProbeFactory coverageProbeFactory) {
         this.coverageProbeFactory = coverageProbeFactory;
+    }
+
+    public static CoverageMonitor create(CoverageProbeFactory coverageProbeFactory) {
+        return new CoverageMonitor(coverageProbeFactory);
     }
 
     public void registerClass(String className) {
@@ -35,7 +41,9 @@ public class CoverageMonitor {
 
     public void dumpCoverage(String outputPath) throws IOException {
         String json = new Gson().toJson(coverageMap.getCollectedProbes());
-        appendToFile(Paths.get(outputPath), json, true);
+        Path outputFile = Paths.get(outputPath);
+        createFileAndEnclosingDir(outputFile);
+        appendToFile(outputFile, json, true);
         clearCoverage();
     }
 }
