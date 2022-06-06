@@ -1,6 +1,5 @@
 package edu.tum.sse.jtec.mojo;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import edu.tum.sse.jtec.agent.JTeCAgent;
 import edu.tum.sse.jtec.agent.AgentOptions;
 import org.apache.maven.plugin.AbstractMojo;
