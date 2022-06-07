@@ -33,7 +33,7 @@ class CoverageMonitorTest {
     void shouldDumpCoverage() throws IOException {
         // given
         CoverageMonitor coverageMonitor = CoverageMonitor.create(new ProcessCoverageProbeFactory());
-        try (MockedStatic<InstrumentationUtils> utilities = mockStatic(InstrumentationUtils.class)) {
+        try (MockedStatic<ProcessUtils> utilities = mockStatic(ProcessUtils.class)) {
             utilities.when(ProcessUtils::getCurrentPid).thenReturn("123");
             coverageMonitor.registerClass("Foo");
             coverageMonitor.registerClass("Bar");
