@@ -67,13 +67,14 @@ public class JTeCMojo extends AbstractMojo {
             }
         } catch (Exception exception) {
             getLog().error("Failed to find JTeC agent JAR, skipping instrumentation.");
+            exception.printStackTrace();
         }
     }
 
     private Path locateAgentJar() throws IOException, URISyntaxException {
         URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
         URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
-        return Paths.get(jarURL.getSchemeSpecificPart());
+        return Paths.get(jarURL);
     }
 
     private void log(String message) {
