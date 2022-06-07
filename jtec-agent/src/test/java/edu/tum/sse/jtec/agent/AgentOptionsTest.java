@@ -38,7 +38,8 @@ class AgentOptionsTest {
                 "cov.instr," +
                 "cov.includes=.*foo.*," +
                 "cov.excludes=.*bar.*," +
-                "cov.level=method";
+                "cov.level=method," +
+                "init.cmd=run.bat";
 
         // when
         AgentOptions parsedOptions = AgentOptions.fromString(options);
@@ -57,5 +58,6 @@ class AgentOptionsTest {
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
         assertEquals(parsedOptions.getCoverageIncludes(), ".*foo.*");
         assertEquals(parsedOptions.getCoverageExcludes(), ".*bar.*");
+        assertEquals(parsedOptions.getPreTestCommand(), "run.bat");
     }
 }

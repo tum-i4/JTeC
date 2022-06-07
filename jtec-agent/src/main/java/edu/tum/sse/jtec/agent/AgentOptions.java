@@ -35,6 +35,10 @@ public class AgentOptions {
     public static final String DEFAULT_COVERAGE_INCLUDES = ".*";
     public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven).*";
 
+    // Pre-test hook.
+    public static final String PRE_TEST_COMMAND = "init.cmd";
+    public static final String DEFAULT_PRE_TEST_COMMAND = "";
+
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
             Paths.get(DEFAULT_TEST_EVENT_OUT).toAbsolutePath(),
@@ -45,7 +49,8 @@ public class AgentOptions {
             false,
             DEFAULT_COVERAGE_LEVEL,
             DEFAULT_COVERAGE_INCLUDES,
-            DEFAULT_COVERAGE_EXCLUDES
+            DEFAULT_COVERAGE_EXCLUDES,
+            DEFAULT_PRE_TEST_COMMAND
     );
 
     private static final String OPTIONS_SEPARATOR = ",";
@@ -61,6 +66,7 @@ public class AgentOptions {
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
+    private String preTestCommand;
 
     private AgentOptions() {
     }
@@ -75,7 +81,8 @@ public class AgentOptions {
             final boolean instrumentCoverage,
             final CoverageLevel coverageLevel,
             final String coverageIncludes,
-            final String coverageExcludes
+            final String coverageExcludes,
+            final String preTestCommand
     ) {
         this.traceTestEvents = traceTestEvents;
         this.testEventOutputPath = testEventOutputPath;
@@ -87,6 +94,7 @@ public class AgentOptions {
         this.coverageLevel = coverageLevel;
         this.coverageIncludes = coverageIncludes;
         this.coverageExcludes = coverageExcludes;
+        this.preTestCommand = preTestCommand;
     }
 
     public static AgentOptions fromString(final String options) {
@@ -95,6 +103,7 @@ public class AgentOptions {
         parseTestEventParams(result, optionsInput);
         parseSysEventParams(result, optionsInput);
         parseCoverageParams(result, optionsInput);
+        parsePreTestParams(result, optionsInput);
         return result;
     }
 
@@ -153,6 +162,10 @@ public class AgentOptions {
         result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES);
     }
 
+    private static void parsePreTestParams(final AgentOptions result, final Map<String, String> optionsInput) {
+        result.preTestCommand = optionsInput.getOrDefault(PRE_TEST_COMMAND, DEFAULT_PRE_TEST_COMMAND);
+    }
+
     public String toAgentString() {
         return TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TEST_EVENT_OUT + VALUE_SEPARATOR + testEventOutputPath +
@@ -163,7 +176,8 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + COVERAGE_INSTRUMENT + VALUE_SEPARATOR + instrumentCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
                 OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + coverageIncludes +
-                OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + coverageExcludes;
+                OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + coverageExcludes +
+                OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
     }
 
     public Path getTestEventOutputPath() {
@@ -204,5 +218,9 @@ public class AgentOptions {
 
     public boolean shouldInstrumentCoverage() {
         return instrumentCoverage;
+    }
+
+    public String getPreTestCommand() {
+        return preTestCommand;
     }
 }
