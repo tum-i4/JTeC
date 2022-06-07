@@ -67,14 +67,10 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     }
 
     private AgentBuilder.Transformer getCoverageTransformer() {
-        // FIXME: We can extend JTeC here in the future, e.g., to support distributed coverage,
-        //  by simply creating a transformer with different parameters here.
         return CoverageTransformer.create(coverageLevel);
     }
 
     private CoverageProbeFactory createCoverageProbeFactory() {
-        // FIXME: We can extend JTeC here in the future, e.g., to support distributed coverage,
-        //  by simply adding new coverage probe factories.
         return new ProcessCoverageProbeFactory();
     }
 
