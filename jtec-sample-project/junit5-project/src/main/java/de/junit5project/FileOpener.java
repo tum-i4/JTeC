@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipFile;
 
@@ -16,7 +18,7 @@ public class FileOpener {
         }
     }
 
-    public void openFiles() throws IOException, URISyntaxException {
+    public void openFiles() throws IOException, URISyntaxException, InterruptedException {
         final String fileName = "test.txt";
         final Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI());
         final File file = path.toFile();
@@ -103,5 +105,17 @@ public class FileOpener {
         System.out.format("FileChannel.open (1), opens: %d\n", ++openCounter);
         final FileChannel fc = FileChannel.open(path, StandardOpenOption.READ);
         fc.close();
+
+        // Open in subprocess
+        final Path subprocFile = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("subproc.txt")).toURI());
+        List<String> commandParts = System.getProperty("os.name").toLowerCase().contains("win") ?
+                Arrays.asList("cmd", "/c", "type " + subprocFile.toAbsolutePath()) :
+                Arrays.asList("bash", "-c", "cat " + subprocFile.toAbsolutePath());
+        Process subprocess = new ProcessBuilder()
+                .command(commandParts)
+                .start();
+        subprocess.waitFor();
+        String output = new BufferedReader(new InputStreamReader(subprocess.getInputStream())).readLine();
+        System.out.println("Opened " + subprocFile + " in subprocess " + subprocess + " with output: " + output);
     }
 }

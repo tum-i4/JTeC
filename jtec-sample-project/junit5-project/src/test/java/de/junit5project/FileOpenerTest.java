@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 
 public class FileOpenerTest {
     @Test
-    public void testFileInterception() throws IOException, URISyntaxException {
+    public void testFileInterception() throws IOException, URISyntaxException, InterruptedException {
         new FileOpener().openFiles();
     }
 }
