@@ -24,13 +24,13 @@ jobs:
         distribution: 'temurin'
         cache: maven
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        settings-path: ${{ github.workspace }} # location for the settings.xml file (will be generated here)
 
     - name: Build & Test
       run: mvn package -B --file pom.xml
 
     - name: Publish to GitHub Packages Apache Maven
       if: ${{ startsWith(github.ref, 'refs/tags/') }}
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DskipTests
       env:
         GITHUB_TOKEN: ${{ github.token }}
