@@ -43,4 +43,12 @@
             </plugin>
         </plugins>
     </build>
+         
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>JTeC</name>
+            <url>https://maven.pkg.github.com/tum-i4/JTeC</url>
+        </repository>
+    </distributionManagement>
 </project>
