@@ -68,7 +68,7 @@ class FridaApplication(object):
             self._stop_requested.set()
 
     def _instrument(self, pid):
-        print("✔ attach(pid={})".format(pid))
+        print("attach(pid={})".format(pid))
         session = self._device.attach(pid)
         session.on(
             "detached",
@@ -77,9 +77,9 @@ class FridaApplication(object):
             ),
         )
         # TODO: Once child gating is more stable, we can follow child processes here as well...
-        # print("✔ enable_child_gating()")
+        # print("enable_child_gating()")
         # session.enable_child_gating()
-        print("✔ create_script()")
+        print("create_script()")
         script = session.create_script(r"""
 "use strict";
 
@@ -224,14 +224,14 @@ instrumentSyscalls();
                 lambda: self._on_message(pid, message)
             ),
         )
-        print("✔ load()")
+        print("load()")
         script.load()
-        print("✔ resume(pid={})".format(pid))
+        print("resume(pid={})".format(pid))
         self._device.resume(pid)
         self._sessions.add(session)
 
     def _on_child_added(self, child):
-        print("⚡ child_added: {}".format(child.pid))
+        print("child_added: {}".format(child.pid))
         self._instrument(child.pid)
         self._reactor.schedule(
             lambda: self._write_tracing_log(
@@ -241,10 +241,10 @@ instrumentSyscalls();
         )
 
     def _on_child_removed(self, child):
-        print("⚡ child_removed: {}".format(child.pid))
+        print("child_removed: {}".format(child.pid))
 
     def _on_detached(self, pid, session, reason):
-        print("⚡ detached: pid={}, reason='{}'".format(pid, reason))
+        print("detached: pid={}, reason='{}'".format(pid, reason))
         self._sessions.remove(session)
         if reason == "process-replaced":
             self._instrument(pid)
