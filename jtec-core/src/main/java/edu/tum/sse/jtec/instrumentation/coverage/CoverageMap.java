@@ -16,7 +16,7 @@ public class CoverageMap {
 
     public void put(String key, String value) {
         if (!collectedProbes.containsKey(key)) {
-            collectedProbes.put(key, new HashSet<>());
+            collectedProbes.putIfAbsent(key, new HashSet<>());
         }
         collectedProbes.get(key).add(value);
     }
