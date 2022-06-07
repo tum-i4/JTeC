@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class JTeCAgent {
 
-    public static final String PID_KEY = "JTEC_PID";
+    private static final String PID_KEY = "JTEC_PID";
 
     public static void premain(String arguments, Instrumentation instrumentation) {
         if (arguments == null) {

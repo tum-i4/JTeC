@@ -21,3 +21,4 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 | cov.instr       | Boolean | `false` (`true` if `cov.level=method`)                                          | Enables class file instrumentation (only needed for `method` or non-forked `class` coverage) |
 | cov.includes    | String  | `.*`                                                                            | Regex for included Java classes                                                              |
 | cov.excludes    | String  | `(sun\|java\|jdk\|com.sun\|edu.tum.sse.jtec\|net.bytebuddy\|org.apache.maven).*`| Regex for excluded Java classes                                                              |
+| init.cmd        | String  | ``                                                                              | Command to execute upon JVM initialization (pre-test hook)                                   |
