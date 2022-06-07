@@ -1,8 +1,19 @@
 # Sample Maven Project
 
+This project serves as a demo and testing project for `JTeC` features.
+
 ## Execute Tests with Tracing and Test Listener enabled
 
 ```shell
-mvn clean verify -fn -Djtec.opts=test.trace=true,test.out=testEvents.log,sys.trace=true,sys.out=sysEvents.log
+mvn clean verify -fn -Djtec.opts="test.trace,sys.trace,cov.trace"
+``` 
+
+## Execute Tests with Pre-test Hook
+
+We can simply use the `init.cmd` option to instrument all test JVM processes with a [frida](https://frida.re/) agent (
+see [script](./scripts/frida-agent.py)):
+
+```shell
+mvn clean verify -fn -Djtec.opts="init.cmd='python $(pwd)/scripts/frida-agent.py -p \$JTEC_PID >> exec.log'" -DforkCount=1 -DreuseForks=false
 ``` 
 
