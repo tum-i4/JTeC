@@ -1,7 +1,6 @@
 package edu.tum.sse.jtec.mojo;
 
 import edu.tum.sse.jtec.agent.JTeCAgent;
-import edu.tum.sse.jtec.agent.AgentOptions;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -54,7 +53,7 @@ public class JTeCMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (agentOpts == null) {
-                agentOpts = AgentOptions.DEFAULT_OPTIONS.toAgentString();
+                return;
             }
             log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
             Path agentJar = locateAgentJar();
