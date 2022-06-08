@@ -100,7 +100,18 @@ const sanitizeFilePath = (filepath) => {
     }
     return null;
 };
-
+/**
+ * Utility to send a file path to host if it is valid.
+ * @param filepath
+ */
+const sendFilePath = (filepath) => {
+    if (filepath !== null) {
+        const sanitizedFilePath = sanitizeFilePath(filepath);
+        if (sanitizedFilePath !== null) {
+            send({ syscall: sanitizedFilePath });
+        }
+    }
+};
 /**
  * Instruments `open` system calls for Linux, macOS, and Windows.
  */
@@ -115,24 +126,19 @@ const instrumentSyscalls = () => {
             }).values();
             if (libcLikeModules.length > 0) {
                 const libcModule = libcLikeModules[0];
-                const callback = (args) => {
-                    const filepath = args[0].readUtf8String();
-                    if (filepath !== null) {
-                        const sanitizedFilePath = sanitizeFilePath(filepath);
-                        if (sanitizedFilePath !== null) {
-                            send({syscall: sanitizedFilePath});
-                        }
-                    }
+                const callback = (argIdx) => (args) => {
+                    const filepath = args[argIdx].readUtf8String();
+                    sendFilePath(filepath);
                 };
                 const pOpenFile = Module.findExportByName(libcModule.name, 'open');
                 if (pOpenFile !== null) {
                     openFilePtrs.push(pOpenFile);
-                    callbacks.push(callback);
+                    callbacks.push(callback(0));
                 }
                 const pOpenAtFile = Module.findExportByName(libcModule.name, 'openat');
                 if (pOpenAtFile !== null) {
                     openFilePtrs.push(pOpenAtFile);
-                    callbacks.push(callback);
+                    callbacks.push(callback(1));
                 }
             }
             break;
@@ -152,12 +158,7 @@ const instrumentSyscalls = () => {
                     .add(4) // 4 bytes padding for pointer to be 8-byte aligned (64-bit)
                     .readPointer()
                     .readUtf16String(); // Win32 has wide-strings
-                if (filepath !== null) {
-                    const sanitizedFilePath = sanitizeFilePath(filepath);
-                    if (sanitizedFilePath !== null) {
-                        send({syscall: sanitizedFilePath});
-                    }
-                }
+                sendFilePath(filepath);
             };
             const pCreateFile = Module.findExportByName('ntdll.dll', 'NtCreateFile');
             if (pCreateFile !== null) {
@@ -175,12 +176,7 @@ const instrumentSyscalls = () => {
             const pOpenFile = Module.findExportByName('libsystem_kernel.dylib', 'open');
             const callback = (argIdx) => (args) => {
                 const filepath = ptr(args[argIdx]).readUtf8String();
-                if (filepath !== null) {
-                    const sanitizedFilePath = sanitizeFilePath(filepath);
-                    if (sanitizedFilePath !== null) {
-                        send({ syscall: sanitizedFilePath });
-                    }
-                }
+                sendFilePath(filepath);
             };
             if (pOpenFile !== null) {
                 openFilePtrs.push(pOpenFile);
