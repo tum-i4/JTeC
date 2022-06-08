@@ -7,8 +7,8 @@ public class JTeCAgent {
         if (arguments == null) {
             throw new RuntimeException("Missing arguments with log file path for instrumentation.");
         }
-        System.out.println("Attach JTeC agent with args: " + arguments);
         AgentOptions options = AgentOptions.fromString(arguments);
+        System.err.println("Attaching JTeC agent with args: " + options.toAgentString());
 
         new Tracer(instrumentation, options);
     }

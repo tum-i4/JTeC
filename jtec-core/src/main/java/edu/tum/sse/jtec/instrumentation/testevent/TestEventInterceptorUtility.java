@@ -157,7 +157,7 @@ public class TestEventInterceptorUtility {
 
     private static String getTestSuiteName(final Description description) {
         final String displayName = description.getDisplayName();
-        return displayName.substring(displayName.indexOf("(") + 1, displayName.indexOf(")"));
+        return displayName.substring(displayName.lastIndexOf("(") + 1, displayName.lastIndexOf(")"));
     }
 
     private static String getTestCaseName(final Description description) {

@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.agent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
+import edu.tum.sse.jtec.instrumentation.coverage.CoverageInstrumentation;
 import edu.tum.sse.jtec.instrumentation.systemevent.SysEventInstrumentation;
 import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 
@@ -13,17 +14,26 @@ import java.util.List;
  */
 public class Tracer {
     private final Instrumentation instrumentation;
-    private final List<AbstractInstrumentation> transformers;
+    private final List<AbstractInstrumentation> customInstrumentationList;
 
     public Tracer(final Instrumentation instrumentation, final AgentOptions options) {
         this.instrumentation = instrumentation;
-        transformers = new ArrayList<>();
+        customInstrumentationList = new ArrayList<>();
         if (options.shouldTraceTestEvents()) {
-            transformers.add(new TestEventInstrumentation(options.getTestEventOutputPath().toString()).attach(instrumentation));
+            customInstrumentationList.add(new TestEventInstrumentation(options.getTestEventOutputPath().toString()).attach(instrumentation));
         }
         if (options.shouldTraceSystemEvents()) {
-            transformers.add(new SysEventInstrumentation(options.getSystemEventOutputPath().toString()).attach(instrumentation));
+            customInstrumentationList.add(new SysEventInstrumentation(options.getSystemEventOutputPath().toString()).attach(instrumentation));
         }
-        // TODO: add coverage instrumentation
+        if (options.shouldTraceCoverage()) {
+            customInstrumentationList.add(
+                    new CoverageInstrumentation(
+                            options.getCoverageOutputPath().toString(),
+                            options.getCoverageLevel(),
+                            options.getCoverageIncludes(),
+                            options.getCoverageExcludes(),
+                            options.shouldInstrumentCoverage()
+                    ).attach(instrumentation));
+        }
     }
 }

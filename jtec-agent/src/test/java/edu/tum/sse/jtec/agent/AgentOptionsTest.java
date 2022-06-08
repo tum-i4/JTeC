@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.agent;
 
+import edu.tum.sse.jtec.instrumentation.coverage.CoverageLevel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +29,16 @@ class AgentOptionsTest {
     @Test
     void shouldParseOptionsFromString() {
         // given
-        String options = "traceTestEvents=true," +
-                "testEventOut=" + tmpDir.resolve("test.log") + "," +
-                "traceSysEvents=true," +
-                "sysEventOut=" + tmpDir.resolve("sys.log");
+        String options = "test.trace=true," +
+                "test.out=" + tmpDir.resolve("test.log") + "," +
+                "sys.trace=true," +
+                "sys.out=" + tmpDir.resolve("sys.log") + "," +
+                "cov.trace=true," +
+                "cov.out=" + tmpDir.resolve("cov.log") + "," +
+                "cov.instr," +
+                "cov.includes=.*foo.*," +
+                "cov.excludes=.*bar.*," +
+                "cov.level=method";
 
         // when
         AgentOptions parsedOptions = AgentOptions.fromString(options);
@@ -43,5 +50,12 @@ class AgentOptionsTest {
         assertTrue(parsedOptions.shouldTraceTestEvents());
         assertEquals(tmpDir.resolve("test.log"), parsedOptions.getTestEventOutputPath());
         assertTrue(parsedOptions.getTestEventOutputPath().toFile().exists());
+        assertTrue(parsedOptions.shouldTraceCoverage());
+        assertEquals(tmpDir.resolve("cov.log"), parsedOptions.getCoverageOutputPath());
+        assertTrue(parsedOptions.getCoverageOutputPath().toFile().exists());
+        assertTrue(parsedOptions.shouldInstrumentCoverage());
+        assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
+        assertEquals(parsedOptions.getCoverageIncludes(), ".*foo.*");
+        assertEquals(parsedOptions.getCoverageExcludes(), ".*bar.*");
     }
 }
