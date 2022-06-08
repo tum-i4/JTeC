@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -12,17 +13,17 @@ public class CoverageMap {
     /**
      * Stores a set of covered probes for each coverageRunId (e.g., PID).
      */
-    private final ConcurrentMap<String, HashSet<String>> collectedProbes = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Set<String>> collectedProbes = new ConcurrentHashMap<>();
 
     public void put(String key, String value) {
         if (!collectedProbes.containsKey(key)) {
-            collectedProbes.putIfAbsent(key, new HashSet<>());
+            collectedProbes.putIfAbsent(key, ConcurrentHashMap.newKeySet());
         }
         collectedProbes.get(key).add(value);
     }
 
     public boolean remove(String key, String value) {
-        HashSet<String> set = collectedProbes.get(key);
+        Set<String> set = collectedProbes.get(key);
         if (set != null) {
             return set.remove(value);
         }
@@ -37,7 +38,7 @@ public class CoverageMap {
         collectedProbes.clear();
     }
 
-    public ConcurrentMap<String, HashSet<String>> getCollectedProbes() {
+    public ConcurrentMap<String, Set<String>> getCollectedProbes() {
         return collectedProbes;
     }
 }
