@@ -24,8 +24,7 @@ public class JTeCAgent {
             try {
                 Process process = ProcessUtils.run(options.getPreTestCommand(),
                         Collections.singletonMap(PID_KEY, ProcessUtils.getCurrentPid()), false);
-                // Since the subprocess is non-blocking, we collect the output in a separate
-                // thread.
+                // Since the subprocess is non-blocking, we collect the output in a separate thread.
                 new Thread(() -> {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                         String line;
@@ -34,6 +33,7 @@ public class JTeCAgent {
                         }
                         process.waitFor();
                     } catch (Exception e) {
+                        System.err.println("Failed to read process output: " + e.getMessage());
                     }
                 }).start();
             } catch (Exception e) {
