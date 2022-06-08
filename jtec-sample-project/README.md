@@ -14,6 +14,10 @@ We can simply use the `init.cmd` option to instrument all test JVM processes wit
 see [script](./scripts/frida-agent.py)):
 
 ```shell
+# Unix-like
 mvn clean verify -fn -Djtec.opts="init.cmd='python $(pwd)/scripts/frida-agent.py -p \$JTEC_PID >> exec.log'" -DforkCount=1 -DreuseForks=false
+
+# Windows
+mvn verify -fn -Djtec.opts="init.cmd='python %cd%\scripts\frida-agent.py -p %JTEC_PID% -o %JTEC_PID%_syscalls.log -i .*jtec-sample.*\..*'" -DforkCount=1 -DreuseForks=false
 ``` 
 

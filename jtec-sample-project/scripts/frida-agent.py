@@ -58,7 +58,7 @@ class FridaApplication(object):
     def _start(self, command: str):
         try:
             pid = self._device.spawn(split(command))
-            self._instrument(pid)
+            self._instrument(pid, True)
         except Exception as e:
             print(f"Failed to spawn process for ({command}): {e}", file=sys.stderr)
             self._stop_requested.set()
@@ -67,7 +67,7 @@ class FridaApplication(object):
         if len(self._sessions) == 0:
             self._stop_requested.set()
 
-    def _instrument(self, pid):
+    def _instrument(self, pid, resume=False):
         print("attach(pid={})".format(pid))
         session = self._device.attach(pid)
         session.on(
@@ -226,8 +226,9 @@ instrumentSyscalls();
         )
         print("load()")
         script.load()
-        print("resume(pid={})".format(pid))
-        self._device.resume(pid)
+        if resume:
+            print("resume(pid={})".format(pid))
+            self._device.resume(pid)
         self._sessions.add(session)
 
     def _on_child_added(self, child):
@@ -257,12 +258,13 @@ instrumentSyscalls();
     def _on_message(self, pid, message):
         if "payload" in message and "syscall" in message["payload"]:
             filepath: str = message["payload"]["syscall"]
-            self._reactor.schedule(
-                lambda: self._write_tracing_log(
-                    '{"timestamp": %d, "pid": "%s_%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
-                    % (time.time_ns(), "", pid, filepath)
+            if self._includes_regex.match(filepath):
+                self._reactor.schedule(
+                    lambda: self._write_tracing_log(
+                        '{"timestamp": %d, "pid": "%s_%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
+                        % (time.time_ns(), "", pid, filepath)
+                    )
                 )
-            )
 
 
 def parse_arguments():
