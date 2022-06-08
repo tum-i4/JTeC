@@ -2,6 +2,9 @@ package edu.tum.sse.jtec.agent;
 
 import edu.tum.sse.jtec.util.ProcessUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
 
@@ -19,9 +22,23 @@ public class JTeCAgent {
         // Before we start tracing, we need to run the pre-test command, if specified.
         if (!options.getPreTestCommand().isEmpty()) {
             try {
-                ProcessUtils.run(options.getPreTestCommand(), Collections.singletonMap(PID_KEY, ProcessUtils.getCurrentPid()), false);
+                Process process = ProcessUtils.run(options.getPreTestCommand(),
+                        Collections.singletonMap(PID_KEY, ProcessUtils.getCurrentPid()), false);
+                // Since the subprocess is non-blocking, we collect the output in a separate
+                // thread.
+                new Thread(() -> {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.err.println(line);
+                        }
+                        process.waitFor();
+                    } catch (Exception e) {
+                    }
+                }).start();
             } catch (Exception e) {
-                System.err.println("Failed to run pre-test command " + options.getPreTestCommand() + " : " + e.getMessage());
+                System.err.println(
+                        "Failed to run pre-test command " + options.getPreTestCommand() + " : " + e.getMessage());
             }
         }
 
