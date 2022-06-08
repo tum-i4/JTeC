@@ -173,36 +173,28 @@ const instrumentSyscalls = () => {
         }
         case "darwin": {
             const pOpenFile = Module.findExportByName('libsystem_kernel.dylib', 'open');
-            const callback = (args) => {
-                const filepath = ptr(args[0]).readUtf8String();
+            const callback = (argIdx) => (args) => {
+                const filepath = ptr(args[argIdx]).readUtf8String();
                 if (filepath !== null) {
                     const sanitizedFilePath = sanitizeFilePath(filepath);
                     if (sanitizedFilePath !== null) {
-                        send({syscall: sanitizedFilePath});
+                        send({ syscall: sanitizedFilePath });
                     }
                 }
             };
             if (pOpenFile !== null) {
                 openFilePtrs.push(pOpenFile);
-                callbacks.push(callback);
+                callbacks.push(callback(0));
             }
             const pOpenNoCancelFile = Module.findExportByName('libsystem_kernel.dylib', '__open_nocancel');
             if (pOpenNoCancelFile !== null) {
                 openFilePtrs.push(pOpenNoCancelFile);
-                callbacks.push(callback);
+                callbacks.push(callback(0));
             }
             const pOpenAtFile = Module.findExportByName('libsystem_kernel.dylib', 'openat');
             if (pOpenAtFile !== null) {
                 openFilePtrs.push(pOpenAtFile);
-                callbacks.push((args) => {
-                    const filepath = ptr(args[1]).readUtf8String();
-                    if (filepath !== null) {
-                        const sanitizedFilePath = sanitizeFilePath(filepath);
-                        if (sanitizedFilePath !== null) {
-                            send({syscall: sanitizedFilePath});
-                        }
-                    }
-                });
+                callbacks.push(callback(1));
             }
             break;
         }
@@ -237,7 +229,7 @@ instrumentSyscalls();
         self._reactor.schedule(
             lambda: self._write_tracing_log(
                 '{"timestamp": %d, "pid": "%s_%d", "action": "SPAWN", "target": "PROCESS", "value": "%s_%d"}'
-                % (time.time_ns(), "", child.parent_pid, "", child.pid)
+                % (time.time_ns(), "java", child.parent_pid, "", child.pid)
             )
         )
 
@@ -262,7 +254,7 @@ instrumentSyscalls();
                 self._reactor.schedule(
                     lambda: self._write_tracing_log(
                         '{"timestamp": %d, "pid": "%s_%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
-                        % (time.time_ns(), "", pid, filepath)
+                        % (time.time_ns(), "java", pid, filepath)
                     )
                 )
 
