@@ -39,21 +39,30 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (agentOpts == null) {
-                agentOpts = AgentOptions.DEFAULT_OPTIONS.toAgentString();
-            }
+            String preparedAgentOpts = prepareAgentOpts();
             log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
             Path agentJar = locateAgentJar();
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
                 String oldValue = properties.getProperty(property);
-                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), agentOpts, (oldValue == null ? "" : " " + oldValue));
+                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), preparedAgentOpts, (oldValue == null ? "" : " " + oldValue));
                 properties.setProperty(property, newValue);
                 log(String.format("Changing Maven property %s to %s.", property, newValue));
             }
         } catch (Exception exception) {
             getLog().error("Failed to find JTeC agent JAR, skipping instrumentation.");
         }
+    }
+
+    private String prepareAgentOpts() {
+        AgentOptions agentOptions;
+        if (agentOpts == null) {
+            agentOptions = AgentOptions.DEFAULT_OPTIONS;
+        } else {
+            agentOptions = AgentOptions.fromString(agentOpts);
+        }
+        agentOptions.setOutputPath(outputDirectory.toPath());
+        return agentOptions.toAgentString();
     }
 
     private Path locateAgentJar() throws IOException, URISyntaxException {

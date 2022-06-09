@@ -49,6 +49,7 @@
                     <execution>
                         <goals>
                             <goal>jtec</goal>
+                            <goal>jtec-report</goal>
                         </goals>
                     </execution>
                 </executions>

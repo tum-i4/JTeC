@@ -29,12 +29,10 @@ class AgentOptionsTest {
     @Test
     void shouldParseOptionsFromString() {
         // given
-        String options = "test.trace=true," +
-                "test.out=" + tmpDir.resolve("test.log") + "," +
+        String options = "jtec.out=" + tmpDir + "," +
+                "test.trace=true," +
                 "sys.trace=true," +
-                "sys.out=" + tmpDir.resolve("sys.log") + "," +
                 "cov.trace=true," +
-                "cov.out=" + tmpDir.resolve("cov.log") + "," +
                 "cov.instr," +
                 "cov.includes=.*foo.*," +
                 "cov.excludes=.*bar.*," +
@@ -44,15 +42,11 @@ class AgentOptionsTest {
         AgentOptions parsedOptions = AgentOptions.fromString(options);
 
         // then
+        assertTrue(parsedOptions.getOutputPath().toFile().isDirectory());
+        assertTrue(parsedOptions.getOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceSystemEvents());
-        assertEquals(tmpDir.resolve("sys.log"), parsedOptions.getSystemEventOutputPath());
-        assertTrue(parsedOptions.getSystemEventOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceTestEvents());
-        assertEquals(tmpDir.resolve("test.log"), parsedOptions.getTestEventOutputPath());
-        assertTrue(parsedOptions.getTestEventOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceCoverage());
-        assertEquals(tmpDir.resolve("cov.log"), parsedOptions.getCoverageOutputPath());
-        assertTrue(parsedOptions.getCoverageOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldInstrumentCoverage());
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
         assertEquals(parsedOptions.getCoverageIncludes(), ".*foo.*");
