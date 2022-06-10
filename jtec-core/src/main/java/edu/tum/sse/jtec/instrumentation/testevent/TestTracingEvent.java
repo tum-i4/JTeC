@@ -1,10 +1,10 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
 public enum TestTracingEvent {
-    SUITE_STARTED("Test suite started"),
-    TEST_STARTED("Test started"),
-    TEST_FINISHED("Test finished"),
-    SUITE_FINISHED("Test suite finished");
+    SUITE_STARTED("SUITE_STARTED"),
+    TEST_STARTED("TEST_STARTED"),
+    TEST_FINISHED("TEST_FINISHED"),
+    SUITE_FINISHED("SUITE_FINISHED");
 
     private final String event;
 

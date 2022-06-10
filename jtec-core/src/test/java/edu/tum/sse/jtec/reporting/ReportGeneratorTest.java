@@ -7,18 +7,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ReportGeneratorTest {
 
     @Test
     void shouldGenerateReport() throws IOException {
         // given
-        Path outputDirectory = Paths.get(Objects.requireNonNull(this.getClass().getResource("jtec-logs")).getPath());
-        ReportGenerator generator = new ReportGenerator(outputDirectory);
+        final Path outputDirectory = Paths.get(Objects.requireNonNull(this.getClass().getResource("/jtec-logs")).getPath());
+        final ReportGenerator generator = new ReportGenerator(outputDirectory, true);
 
         // when
-        TestReport testReport = generator.generateReport("sample-report");
+        final TestReport testReport = generator.generateReport("sample-report");
+
 
         // then
 

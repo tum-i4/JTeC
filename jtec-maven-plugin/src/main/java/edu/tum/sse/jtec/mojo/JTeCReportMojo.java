@@ -15,9 +15,9 @@ public class JTeCReportMojo extends AbstractJTeCMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            ReportGenerator = new ReportGenerator(outputDirectory);
+            final ReportGenerator generator = new ReportGenerator(outputDirectory.toPath(), true);
             log("Hello from report mojo!");
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
 
         }
     }
