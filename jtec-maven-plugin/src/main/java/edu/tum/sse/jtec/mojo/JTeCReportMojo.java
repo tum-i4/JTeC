@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.mojo;
 
+import edu.tum.sse.jtec.reporting.ReportGenerator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -14,6 +15,7 @@ public class JTeCReportMojo extends AbstractJTeCMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            ReportGenerator = new ReportGenerator(outputDirectory);
             log("Hello from report mojo!");
         } catch (Exception exception) {
 
