@@ -14,7 +14,7 @@ public abstract class AbstractJTeCMojo extends AbstractMojo {
      */
     @Parameter(property = "jtec.debug", readonly = true, defaultValue = "false")
     boolean debug;
-    
+
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     MavenProject project;
 

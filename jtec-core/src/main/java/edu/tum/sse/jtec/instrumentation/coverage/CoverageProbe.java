@@ -5,7 +5,7 @@ public abstract class CoverageProbe {
      * An identifier for the coverage run (e.g., a process identifier).
      */
     private final String coverageRunId;
-    private final long timestampNanos = System.currentTimeMillis() * 1_000_000;
+    private final long timestampNanos = System.currentTimeMillis();
 
     public CoverageProbe(String coverageRunId) {
         this.coverageRunId = coverageRunId;

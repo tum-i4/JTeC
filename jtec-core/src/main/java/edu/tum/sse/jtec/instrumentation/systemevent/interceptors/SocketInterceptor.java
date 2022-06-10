@@ -19,7 +19,7 @@ public class SocketInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final SocketAddress address, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis() * 1000000;
+        final Long timestamp = System.currentTimeMillis();
         try {
             final String message = String.format("{\"timestamp\": %d, \"pid\": \"%s\", \"action\": \"CONNECT\", \"target\": \"SOCKET\", \"value\": \"%s\"}\n",
                     timestamp, currentPid, address);

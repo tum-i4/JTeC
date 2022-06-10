@@ -23,6 +23,7 @@ public class Tracer {
     public Tracer(final Instrumentation instrumentation, final AgentOptions options) {
         this.instrumentation = instrumentation;
         customInstrumentationList = new ArrayList<>();
+        // Order matters here: (1) test events, (2) system, (3) coverage
         if (options.shouldTraceTestEvents()) {
             Path testEventOutput = options.getOutputPath().resolve(String.format("%s_%d_test.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(testEventOutput);
