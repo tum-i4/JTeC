@@ -8,9 +8,9 @@ public final class TestSuite {
     private long duration;
     private long startTimestamp;
     private long endTimestamp;
-    private int passed = 0;
-    private int failed = 0;
-    private int ignored = 0;
+    private int runCount = 0;
+    private int failureCount = 0;
+    private int ignoreCount = 0;
     private Set<String> spawnedProcesses = new HashSet<>();  // PIDs
     private Set<String> startedThreads = new HashSet<>();  // Thread names
     private Set<String> connectedSockets = new HashSet<>();  // Address and port
@@ -44,28 +44,28 @@ public final class TestSuite {
         this.startTimestamp = startTimestamp;
     }
 
-    public int getPassed() {
-        return passed;
+    public int getRunCount() {
+        return runCount;
     }
 
-    public void setPassed(int passed) {
-        this.passed = passed;
+    public void setRunCount(int runCount) {
+        this.runCount = runCount;
     }
 
-    public int getFailed() {
-        return failed;
+    public int getFailureCount() {
+        return failureCount;
     }
 
-    public void setFailed(int failed) {
-        this.failed = failed;
+    public void setFailureCount(int failureCount) {
+        this.failureCount = failureCount;
     }
 
-    public int getIgnored() {
-        return ignored;
+    public int getIgnoreCount() {
+        return ignoreCount;
     }
 
-    public void setIgnored(int ignored) {
-        this.ignored = ignored;
+    public void setIgnoreCount(int ignoreCount) {
+        this.ignoreCount = ignoreCount;
     }
 
     public long getEndTimestamp() {

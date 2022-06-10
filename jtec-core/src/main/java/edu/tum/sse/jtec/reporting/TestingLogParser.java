@@ -60,9 +60,9 @@ public final class TestingLogParser {
                         // Parse details of test suite end event.
                         String[] eventDetailParts = result.group(4).split(" ");
                         currentTestSuite.setTestId(eventDetailParts[0]);
-                        currentTestSuite.setPassed(Integer.parseInt(eventDetailParts[1]));
-                        currentTestSuite.setFailed(Integer.parseInt(eventDetailParts[2]));
-                        currentTestSuite.setIgnored(Integer.parseInt(eventDetailParts[3]));
+                        currentTestSuite.setRunCount(Integer.parseInt(eventDetailParts[1]));
+                        currentTestSuite.setFailureCount(Integer.parseInt(eventDetailParts[2]));
+                        currentTestSuite.setIgnoreCount(Integer.parseInt(eventDetailParts[3]));
 
                         // Add test suite to map.
                         testSuites.putIfAbsent(testSuitePid, new ArrayList<>());
