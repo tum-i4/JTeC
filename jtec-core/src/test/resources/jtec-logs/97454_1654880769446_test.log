@@ -1,0 +1,4 @@
+1654880772293 97454 SUITE_STARTED
+1654880772319 97454 TEST_STARTED de.junit5project.ThreadStarterTest testDoSomething
+1654880772359 97454 TEST_FINISHED de.junit5project.ThreadStarterTest testDoSomething
+1654880772363 97454 SUITE_FINISHED de.junit5project.ThreadStarterTest 1 0 0
