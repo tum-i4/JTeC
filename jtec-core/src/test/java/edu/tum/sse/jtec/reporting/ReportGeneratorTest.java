@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReportGeneratorTest {
@@ -53,5 +55,19 @@ class ReportGeneratorTest {
         assertEquals(2, testReport.getTestSuites().get(0).getOpenedFiles().size());
         assertEquals(1654880784002L, testReport.getTestSuites().get(1).getStartTimestamp());
         assertEquals(0, testReport.getTestSuites().get(1).getOpenedFiles().size());
+    }
+
+    @Test
+    void shouldAggregateTestReports() {
+        // given
+        TestReport report1 = new TestReport("report-1", 0, 0, Arrays.asList(new TestSuite()));
+        TestReport report2 = new TestReport("report-2", 0, 0, Arrays.asList(new TestSuite()));
+        final ReportGenerator generator = new ReportGenerator(Paths.get(""), false);
+        // when
+        final TestReport testReport = generator.aggregateReports("report-3", Arrays.asList(report1, report2));
+
+        // then
+        assertEquals("report-3", testReport.getReportId());
+        assertEquals(2, testReport.getTestSuites().size());
     }
 }
