@@ -80,7 +80,7 @@ public class TestEventInterceptorUtility {
 
     public static void executionFinished(final TestIdentifier testIdentifier, final TestExecutionResult testExecutionResult, final Description description) {
         if (description != null) {
-            if (testIdentifier.isTest()) {
+            if (testIdentifier.isTest() && !currentTestCase.isEmpty()) {
                 testFinished();
                 incrementRunCount();
                 switch (testExecutionResult.getStatus()) {
