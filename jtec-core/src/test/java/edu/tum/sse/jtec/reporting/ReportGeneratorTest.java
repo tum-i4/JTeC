@@ -29,9 +29,9 @@ class ReportGeneratorTest {
         assertEquals("de.junit5project.ThreadStarterTest", testReport.getTestSuites().get(0).getTestId());
         assertEquals(1654880769446L, testReport.getTestSuites().get(0).getStartTimestamp());
         assertEquals(1654880772363L, testReport.getTestSuites().get(0).getEndTimestamp());
-        assertEquals(1, testReport.getTestSuites().get(0).getPassed());
-        assertEquals(0, testReport.getTestSuites().get(0).getFailed());
-        assertEquals(0, testReport.getTestSuites().get(0).getIgnored());
+        assertEquals(1, testReport.getTestSuites().get(0).getRunCount());
+        assertEquals(0, testReport.getTestSuites().get(0).getFailureCount());
+        assertEquals(0, testReport.getTestSuites().get(0).getIgnoreCount());
         assertEquals(3, testReport.getTestSuites().get(0).getOpenedFiles().size());
         assertEquals(1, testReport.getTestSuites().get(0).getSpawnedProcesses().size());
         assertEquals(1, testReport.getTestSuites().get(0).getStartedThreads().size());
