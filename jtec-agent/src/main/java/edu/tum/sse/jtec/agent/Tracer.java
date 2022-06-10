@@ -36,7 +36,6 @@ public class Tracer {
         }
         if (options.shouldTraceCoverage()) {
             Path covEventOutput = options.getOutputPath().resolve(String.format("%s_%d_cov.log", getCurrentPid(), System.currentTimeMillis()));
-            createFileAndEnclosingDir(covEventOutput);
             customInstrumentationList.add(
                     new CoverageInstrumentation(
                             covEventOutput.toString(),
