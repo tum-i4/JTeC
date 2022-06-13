@@ -10,6 +10,7 @@ from shlex import split
 import frida
 from frida_tools.application import Reactor
 
+
 class FridaApplication(object):
     """
     Taken from: https://github.com/frida/frida-python/blob/main/examples/child_gating.py
@@ -24,6 +25,7 @@ class FridaApplication(object):
         self._device = frida.get_local_device()
         self._sessions = set()
 
+        # NOTE: These can be added to support child gating (i.e., following child processes)
         # self._device.on(
         #     "child-added",
         #     lambda child: self._reactor.schedule(lambda: self._on_child_added(child)),
@@ -76,10 +78,13 @@ class FridaApplication(object):
                 lambda: self._on_detached(pid, session, reason)
             ),
         )
-        # TODO: Once child gating is more stable, we can follow child processes here as well...
+        # NOTE: This can be added to support child gating (i.e., following child processes)
         # print("enable_child_gating()")
         # session.enable_child_gating()
         print("create_script()")
+
+        # NOTE: The script could be in a separate JS file,
+        # but for the sake of easy reuse we keep it inside the Python script.
         script = session.create_script(r"""
 "use strict";
 
@@ -224,8 +229,8 @@ instrumentSyscalls();
         self._instrument(child.pid)
         self._reactor.schedule(
             lambda: self._write_tracing_log(
-                '{"timestamp": %d, "pid": "%s_%d", "action": "SPAWN", "target": "PROCESS", "value": "%s_%d"}'
-                % (time.time_ns(), "java", child.parent_pid, "", child.pid)
+                '{"timestamp": %d, "pid": "%d", "action": "SPAWN", "target": "PROCESS", "value": "%d"}'
+                % (time.time_ns() / 1_000_000, child.parent_pid, child.pid)
             )
         )
 
@@ -249,8 +254,8 @@ instrumentSyscalls();
             if self._includes_regex.match(filepath):
                 self._reactor.schedule(
                     lambda: self._write_tracing_log(
-                        '{"timestamp": %d, "pid": "%s_%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
-                        % (time.time_ns(), "java", pid, filepath)
+                        '{"timestamp": %d, "pid": "%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
+                        % (time.time_ns() / 1_000_000, pid, filepath)
                     )
                 )
 
@@ -293,6 +298,7 @@ def main():
     output_file: Path = Path(args.output).resolve()
     if output_file.exists():
         output_file.unlink()
+    output_file.parent.mkdir(parents=True, exist_ok=True)
     output_file.touch()
 
     app = FridaApplication(tracing_log=output_file, includes_regex=args.includes)

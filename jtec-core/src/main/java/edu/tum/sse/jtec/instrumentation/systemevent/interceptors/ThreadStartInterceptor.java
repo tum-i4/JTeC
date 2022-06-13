@@ -14,7 +14,7 @@ public class ThreadStartInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.FieldValue(value = "name") final String threadName, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis() * 1000000;
+        final Long timestamp = System.currentTimeMillis();
         try {
             final String message = String.format("{\"timestamp\": %d, \"pid\": \"%s\", \"action\": \"START\", \"target\": \"THREAD\", \"value\": \"%s\"}\n",
                     timestamp, currentPid, threadName);

@@ -6,7 +6,12 @@ import edu.tum.sse.jtec.instrumentation.systemevent.SysEventInstrumentation;
 import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 
 import java.lang.instrument.Instrumentation;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
+import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
 
 /**
  * A {@link Tracer} registers transformers that perform bytecode instrumentation based on {@link AgentOptions}.
@@ -19,16 +24,22 @@ public class Tracer {
     public Tracer(final Instrumentation instrumentation, final AgentOptions options) {
         this.instrumentation = instrumentation;
         customInstrumentationList = new ArrayList<>();
+        // Order matters here: (1) test events, (2) system, (3) coverage
         if (options.shouldTraceTestEvents()) {
-            customInstrumentationList.add(new TestEventInstrumentation(options.getTestEventOutputPath().toString()).attach(instrumentation));
+            Path testEventOutput = options.getOutputPath().resolve(String.format("%s_%d_test.log", getCurrentPid(), System.currentTimeMillis()));
+            createFileAndEnclosingDir(testEventOutput);
+            customInstrumentationList.add(new TestEventInstrumentation(testEventOutput.toString()).attach(instrumentation));
         }
         if (options.shouldTraceSystemEvents()) {
-            customInstrumentationList.add(new SysEventInstrumentation(options.getSystemEventOutputPath().toString()).attach(instrumentation));
+            Path sysEventOutput = options.getOutputPath().resolve(String.format("%s_%d_sys.log", getCurrentPid(), System.currentTimeMillis()));
+            createFileAndEnclosingDir(sysEventOutput);
+            customInstrumentationList.add(new SysEventInstrumentation(sysEventOutput.toString()).attach(instrumentation));
         }
         if (options.shouldTraceCoverage()) {
+            Path covEventOutput = options.getOutputPath().resolve(String.format("%s_%d_cov.log", getCurrentPid(), System.currentTimeMillis()));
             customInstrumentationList.add(
                     new CoverageInstrumentation(
-                            options.getCoverageOutputPath().toString(),
+                            covEventOutput.toString(),
                             options.getCoverageLevel(),
                             options.getCoverageIncludes(),
                             options.getCoverageExcludes(),

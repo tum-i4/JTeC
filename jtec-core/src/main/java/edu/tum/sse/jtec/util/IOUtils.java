@@ -37,7 +37,8 @@ public final class IOUtils {
                 fileLock = fileChannel.lock();
                 fileChannel.write(ByteBuffer.wrap(messageAsByteArray));
             } catch (Exception exception) {
-                throw new IOException("Problem with locking when writing to file: " + exception.getMessage());
+                exception.printStackTrace();
+                throw new IOException("Problem with locking when writing to file " + file);
             } finally {
                 if (fileLock != null && fileLock.isValid()) {
                     fileLock.release();

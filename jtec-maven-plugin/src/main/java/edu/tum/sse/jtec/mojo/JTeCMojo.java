@@ -1,13 +1,12 @@
 package edu.tum.sse.jtec.mojo;
 
+import edu.tum.sse.jtec.agent.AgentOptions;
 import edu.tum.sse.jtec.agent.JTeCAgent;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -25,8 +24,8 @@ import java.util.Properties;
  * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#debugForkedProcess">Surefire</a> or
  * <a href="https://maven.apache.org/surefire/maven-failsafe-plugin/integration-test-mojo.html#debugForkedProcess">Failsafe</a> debug option.
  */
-@Mojo(name = "jtec", defaultPhase = LifecyclePhase.PROCESS_TEST_CLASSES)
-public class JTeCMojo extends AbstractMojo {
+@Mojo(name = "jtec", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true)
+public class JTeCMojo extends AbstractJTeCMojo {
 
     private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
     private static final String FAILSAFE_DEBUG_OPTION = "maven.failsafe.debug";
@@ -37,30 +36,16 @@ public class JTeCMojo extends AbstractMojo {
     @Parameter(property = "jtec.opts", readonly = true)
     String agentOpts;
 
-    /**
-     * Enable debug output.
-     */
-    @Parameter(property = "jtec.debug", readonly = true, defaultValue = "false")
-    boolean debug;
-
-    /**
-     * The current project.
-     */
-    @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    MavenProject project;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            if (agentOpts == null) {
-                return;
-            }
+            String preparedAgentOpts = prepareAgentOpts();
             log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
             Path agentJar = locateAgentJar();
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
                 String oldValue = properties.getProperty(property);
-                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), agentOpts, (oldValue == null ? "" : " " + oldValue));
+                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), preparedAgentOpts, (oldValue == null ? "" : " " + oldValue));
                 properties.setProperty(property, newValue);
                 log(String.format("Changing Maven property %s to %s.", property, newValue));
             }
@@ -70,17 +55,20 @@ public class JTeCMojo extends AbstractMojo {
         }
     }
 
+    private String prepareAgentOpts() {
+        AgentOptions agentOptions;
+        if (agentOpts == null) {
+            agentOptions = AgentOptions.DEFAULT_OPTIONS;
+        } else {
+            agentOptions = AgentOptions.fromString(agentOpts);
+        }
+        agentOptions.setOutputPath(outputDirectory.toPath());
+        return agentOptions.toAgentString();
+    }
+
     private Path locateAgentJar() throws IOException, URISyntaxException {
         URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
         URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
         return Paths.get(jarURL);
-    }
-
-    private void log(String message) {
-        if (debug) {
-            getLog().warn(message);
-        } else {
-            getLog().info(message);
-        }
     }
 }

@@ -14,7 +14,7 @@ public class ClassLoaderInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final String printedName, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis() * 1000000;
+        final Long timestamp = System.currentTimeMillis();
         try {
             final String message = String.format("{\"timestamp\": %d, \"pid\": \"%s\", \"action\": \"OPEN\", \"target\": \"RESOURCE\", \"value\": \"%s\"}\n",
                     timestamp, currentPid, printedName);

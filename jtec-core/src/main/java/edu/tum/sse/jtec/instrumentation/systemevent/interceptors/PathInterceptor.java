@@ -19,7 +19,7 @@ public class PathInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final Path path, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis() * 1000000;
+        final Long timestamp = System.currentTimeMillis();
         try {
             final Path outputFile = Paths.get(outputPath);
             if (outputFile.getFileName().equals(path.getFileName())) {

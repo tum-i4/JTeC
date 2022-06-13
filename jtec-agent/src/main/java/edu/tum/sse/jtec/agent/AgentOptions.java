@@ -9,31 +9,26 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
-
 public class AgentOptions {
+    // Output.
+    public static final String AGENT_OUTPUT = "jtec.out";
+    public static final String DEFAULT_AGENT_OUTPUT = "";
 
     // Test event instrumentation.
     public static final String TRACE_TEST_EVENTS = "test.trace";
-    public static final String TEST_EVENT_OUT = "test.out";
-    public static final String DEFAULT_TEST_EVENT_OUT = "testEvents.log";
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
-    public static final String SYS_EVENT_OUT = "sys.out";
-    public static final String DEFAULT_SYS_EVENT_OUT = "sysEvents.log";
 
     // Coverage instrumentation.
     public static final String TRACE_COVERAGE = "cov.trace";
-    public static final String COVERAGE_OUT = "cov.out";
     public static final String COVERAGE_INSTRUMENT = "cov.instr";
     public static final String COVERAGE_LEVEL = "cov.level";
     public static final String COVERAGE_INCLUDES = "cov.includes";
     public static final String COVERAGE_EXCLUDES = "cov.excludes";
-    public static final String DEFAULT_COVERAGE_OUT = "coverage.log";
     public static final CoverageLevel DEFAULT_COVERAGE_LEVEL = CoverageLevel.CLASS;
     public static final String DEFAULT_COVERAGE_INCLUDES = ".*";
-    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven).*";
+    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven|org.junit).*";
 
     // Pre-test hook.
     public static final String PRE_TEST_COMMAND = "init.cmd";
@@ -41,16 +36,14 @@ public class AgentOptions {
 
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
-            Paths.get(DEFAULT_TEST_EVENT_OUT).toAbsolutePath(),
             false,
-            Paths.get(DEFAULT_SYS_EVENT_OUT).toAbsolutePath(),
             false,
-            Paths.get(DEFAULT_COVERAGE_OUT).toAbsolutePath(),
             false,
             DEFAULT_COVERAGE_LEVEL,
             DEFAULT_COVERAGE_INCLUDES,
             DEFAULT_COVERAGE_EXCLUDES,
-            DEFAULT_PRE_TEST_COMMAND
+            DEFAULT_PRE_TEST_COMMAND,
+            Paths.get(DEFAULT_AGENT_OUTPUT).toAbsolutePath()
     );
 
     private static final String OPTIONS_SEPARATOR = ",";
@@ -60,46 +53,41 @@ public class AgentOptions {
     private boolean traceTestEvents = false;
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
-    private Path testEventOutputPath;
-    private Path systemEventOutputPath;
-    private Path coverageOutputPath;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
     private String preTestCommand;
+    private Path outputPath;
 
     private AgentOptions() {
     }
 
     private AgentOptions(
             final boolean traceTestEvents,
-            final Path testEventOutputPath,
             final boolean traceSystemEvents,
-            final Path systemEventOutputPath,
             final boolean traceCoverage,
-            final Path coverageOutputPath,
             final boolean instrumentCoverage,
             final CoverageLevel coverageLevel,
             final String coverageIncludes,
             final String coverageExcludes,
-            final String preTestCommand
+            final String preTestCommand,
+            final Path outputPath
     ) {
         this.traceTestEvents = traceTestEvents;
-        this.testEventOutputPath = testEventOutputPath;
         this.traceSystemEvents = traceSystemEvents;
-        this.systemEventOutputPath = systemEventOutputPath;
         this.traceCoverage = traceCoverage;
-        this.coverageOutputPath = coverageOutputPath;
         this.instrumentCoverage = instrumentCoverage;
         this.coverageLevel = coverageLevel;
         this.coverageIncludes = coverageIncludes;
         this.coverageExcludes = coverageExcludes;
         this.preTestCommand = preTestCommand;
+        this.outputPath = outputPath;
     }
 
     public static AgentOptions fromString(final String options) {
         final AgentOptions result = new AgentOptions();
         final Map<String, String> optionsInput = extractOptions(options);
+        parseOutputDirectory(result, optionsInput);
         parseTestEventParams(result, optionsInput);
         parseSysEventParams(result, optionsInput);
         parseCoverageParams(result, optionsInput);
@@ -127,31 +115,20 @@ public class AgentOptions {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    private static void parseOutputDirectory(final AgentOptions result, final Map<String, String> optionsInput) {
+        result.outputPath = Paths.get(optionsInput.getOrDefault(AGENT_OUTPUT, DEFAULT_AGENT_OUTPUT)).toAbsolutePath();
+    }
+
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
-        if (!optionsInput.containsKey(TRACE_TEST_EVENTS)) {
-            return;
-        }
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
-        result.testEventOutputPath = Paths.get(optionsInput.getOrDefault(TEST_EVENT_OUT, DEFAULT_TEST_EVENT_OUT)).toAbsolutePath();
-        createFileAndEnclosingDir(result.testEventOutputPath);
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
-        if (!optionsInput.containsKey(TRACE_SYS_EVENTS)) {
-            return;
-        }
         result.traceSystemEvents = Boolean.parseBoolean(optionsInput.get(TRACE_SYS_EVENTS));
-        result.systemEventOutputPath = Paths.get(optionsInput.getOrDefault(SYS_EVENT_OUT, DEFAULT_SYS_EVENT_OUT)).toAbsolutePath();
-        createFileAndEnclosingDir(result.systemEventOutputPath);
     }
 
     private static void parseCoverageParams(final AgentOptions result, final Map<String, String> optionsInput) {
-        if (!optionsInput.containsKey(TRACE_COVERAGE)) {
-            return;
-        }
         result.traceCoverage = Boolean.parseBoolean(optionsInput.get(TRACE_COVERAGE));
-        result.coverageOutputPath = Paths.get(optionsInput.getOrDefault(COVERAGE_OUT, DEFAULT_COVERAGE_OUT)).toAbsolutePath();
-        createFileAndEnclosingDir(result.coverageOutputPath);
         result.coverageLevel = CoverageLevel.valueOf(optionsInput.getOrDefault(COVERAGE_LEVEL, DEFAULT_COVERAGE_LEVEL.toString()).toUpperCase());
         if (result.coverageLevel == CoverageLevel.METHOD) {
             result.instrumentCoverage = true;
@@ -167,12 +144,10 @@ public class AgentOptions {
     }
 
     public String toAgentString() {
-        return TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
-                OPTIONS_SEPARATOR + TEST_EVENT_OUT + VALUE_SEPARATOR + testEventOutputPath +
+        return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
+                OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
-                OPTIONS_SEPARATOR + SYS_EVENT_OUT + VALUE_SEPARATOR + systemEventOutputPath +
                 OPTIONS_SEPARATOR + TRACE_COVERAGE + VALUE_SEPARATOR + traceCoverage +
-                OPTIONS_SEPARATOR + COVERAGE_OUT + VALUE_SEPARATOR + coverageOutputPath +
                 OPTIONS_SEPARATOR + COVERAGE_INSTRUMENT + VALUE_SEPARATOR + instrumentCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
                 OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + coverageIncludes +
@@ -180,28 +155,44 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
     }
 
-    public Path getTestEventOutputPath() {
-        return testEventOutputPath;
+    public void setTraceSystemEvents(boolean traceSystemEvents) {
+        this.traceSystemEvents = traceSystemEvents;
     }
 
-    public Path getSystemEventOutputPath() {
-        return systemEventOutputPath;
+    public void setTraceTestEvents(boolean traceTestEvents) {
+        this.traceTestEvents = traceTestEvents;
     }
 
-    public Path getCoverageOutputPath() {
-        return coverageOutputPath;
+    public void setTraceCoverage(boolean traceCoverage) {
+        this.traceCoverage = traceCoverage;
+    }
+
+    public void setInstrumentCoverage(boolean instrumentCoverage) {
+        this.instrumentCoverage = instrumentCoverage;
     }
 
     public CoverageLevel getCoverageLevel() {
         return coverageLevel;
     }
 
+    public void setCoverageLevel(CoverageLevel coverageLevel) {
+        this.coverageLevel = coverageLevel;
+    }
+
     public String getCoverageIncludes() {
         return coverageIncludes;
     }
 
+    public void setCoverageIncludes(String coverageIncludes) {
+        this.coverageIncludes = coverageIncludes;
+    }
+
     public String getCoverageExcludes() {
         return coverageExcludes;
+    }
+
+    public void setCoverageExcludes(String coverageExcludes) {
+        this.coverageExcludes = coverageExcludes;
     }
 
     public boolean shouldTraceTestEvents() {
@@ -222,5 +213,13 @@ public class AgentOptions {
 
     public String getPreTestCommand() {
         return preTestCommand;
+    }
+
+    public Path getOutputPath() {
+        return outputPath;
+    }
+
+    public void setOutputPath(Path outputPath) {
+        this.outputPath = outputPath;
     }
 }

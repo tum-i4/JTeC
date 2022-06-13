@@ -1,13 +1,12 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
 import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
+import static edu.tum.sse.jtec.util.JSONUtils.toJson;
 
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
@@ -40,7 +39,7 @@ public class CoverageMonitor {
     }
 
     public void dumpCoverage(String outputPath) throws IOException {
-        String json = new Gson().toJson(coverageMap.getCollectedProbes());
+        String json = toJson(coverageMap.getCollectedProbes());
         Path outputFile = Paths.get(outputPath);
         createFileAndEnclosingDir(outputFile);
         appendToFile(outputFile, json, true);
