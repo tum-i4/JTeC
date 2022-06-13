@@ -10,13 +10,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.getCurrentPid;
+import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
 import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
 
 /**
  * A {@link Tracer} registers transformers that perform bytecode instrumentation based on {@link AgentOptions}.
  */
 public class Tracer {
+
     private final Instrumentation instrumentation;
     private final List<AbstractInstrumentation> customInstrumentationList;
 

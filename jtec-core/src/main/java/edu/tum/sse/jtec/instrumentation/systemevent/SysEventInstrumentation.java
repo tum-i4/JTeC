@@ -2,6 +2,7 @@ package edu.tum.sse.jtec.instrumentation.systemevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
 import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.*;
+import edu.tum.sse.jtec.util.ProcessUtils;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -79,7 +80,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
      * Adds visitors to the methods for tracing system events.
      */
     private AgentBuilder.Transformer systemEventTransformer() {
-        final String currentPid = getCurrentPid();
+        final String currentPid = ProcessUtils.getCurrentPid();
         return (builder, typeDescription, classLoader, module) ->
                 builder.visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
                                 .to(StringPathInterceptor.class)

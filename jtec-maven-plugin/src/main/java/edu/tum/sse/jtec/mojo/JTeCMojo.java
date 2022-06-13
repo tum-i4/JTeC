@@ -51,6 +51,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             }
         } catch (Exception exception) {
             getLog().error("Failed to find JTeC agent JAR, skipping instrumentation.");
+            exception.printStackTrace();
         }
     }
 
@@ -68,6 +69,6 @@ public class JTeCMojo extends AbstractJTeCMojo {
     private Path locateAgentJar() throws IOException, URISyntaxException {
         URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
         URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
-        return Paths.get(jarURL.getSchemeSpecificPart());
+        return Paths.get(jarURL);
     }
 }

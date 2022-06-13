@@ -14,6 +14,7 @@ public final class SystemEventLogParser {
     }
 
     private Optional<TestSuite> findMatchingTestSuite(SystemInstrumentationEvent event, List<TestSuite> testSuites) {
+        if (testSuites == null || event == null) return Optional.empty();
         return testSuites.stream()
                 .filter(testSuite -> testSuite.getStartTimestamp() <= event.getTimestamp() && testSuite.getEndTimestamp() >= event.getTimestamp())
                 .findFirst();

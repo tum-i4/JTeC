@@ -1,6 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.getCurrentPid;
+import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
 
 /**
  * A coverage probe factory that collects coverage probes per PID of the currently running process.

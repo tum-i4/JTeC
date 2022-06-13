@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class IOUtils {
+public final class IOUtils {
 
     public static void createFileAndEnclosingDir(Path path) {
         if (Files.notExists(path)) {
