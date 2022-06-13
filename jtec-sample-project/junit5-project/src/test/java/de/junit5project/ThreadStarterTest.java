@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ThreadStarterTest {
 
     @Test
-    public void testDoSomething() {
-        final ThreadStarter app = new ThreadStarter();
-        assertTrue(app.doSomething());
+    public void testDoSomething() throws InterruptedException {
+        assertTrue(ThreadStarter.doSomething());
     }
 }

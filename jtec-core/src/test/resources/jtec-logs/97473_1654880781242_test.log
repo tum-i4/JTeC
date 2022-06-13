@@ -1,0 +1,4 @@
+1654880784002 97473 SUITE_STARTED
+1654880784026 97473 TEST_STARTED de.junit5project.ThreadStarterIT testThreadStarter
+1654880784059 97473 TEST_FINISHED de.junit5project.ThreadStarterIT testThreadStarter
+1654880784063 97473 SUITE_FINISHED de.junit5project.ThreadStarterIT 0 1 0

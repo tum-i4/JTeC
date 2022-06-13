@@ -1,0 +1,6 @@
+{"timestamp": 1654880771469, "pid": "97454", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/Runnable.class"}
+{"timestamp": 1654880772340, "pid": "97454", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/Exception.class"}
+{"timestamp": 1654880772341, "pid": "97454", "action": "OPEN", "target": "FILE", "value": "/JTeC/jtec-sample-project/junit5-project/target/classes/de/junit5project/ThreadStarter.class"}
+{"timestamp": 1654880772362, "pid": "97454", "action": "START", "target": "THREAD", "value": "Thread-3"}
+{"timestamp": 1654880772364, "pid": "97454", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/Throwable.class"}
+{"timestamp": 1654880772368, "pid": "97454", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/RuntimeException.class"}

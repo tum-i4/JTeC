@@ -19,6 +19,7 @@ Add plugin to Maven project:
                 <execution>
                     <goals>
                         <goal>jtec</goal>
+                        <goal>report</goal>
                     </goals>
                 </execution>
             </executions>
@@ -37,3 +38,18 @@ $ mvn test -Djtec.opts=traceTestEvents=true,...
 
 However, there are already some reasonable defaults for the JTeC agent defined (e.g., store log files to the current
 working directory).
+
+## Report Generation
+
+The goal `jtec:report` which by default runs as part of the `verify` lifecycle phase, generates JSON test reports in
+the `target/jtec` directory of a Maven project.
+If used on a multi-module project, each module has its own report.
+
+## Aggregate Reports
+
+The goal `jtec:report-aggregate` can be used to generate an aggregated test report in `target/jtec` of the root project
+of a Maven multi-module project:
+
+```shell
+$ mvn clean verify -Djtec.opts="test.trace,sys.trace,cov.trace" jtec:report-aggregate
+```

@@ -14,7 +14,7 @@ public class ProcessStartInterceptor {
      */
     @Advice.OnMethodExit
     public static void enter(@Advice.Return final Process process, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis() * 1000000;
+        final Long timestamp = System.currentTimeMillis();
         try {
             final String pid = process.toString().split(", ")[0].replace("Process[pid=", "");
             final String message = String.format("{\"timestamp\": %d, \"pid\": \"%s\", \"action\": \"SPAWN\", \"target\": \"PROCESS\", \"value\": \"%s\"}\n",
