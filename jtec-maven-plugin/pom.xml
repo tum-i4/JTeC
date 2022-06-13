@@ -7,11 +7,11 @@
     <parent>
         <groupId>edu.tum.sse</groupId>
         <artifactId>jtec</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
     </parent>
 
     <artifactId>jtec-maven-plugin</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>JTeC Maven Plugin</name>
     <packaging>maven-plugin</packaging>
     <properties>
