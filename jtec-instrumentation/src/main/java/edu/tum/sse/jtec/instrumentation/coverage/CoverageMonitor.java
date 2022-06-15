@@ -1,34 +1,33 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
+import edu.tum.sse.jtec.instrumentation.util.IOUtils;
+import edu.tum.sse.jtec.instrumentation.util.JSONUtils;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
-import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
-import static edu.tum.sse.jtec.util.JSONUtils.toJson;
 
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
     private final CoverageProbeFactory coverageProbeFactory;
 
-    private CoverageMonitor(CoverageProbeFactory coverageProbeFactory) {
+    private CoverageMonitor(final CoverageProbeFactory coverageProbeFactory) {
         this.coverageProbeFactory = coverageProbeFactory;
     }
 
-    public static CoverageMonitor create(CoverageProbeFactory coverageProbeFactory) {
+    public static CoverageMonitor create(final CoverageProbeFactory coverageProbeFactory) {
         return new CoverageMonitor(coverageProbeFactory);
     }
 
-    public void registerClass(String className) {
+    public void registerClass(final String className) {
         registerProbe(coverageProbeFactory.createClassProbe(className));
     }
 
-    public void registerMethodCall(String className, String methodSignature, String returnType) {
+    public void registerMethodCall(final String className, final String methodSignature, final String returnType) {
         registerProbe(coverageProbeFactory.createMethodProbe(className, methodSignature, returnType));
     }
 
-    private void registerProbe(CoverageProbe probe) {
+    private void registerProbe(final CoverageProbe probe) {
         if (probe != null && !coverageMap.contains(probe.getCoverageRunId(), probe.getProbeId())) {
             coverageMap.put(probe.getCoverageRunId(), probe.getProbeId());
         }
@@ -38,11 +37,11 @@ public class CoverageMonitor {
         coverageMap.clear();
     }
 
-    public void dumpCoverage(String outputPath) throws IOException {
-        String json = toJson(coverageMap.getCollectedProbes());
-        Path outputFile = Paths.get(outputPath);
-        createFileAndEnclosingDir(outputFile);
-        appendToFile(outputFile, json, true);
+    public void dumpCoverage(final String outputPath) throws IOException {
+        final String json = JSONUtils.toJson(coverageMap.getCollectedProbes());
+        final Path outputFile = Paths.get(outputPath);
+        IOUtils.createFileAndEnclosingDir(outputFile);
+        IOUtils.appendToFile(outputFile, json, true);
         clearCoverage();
     }
 }

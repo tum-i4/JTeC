@@ -36,6 +36,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     public static final String EXECUTION_FINISHED = "executionFinished";
     public static final String TEST_RUN_STARTED = "testRunStarted";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
+    public static final String ORG_JUNIT = "org.junit";
 
     private Instrumentation instrumentation;
     private ResettableClassFileTransformer transformer;
@@ -77,6 +78,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                 .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
                 .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
                 .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
+                .ignore(ElementMatchers.nameStartsWith("org").and(ElementMatchers.noneOf(TEST_EXECUTION_LISTENER_JUNIT5, TEST_EXECUTION_LISTENER_SPRING, RUN_LISTENER_JUNIT4)))
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
                         .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
