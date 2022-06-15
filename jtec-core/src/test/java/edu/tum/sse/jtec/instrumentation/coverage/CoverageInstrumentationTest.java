@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
@@ -16,14 +17,29 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class CoverageInstrumentationTest {
 
+    private final Instrumentation instrumentation = ByteBuddyAgent.install();
+    CoverageMonitor coverageMonitorSpy;
     private Path tmpDir;
     private ClassLoader classLoader;
-    private Instrumentation instrumentation = ByteBuddyAgent.install();
-    CoverageMonitor coverageMonitorSpy;
+
+    private static void checkJVMRequirements() {
+        final Instrumentation instrumentation = ByteBuddyAgent.install(ByteBuddyAgent.AttachmentProvider.DEFAULT);
+        if (!instrumentation.isRedefineClassesSupported()) {
+            throw new RuntimeException("The executing JVM does not support class redefinition");
+        }
+        if (!instrumentation.isRetransformClassesSupported()) {
+            throw new RuntimeException("The executing JVM does not support class retransformation");
+        }
+    }
 
     @BeforeEach
     void setUp() throws IOException {
@@ -43,27 +59,17 @@ class CoverageInstrumentationTest {
         tmpDir.toFile().delete();
     }
 
-    private void checkJVMRequirements() {
-        Instrumentation instrumentation = ByteBuddyAgent.install(ByteBuddyAgent.AttachmentProvider.DEFAULT);
-        if (!instrumentation.isRedefineClassesSupported()) {
-            throw new RuntimeException("The executing JVM does not support class redefinition");
-        }
-        if (!instrumentation.isRetransformClassesSupported()) {
-            throw new RuntimeException("The executing JVM does not support class retransformation");
-        }
-    }
-
     @Test
     void shouldInstrumentClassLevel() throws ClassNotFoundException {
         // given
-        String fooClass = Foo.class.getName();
-        CoverageLevel coverageLevel = CoverageLevel.CLASS;
+        final String fooClass = Foo.class.getName();
+        final CoverageLevel coverageLevel = CoverageLevel.CLASS;
 
         assertEquals(fooClass, classLoader.loadClass(fooClass).getName());
 
         // when
         CoverageInstrumentation instr = null;
-        try (MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
+        try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
             monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
@@ -72,10 +78,10 @@ class CoverageInstrumentationTest {
                     "",
                     true
             );
-            instr.attach(instrumentation);
-            Class<?> fooType = classLoader.loadClass(fooClass);
+            instr.attach(instrumentation, new File("/users/raphael/cqse"));
+            final Class<?> fooType = classLoader.loadClass(fooClass);
             fooType.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             fail();
         } finally {
@@ -91,14 +97,14 @@ class CoverageInstrumentationTest {
     @Test
     void shouldInstrumentMethodLevel() throws ClassNotFoundException {
         // given
-        String fooClass = Foo.class.getName();
-        CoverageLevel coverageLevel = CoverageLevel.METHOD;
+        final String fooClass = Foo.class.getName();
+        final CoverageLevel coverageLevel = CoverageLevel.METHOD;
 
         assertEquals(fooClass, classLoader.loadClass(fooClass).getName());
 
         // when
         CoverageInstrumentation instr = null;
-        try (MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
+        try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
             monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
@@ -107,10 +113,10 @@ class CoverageInstrumentationTest {
                     "",
                     true
             );
-            instr.attach(instrumentation);
-            Class<?> fooType = classLoader.loadClass(fooClass);
+            instr.attach(instrumentation, new File("/users/raphael/cqse"));
+            final Class<?> fooType = classLoader.loadClass(fooClass);
             fooType.getDeclaredMethod("foo").invoke(fooType.getDeclaredConstructor().newInstance());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             fail();
         } finally {

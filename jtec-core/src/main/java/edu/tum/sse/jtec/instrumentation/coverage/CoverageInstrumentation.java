@@ -4,6 +4,7 @@ import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 
@@ -33,6 +34,10 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
         this.shouldInstrument = shouldInstrument;
     }
 
+    private static CoverageProbeFactory createCoverageProbeFactory() {
+        return new ProcessCoverageProbeFactory();
+    }
+
     @Override
     public void reset() {
         if (instrumentation != null && transformer != null) {
@@ -41,7 +46,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     }
 
     @Override
-    public CoverageInstrumentation attach(Instrumentation instrumentation) {
+    public CoverageInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
         coverageMonitor = CoverageMonitor.create(createCoverageProbeFactory());
         GlobalCoverageMonitor.set(coverageMonitor);
@@ -70,14 +75,10 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
         return CoverageTransformer.create(coverageLevel);
     }
 
-    private CoverageProbeFactory createCoverageProbeFactory() {
-        return new ProcessCoverageProbeFactory();
-    }
-
     public void dumpCoverage() {
         try {
             coverageMonitor.dumpCoverage(outputPath);
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
             System.err.println("Failed to dump coverage: " + exception.getMessage());
         }
     }

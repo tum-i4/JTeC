@@ -1,18 +1,24 @@
 package edu.tum.sse.jtec.instrumentation.systemevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.*;
-import edu.tum.sse.jtec.util.ProcessUtils;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.ClassLoaderInterceptor;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.PathInterceptor;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.ProcessStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.SocketInterceptor;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.StringPathInterceptor;
+import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.ThreadStartInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.*;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
 
 /**
  * Adds system event instrumentation for files, resources (from JARs), libraries (e.g., native DLLs), sockets, threads, and processes.
@@ -55,7 +61,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
     }
 
     @Override
-    public SysEventInstrumentation attach(final Instrumentation instrumentation) {
+    public SysEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
         this.transformer = new AgentBuilder.Default()
                 .disableClassFormatChanges()
@@ -70,6 +76,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
         return this;
     }
 
+    @Override
     public void reset() {
         if (instrumentation != null && transformer != null) {
             instrumentation.removeTransformer(transformer);
@@ -80,25 +87,24 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
      * Adds visitors to the methods for tracing system events.
      */
     private AgentBuilder.Transformer systemEventTransformer() {
-        final String currentPid = ProcessUtils.getCurrentPid();
         return (builder, typeDescription, classLoader, module) ->
-                builder.visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                builder.visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(StringPathInterceptor.class)
                                 .on(ElementMatchers.nameMatches(STRING_PARAMETER_TRACED_METHODS)
                                         .and(ElementMatchers.takesArgument(0, TypeDescription.STRING)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(SocketInterceptor.class)
                                 .on(ElementMatchers.nameMatches(SOCKET_ADDRESS_PARAMETER_TRACED_METHODS).and(ElementMatchers.takesArguments(2)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(PathInterceptor.class)
                                 .on(ElementMatchers.nameMatches(PATH_PARAMETER_TRACED_METHODS).and(ElementMatchers.takesArgument(0, Path.class)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(ClassLoaderInterceptor.class)
                                 .on(ElementMatchers.nameMatches(CLASS_LOADER_TRACED_METHODS))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(ThreadStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(THREAD_CREATION_METHODS).and(ElementMatchers.takesArguments(0).and(ElementMatchers.returns(TypeDescription.VOID))))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath).bind(AdvicePid.class, currentPid)
+                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(ProcessStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(PROCESS_CREATION_METHODS).and(ElementMatchers.returns(Process.class).and(ElementMatchers.takesArguments(1)))));
     }

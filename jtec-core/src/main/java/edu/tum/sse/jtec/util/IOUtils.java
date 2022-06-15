@@ -11,7 +11,7 @@ import java.nio.file.StandardOpenOption;
 
 public final class IOUtils {
 
-    public static void createFileAndEnclosingDir(Path path) {
+    public static void createFileAndEnclosingDir(final Path path) {
         if (Files.notExists(path)) {
             try {
                 if (Files.notExists(path.getParent())) {
@@ -25,18 +25,18 @@ public final class IOUtils {
         }
     }
 
-    public static void appendToFile(Path file, String message, boolean lock) throws IOException {
+    public static void appendToFile(final Path file, final String message, final boolean lock) throws IOException {
         writeToFile(file, message, lock, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
     }
 
-    public static void writeToFile(Path file, String message, boolean lock, StandardOpenOption... options) throws IOException {
-        byte[] messageAsByteArray = message.getBytes(StandardCharsets.UTF_8);
+    public static void writeToFile(final Path file, final String message, final boolean lock, final StandardOpenOption... options) throws IOException {
+        final byte[] messageAsByteArray = message.getBytes(StandardCharsets.UTF_8);
         if (lock) {
             FileLock fileLock = null;
-            try (FileChannel fileChannel = FileChannel.open(file, options)) {
+            try (final FileChannel fileChannel = FileChannel.open(file, options)) {
                 fileLock = fileChannel.lock();
                 fileChannel.write(ByteBuffer.wrap(messageAsByteArray));
-            } catch (Exception exception) {
+            } catch (final Exception exception) {
                 exception.printStackTrace();
                 throw new IOException("Problem with locking when writing to file " + file);
             } finally {

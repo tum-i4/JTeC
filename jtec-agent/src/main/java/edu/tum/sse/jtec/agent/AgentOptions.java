@@ -155,44 +155,16 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
     }
 
-    public void setTraceSystemEvents(boolean traceSystemEvents) {
-        this.traceSystemEvents = traceSystemEvents;
-    }
-
-    public void setTraceTestEvents(boolean traceTestEvents) {
-        this.traceTestEvents = traceTestEvents;
-    }
-
-    public void setTraceCoverage(boolean traceCoverage) {
-        this.traceCoverage = traceCoverage;
-    }
-
-    public void setInstrumentCoverage(boolean instrumentCoverage) {
-        this.instrumentCoverage = instrumentCoverage;
-    }
-
     public CoverageLevel getCoverageLevel() {
         return coverageLevel;
-    }
-
-    public void setCoverageLevel(CoverageLevel coverageLevel) {
-        this.coverageLevel = coverageLevel;
     }
 
     public String getCoverageIncludes() {
         return coverageIncludes;
     }
 
-    public void setCoverageIncludes(String coverageIncludes) {
-        this.coverageIncludes = coverageIncludes;
-    }
-
     public String getCoverageExcludes() {
         return coverageExcludes;
-    }
-
-    public void setCoverageExcludes(String coverageExcludes) {
-        this.coverageExcludes = coverageExcludes;
     }
 
     public boolean shouldTraceTestEvents() {
@@ -219,7 +191,7 @@ public class AgentOptions {
         return outputPath;
     }
 
-    public void setOutputPath(Path outputPath) {
+    public void setOutputPath(final Path outputPath) {
         this.outputPath = outputPath;
     }
 }
