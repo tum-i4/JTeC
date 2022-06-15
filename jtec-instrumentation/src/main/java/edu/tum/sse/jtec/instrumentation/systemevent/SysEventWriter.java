@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class MessageWriter {
+public class SysEventWriter {
 
     public static void writeMessage(final String action, final String target, final String value, final String outputPath) {
         final Long timestamp = System.currentTimeMillis();

@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
+import edu.tum.sse.jtec.instrumentation.util.ProcessUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -12,8 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
-
 public class TestEventInterceptorUtility {
 
     public static String testingLogFilePath;
@@ -24,7 +23,7 @@ public class TestEventInterceptorUtility {
 
     public static boolean inTestSuite = false;
 
-    public static String currentPid = getCurrentPid();
+    public static String currentPid = ProcessUtils.getCurrentPid();
 
 
     /**

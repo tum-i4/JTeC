@@ -1,7 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
 import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
-import edu.tum.sse.jtec.instrumentation.systemevent.MessageWriter;
+import edu.tum.sse.jtec.instrumentation.systemevent.SysEventWriter;
 import net.bytebuddy.asm.Advice;
 
 import java.nio.file.Path;
@@ -21,6 +21,6 @@ public class StringPathInterceptor {
         if (outputFile.getFileName().equals(Paths.get(printedName).getFileName())) {
             return;
         }
-        MessageWriter.writeMessage("OPEN", "FILE", printedName, outputPath);
+        SysEventWriter.writeMessage("OPEN", "FILE", printedName, outputPath);
     }
 }
