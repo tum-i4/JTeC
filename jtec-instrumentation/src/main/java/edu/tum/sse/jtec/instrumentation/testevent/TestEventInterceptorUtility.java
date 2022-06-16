@@ -23,7 +23,7 @@ public class TestEventInterceptorUtility {
 
     public static boolean inTestSuite = false;
 
-    public static String currentPid = ProcessUtils.getCurrentPid();
+    public static String currentPid = ProcessUtils.getInstrumentedPid();
 
 
     /**

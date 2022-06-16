@@ -9,11 +9,11 @@ public class ProcessCoverageProbeFactory implements CoverageProbeFactory {
 
     @Override
     public ClassCoverageProbe createClassProbe(final String className) {
-        return new ClassCoverageProbe(ProcessUtils.getCurrentPid(), className);
+        return new ClassCoverageProbe(ProcessUtils.getInstrumentedPid(), className);
     }
 
     @Override
     public MethodCoverageProbe createMethodProbe(final String className, final String methodSignature, final String returnType) {
-        return new MethodCoverageProbe(ProcessUtils.getCurrentPid(), className, methodSignature, returnType);
+        return new MethodCoverageProbe(ProcessUtils.getInstrumentedPid(), className, methodSignature, returnType);
     }
 }

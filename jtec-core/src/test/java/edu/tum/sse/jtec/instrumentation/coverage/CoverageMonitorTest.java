@@ -1,7 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import edu.tum.sse.jtec.instrumentation.InstrumentationUtils;
-import edu.tum.sse.jtec.util.ProcessUtils;
+import edu.tum.sse.jtec.instrumentation.util.ProcessUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,7 @@ import org.mockito.MockedStatic;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.mockito.Mockito.mockStatic;
@@ -32,12 +31,12 @@ class CoverageMonitorTest {
     @Test
     void shouldDumpCoverage() throws IOException {
         // given
-        CoverageMonitor coverageMonitor = CoverageMonitor.create(new ProcessCoverageProbeFactory());
-        try (MockedStatic<ProcessUtils> utilities = mockStatic(ProcessUtils.class)) {
-            utilities.when(ProcessUtils::getCurrentPid).thenReturn("123");
+        final CoverageMonitor coverageMonitor = CoverageMonitor.create(new ProcessCoverageProbeFactory());
+        try (final MockedStatic<ProcessUtils> utilities = mockStatic(ProcessUtils.class)) {
+            utilities.when(ProcessUtils::getInstrumentedPid).thenReturn("123");
             coverageMonitor.registerClass("Foo");
             coverageMonitor.registerClass("Bar");
-            utilities.when(ProcessUtils::getCurrentPid).thenReturn("234");
+            utilities.when(ProcessUtils::getInstrumentedPid).thenReturn("234");
             coverageMonitor.registerClass("Foo");
         }
 
@@ -45,6 +44,6 @@ class CoverageMonitorTest {
         coverageMonitor.dumpCoverage(output.toAbsolutePath().toString());
 
         // then
-        assertLinesMatch(Arrays.asList("{\"123\":[\"Bar\",\"Foo\"],\"234\":[\"Foo\"]}"), Files.readAllLines(output));
+        assertLinesMatch(Collections.singletonList("{\"123\":[\"Bar\",\"Foo\"],\"234\":[\"Foo\"]}"), Files.readAllLines(output));
     }
 }
