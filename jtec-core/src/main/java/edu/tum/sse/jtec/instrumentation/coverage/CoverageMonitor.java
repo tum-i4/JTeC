@@ -1,7 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import edu.tum.sse.jtec.instrumentation.util.IOUtils;
-import edu.tum.sse.jtec.instrumentation.util.JSONUtils;
+import edu.tum.sse.jtec.util.IOUtils;
+import edu.tum.sse.jtec.util.JSONUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;

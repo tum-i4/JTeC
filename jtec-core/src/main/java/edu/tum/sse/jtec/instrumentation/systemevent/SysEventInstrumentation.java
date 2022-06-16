@@ -68,6 +68,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
                 .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
                 .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
+                .with(new AgentBuilder.InjectionStrategy.UsingInstrumentation(instrumentation, tempFolder))
                 .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
                 .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())

@@ -1,6 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
-import edu.tum.sse.jtec.instrumentation.util.ProcessUtils;
+import edu.tum.sse.jtec.util.ProcessUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -23,7 +23,7 @@ public class TestEventInterceptorUtility {
 
     public static boolean inTestSuite = false;
 
-    public static String currentPid = ProcessUtils.getInstrumentedPid();
+    public static String currentPid = ProcessUtils.getCurrentPid();
 
 
     /**

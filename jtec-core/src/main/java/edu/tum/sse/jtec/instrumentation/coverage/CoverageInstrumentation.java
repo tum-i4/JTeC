@@ -57,6 +57,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
                     .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
                     .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
                     .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
+                    .with(new AgentBuilder.InjectionStrategy.UsingInstrumentation(instrumentation, tempFolder))
                     .type(ElementMatchers.nameMatches(includePattern))
                     .transform(getCoverageTransformer())
                     .ignore(ElementMatchers.nameMatches(excludePattern))

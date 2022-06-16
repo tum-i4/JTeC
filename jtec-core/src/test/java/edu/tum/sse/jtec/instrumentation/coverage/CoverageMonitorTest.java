@@ -1,6 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import edu.tum.sse.jtec.instrumentation.util.ProcessUtils;
+import edu.tum.sse.jtec.util.ProcessUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,10 +33,10 @@ class CoverageMonitorTest {
         // given
         final CoverageMonitor coverageMonitor = CoverageMonitor.create(new ProcessCoverageProbeFactory());
         try (final MockedStatic<ProcessUtils> utilities = mockStatic(ProcessUtils.class)) {
-            utilities.when(ProcessUtils::getInstrumentedPid).thenReturn("123");
+            utilities.when(ProcessUtils::getCurrentPid).thenReturn("123");
             coverageMonitor.registerClass("Foo");
             coverageMonitor.registerClass("Bar");
-            utilities.when(ProcessUtils::getInstrumentedPid).thenReturn("234");
+            utilities.when(ProcessUtils::getCurrentPid).thenReturn("234");
             coverageMonitor.registerClass("Foo");
         }
 
