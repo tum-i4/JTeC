@@ -1,9 +1,10 @@
 package edu.tum.sse.jtec.reporting;
 
+import com.google.gson.reflect.TypeToken;
 import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -28,8 +29,9 @@ public final class SystemEventLogParser {
         // (this will also support multiple levels of child processes).
         Map<String, List<TestSuite>> spawnedProcessTestSuiteMap = new HashMap<>();
 
-        for (String line : Files.readAllLines(sysLog)) {
-            SystemInstrumentationEvent event = fromJson(line, SystemInstrumentationEvent.class);
+        Type type = new TypeToken<List<SystemInstrumentationEvent>>() {}.getType();
+        List<SystemInstrumentationEvent> events = fromJson(sysLog, type);
+        for (SystemInstrumentationEvent event : events) {
             switch (event.getAction()) {
                 case OPEN:
                     if (event.getTarget() == SystemInstrumentationEvent.Target.FILE || event.getTarget() == SystemInstrumentationEvent.Target.RESOURCE) {

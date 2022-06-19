@@ -19,6 +19,10 @@ public class AgentOptions {
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
+    public static final String FILE_INCLUDES = "sys.includes";
+    public static final String FILE_EXCLUDES = "sys.excludes";
+    public static final String DEFAULT_FILE_INCLUDES = ".*";
+    public static final String DEFAULT_FILE_EXCLUDES = ".*.(log|tmp)";
 
     // Coverage instrumentation.
     public static final String TRACE_COVERAGE = "cov.trace";
@@ -43,7 +47,9 @@ public class AgentOptions {
             DEFAULT_COVERAGE_INCLUDES,
             DEFAULT_COVERAGE_EXCLUDES,
             DEFAULT_PRE_TEST_COMMAND,
-            Paths.get(DEFAULT_AGENT_OUTPUT).toAbsolutePath()
+            Paths.get(DEFAULT_AGENT_OUTPUT).toAbsolutePath(),
+            DEFAULT_FILE_INCLUDES,
+            DEFAULT_FILE_EXCLUDES
     );
 
     private static final String OPTIONS_SEPARATOR = ",";
@@ -58,6 +64,8 @@ public class AgentOptions {
     private String coverageExcludes;
     private String preTestCommand;
     private Path outputPath;
+    private String fileIncludes;
+    private String fileExcludes;
 
     private AgentOptions() {
     }
@@ -71,7 +79,9 @@ public class AgentOptions {
             final String coverageIncludes,
             final String coverageExcludes,
             final String preTestCommand,
-            final Path outputPath
+            final Path outputPath,
+            final String fileIncludes,
+            final String fileExcludes
     ) {
         this.traceTestEvents = traceTestEvents;
         this.traceSystemEvents = traceSystemEvents;
@@ -82,6 +92,8 @@ public class AgentOptions {
         this.coverageExcludes = coverageExcludes;
         this.preTestCommand = preTestCommand;
         this.outputPath = outputPath;
+        this.fileIncludes = fileIncludes;
+        this.fileExcludes = fileExcludes;
     }
 
     public static AgentOptions fromString(final String options) {
@@ -125,6 +137,8 @@ public class AgentOptions {
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceSystemEvents = Boolean.parseBoolean(optionsInput.get(TRACE_SYS_EVENTS));
+        result.fileIncludes = optionsInput.getOrDefault(FILE_INCLUDES, DEFAULT_FILE_INCLUDES);
+        result.fileExcludes = optionsInput.getOrDefault(FILE_EXCLUDES, DEFAULT_FILE_EXCLUDES);
     }
 
     private static void parseCoverageParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -147,6 +161,8 @@ public class AgentOptions {
         return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
+                OPTIONS_SEPARATOR + FILE_INCLUDES + VALUE_SEPARATOR + fileIncludes +
+                OPTIONS_SEPARATOR + FILE_EXCLUDES + VALUE_SEPARATOR + fileExcludes +
                 OPTIONS_SEPARATOR + TRACE_COVERAGE + VALUE_SEPARATOR + traceCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_INSTRUMENT + VALUE_SEPARATOR + instrumentCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
@@ -193,5 +209,13 @@ public class AgentOptions {
 
     public void setOutputPath(final Path outputPath) {
         this.outputPath = outputPath;
+    }
+
+    public String getFileIncludes() {
+        return fileIncludes;
+    }
+
+    public String getFileExcludes() {
+        return fileExcludes;
     }
 }

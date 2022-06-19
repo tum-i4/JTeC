@@ -3,7 +3,7 @@ package edu.tum.sse.jtec.agent;
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
 import edu.tum.sse.jtec.instrumentation.InstrumentationUtils;
 import edu.tum.sse.jtec.instrumentation.coverage.CoverageInstrumentation;
-import edu.tum.sse.jtec.instrumentation.systemevent.SysEventInstrumentation;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemEventInstrumentation;
 import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 import edu.tum.sse.jtec.util.IOUtils;
 
@@ -42,7 +42,7 @@ public class Tracer {
         if (options.shouldTraceSystemEvents()) {
             final Path sysEventOutput = options.getOutputPath().resolve(String.format("%s_%d_sys.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(sysEventOutput);
-            customInstrumentationList.add(new SysEventInstrumentation(sysEventOutput.toString()).attach(instrumentation, tempFolder));
+            customInstrumentationList.add(new SystemEventInstrumentation(sysEventOutput.toString(), options.getFileIncludes(), options.getFileExcludes()).attach(instrumentation, tempFolder));
         }
         if (options.shouldTraceCoverage()) {
             final Path covEventOutput = options.getOutputPath().resolve(String.format("%s_%d_cov.log", getCurrentPid(), System.currentTimeMillis()));

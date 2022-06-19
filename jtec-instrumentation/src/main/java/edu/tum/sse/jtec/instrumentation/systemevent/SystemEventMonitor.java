@@ -1,18 +1,18 @@
 package edu.tum.sse.jtec.instrumentation.systemevent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SysEventWriter {
+public class SystemEventMonitor {
 
-    private static final List<SystemInstrumentationEvent> events = new ArrayList<>();
+    private static final Collection<SystemInstrumentationEvent> events = new ConcurrentLinkedQueue<>();
     private static final String pid = java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 
-    public static List<SystemInstrumentationEvent> getEvents() {
+    public static Collection<SystemInstrumentationEvent> getEvents() {
         return events;
     }
 
-    public static void writeMessage(final SystemInstrumentationEvent.Action action, final SystemInstrumentationEvent.Target target, final String value, final String outputPath) {
+    public static void record(final SystemInstrumentationEvent.Action action, final SystemInstrumentationEvent.Target target, final String value) {
         SystemInstrumentationEvent event = new SystemInstrumentationEvent(
                 System.currentTimeMillis(),
                 pid,

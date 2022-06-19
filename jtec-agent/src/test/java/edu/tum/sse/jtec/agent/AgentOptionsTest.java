@@ -32,6 +32,8 @@ class AgentOptionsTest {
         String options = "jtec.out=" + tmpDir + "," +
                 "test.trace=true," +
                 "sys.trace=true," +
+                "sys.includes=.*," +
+                "sys.excludes=.*.class," +
                 "cov.trace=true," +
                 "cov.instr," +
                 "cov.includes=.*foo.*," +
@@ -46,6 +48,8 @@ class AgentOptionsTest {
         assertTrue(parsedOptions.getOutputPath().toFile().isDirectory());
         assertTrue(parsedOptions.getOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceSystemEvents());
+        assertEquals(parsedOptions.getFileIncludes(), ".*");
+        assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());
         assertTrue(parsedOptions.shouldTraceCoverage());
         assertTrue(parsedOptions.shouldInstrumentCoverage());

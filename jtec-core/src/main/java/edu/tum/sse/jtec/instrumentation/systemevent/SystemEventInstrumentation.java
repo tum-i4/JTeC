@@ -19,6 +19,9 @@ import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
@@ -26,7 +29,7 @@ import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE
 /**
  * Adds system event instrumentation for files, resources (from JARs), libraries (e.g., native DLLs), sockets, threads, and processes.
  */
-public class SysEventInstrumentation extends AbstractInstrumentation<SysEventInstrumentation> {
+public class SystemEventInstrumentation extends AbstractInstrumentation<SystemEventInstrumentation> {
 
     private static final String TYPES_TO_TRACE = "(" +
             "java.io.FileInputStream|" +
@@ -55,16 +58,22 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
             ")";
     private static final String THREAD_CREATION_METHODS = "start";
     private static final String PROCESS_CREATION_METHODS = "start";
-
+    private final String fileIncludes;
+    private final String fileExcludes;
     private Instrumentation instrumentation;
     private ResettableClassFileTransformer transformer;
 
-    public SysEventInstrumentation(final String outputPath) {
+    public SystemEventInstrumentation(final String outputPath,
+                                      final String fileIncludes,
+                                      final String fileExcludes
+    ) {
         super(outputPath);
+        this.fileIncludes = fileIncludes;
+        this.fileExcludes = fileExcludes;
     }
 
     @Override
-    public SysEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
+    public SystemEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
         this.transformer = new AgentBuilder.Default()
                 .disableClassFormatChanges()
@@ -85,7 +94,18 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
 
     public void dumpEvents() {
         try {
-            final String json = JSONUtils.toJson(SysEventWriter.getEvents().toArray());
+            Pattern fileIncludes = Pattern.compile(this.fileIncludes);
+            Pattern fileExcludes = Pattern.compile(this.fileExcludes);
+            List<SystemInstrumentationEvent> events = SystemEventMonitor.getEvents()
+                    .stream()
+                    .filter(event -> {
+                        if (event.getAction() != SystemInstrumentationEvent.Action.OPEN || (event.getTarget() != SystemInstrumentationEvent.Target.FILE && event.getTarget() != SystemInstrumentationEvent.Target.RESOURCE)) {
+                            return true;
+                        }
+                        return fileIncludes.matcher(event.getValue()).matches() && !fileExcludes.matcher(event.getValue()).matches();
+                    })
+                    .collect(Collectors.toList());
+            final String json = JSONUtils.toJson(events);
             final Path outputFile = Paths.get(outputPath);
             IOUtils.createFileAndEnclosingDir(outputFile);
             IOUtils.appendToFile(outputFile, json, true);
@@ -106,23 +126,23 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
      */
     private AgentBuilder.Transformer systemEventTransformer() {
         return (builder, typeDescription, classLoader, module) ->
-                builder.visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                builder.visit(Advice.withCustomMapping()
                                 .to(StringPathInterceptor.class)
                                 .on(ElementMatchers.nameMatches(STRING_PARAMETER_TRACED_METHODS)
                                         .and(ElementMatchers.takesArgument(0, TypeDescription.STRING)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                        visit(Advice.withCustomMapping()
                                 .to(SocketInterceptor.class)
                                 .on(ElementMatchers.nameMatches(SOCKET_ADDRESS_PARAMETER_TRACED_METHODS).and(ElementMatchers.takesArguments(2)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                        visit(Advice.withCustomMapping()
                                 .to(PathInterceptor.class)
                                 .on(ElementMatchers.nameMatches(PATH_PARAMETER_TRACED_METHODS).and(ElementMatchers.takesArgument(0, Path.class)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                        visit(Advice.withCustomMapping()
                                 .to(ClassLoaderInterceptor.class)
                                 .on(ElementMatchers.nameMatches(CLASS_LOADER_TRACED_METHODS).and(ElementMatchers.takesArgument(0, TypeDescription.STRING)))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                        visit(Advice.withCustomMapping()
                                 .to(ThreadStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(THREAD_CREATION_METHODS).and(ElementMatchers.takesArguments(0).and(ElementMatchers.returns(TypeDescription.VOID))))).
-                        visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
+                        visit(Advice.withCustomMapping()
                                 .to(ProcessStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(PROCESS_CREATION_METHODS).and(ElementMatchers.returns(Process.class).and(ElementMatchers.takesArguments(1)))));
     }
