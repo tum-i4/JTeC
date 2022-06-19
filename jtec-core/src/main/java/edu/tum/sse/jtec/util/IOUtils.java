@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -8,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 
 public final class IOUtils {
 
@@ -22,6 +24,15 @@ public final class IOUtils {
                 System.err.println("Failed to create file.");
                 exception.printStackTrace();
             }
+        }
+    }
+
+    public static void removeDir(final Path path) throws IOException {
+        if (path.toFile().exists()) {
+            Files.walk(path)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
     }
 
