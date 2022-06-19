@@ -9,8 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
-import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;
+import static edu.tum.sse.jtec.util.IOUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IOUtilsTest {
@@ -40,6 +39,23 @@ class IOUtilsTest {
         // then
         assertTrue(Files.exists(file.getParent()));
         assertTrue(Files.exists(file));
+    }
+
+    @Test
+    void shouldRemoveDir() throws IOException {
+        // given
+        Path file = tmpDir.resolve("foo").resolve("bar.txt");
+        createFileAndEnclosingDir(file);
+        assertTrue(Files.exists(file.getParent()));
+        assertTrue(Files.exists(file));
+
+        // when
+        removeDir(tmpDir);
+
+        // then
+        assertFalse(Files.exists(file.getParent()));
+        assertFalse(Files.exists(file));
+        assertFalse(Files.exists(tmpDir));
     }
 
     @Test
