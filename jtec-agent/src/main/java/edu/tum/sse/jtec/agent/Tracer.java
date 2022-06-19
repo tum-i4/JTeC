@@ -5,12 +5,10 @@ import edu.tum.sse.jtec.instrumentation.InstrumentationUtils;
 import edu.tum.sse.jtec.instrumentation.coverage.CoverageInstrumentation;
 import edu.tum.sse.jtec.instrumentation.systemevent.SystemEventInstrumentation;
 import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
-import edu.tum.sse.jtec.util.IOUtils;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ public class Tracer {
         this.instrumentation = instrumentation;
         customInstrumentationList = new ArrayList<>();
 
-        final File tempFolder = InstrumentationUtils.appendInstrumentationJarFile(instrumentation, getInstrumentationLocation());
+        final File tempFolder = InstrumentationUtils.appendInstrumentationJarFile(instrumentation, getInstrumentationJarLocation());
         if (tempFolder == null) return;
 
         // Order matters here: (1) test events, (2) system, (3) coverage
@@ -57,27 +55,15 @@ public class Tracer {
         }
     }
 
-    /**
-     * Returns the directory that contains the agent or null if it can't be resolved.
-     */
-    public static Path getJTecInstallDirectory() {
+    private String getInstrumentationJarLocation() {
         try {
-            final URI jarFileUri = IOUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-            // we assume that the dist zip is extracted and the agent jar not moved
-            return Paths.get(jarFileUri).getParent().getParent().getParent();
-        } catch (final URISyntaxException e) {
-            throw new RuntimeException("Failed to obtain agent directory. This is a bug, please report it.", e);
+            final String finalUrl = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("jtec-agent", "jtec-instrumentation");
+            if (Files.exists(Paths.get(finalUrl))) {
+                return finalUrl;
+            }
+            throw new RuntimeException("Instrumentation JAR not found at " + finalUrl);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    private String getInstrumentationLocation() {
-        final Path jTecInstallDirectory = getJTecInstallDirectory();
-        final String implementationVersion = getClass().getPackage().getImplementationVersion();
-        if (jTecInstallDirectory.toAbsolutePath().toString().contains(".m2")) {
-            return String.format("%s/jtec-instrumentation/%s/jtec-instrumentation-%s.jar", jTecInstallDirectory, implementationVersion, implementationVersion);
-        } else if (jTecInstallDirectory.toAbsolutePath().toString().contains("target")) {
-            return String.format("%s/jtec-instrumentation/target/jtec-instrumentation-%s.jar", jTecInstallDirectory, implementationVersion);
-        }
-        throw new RuntimeException("Could not find instrumentation Jar File in " + jTecInstallDirectory);
     }
 }

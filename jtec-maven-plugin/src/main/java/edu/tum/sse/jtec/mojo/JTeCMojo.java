@@ -45,7 +45,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
                 String oldValue = properties.getProperty(property);
-                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), preparedAgentOpts, (oldValue == null ? "" : " " + oldValue));
+                String newValue = String.format("%s-javaagent:%s=%s", (oldValue == null ? "" : oldValue + " "), agentJar.toAbsolutePath(), preparedAgentOpts);
                 properties.setProperty(property, newValue);
                 log(String.format("Changing Maven property %s to %s.", property, newValue));
             }
