@@ -57,11 +57,11 @@ public class Tracer {
 
     private String getInstrumentationJarLocation() {
         try {
-            final String finalUrl = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("jtec-agent", "jtec-instrumentation");
-            if (Files.exists(Paths.get(finalUrl))) {
-                return finalUrl;
+            final String jarPath = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toString().replace("jtec-agent", "jtec-instrumentation");
+            if (Files.exists(Paths.get(jarPath))) {
+                return jarPath;
             }
-            throw new RuntimeException("Instrumentation JAR not found at " + finalUrl);
+            throw new RuntimeException("Instrumentation JAR not found at " + jarPath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
