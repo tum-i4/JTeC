@@ -2,6 +2,7 @@ package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
 import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
 import edu.tum.sse.jtec.instrumentation.systemevent.SysEventWriter;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
 import net.bytebuddy.asm.Advice;
 
 import java.net.SocketAddress;
@@ -16,6 +17,6 @@ public class SocketInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final SocketAddress address, @AdviceOutput final String outputPath) {
-        SysEventWriter.writeMessage("CONNECT", "SOCKET", address.toString(), outputPath);
+        SysEventWriter.writeMessage(SystemInstrumentationEvent.Action.CONNECT, SystemInstrumentationEvent.Target.SOCKET, address.toString(), outputPath);
     }
 }

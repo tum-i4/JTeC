@@ -15,29 +15,4 @@
     <name>JTeC Instrumentation Package</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <junit-platform.version>1.7.0</junit-platform.version>
-        <bytebuddy.version>1.12.10</bytebuddy.version>
-        <junit4.version>4.13</junit4.version>
-        <junit5.version>5.7.0</junit5.version>
-        <mockito.version>4.5.1</mockito.version>
-    </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

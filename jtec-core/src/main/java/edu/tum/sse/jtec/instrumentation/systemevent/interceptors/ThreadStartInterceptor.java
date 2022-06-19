@@ -2,6 +2,7 @@ package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
 import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
 import edu.tum.sse.jtec.instrumentation.systemevent.SysEventWriter;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
 import net.bytebuddy.asm.Advice;
 
 public class ThreadStartInterceptor {
@@ -10,6 +11,6 @@ public class ThreadStartInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.FieldValue(value = "name") final String threadName, @AdviceOutput final String outputPath) {
-        SysEventWriter.writeMessage("START", "THREAD", threadName, outputPath);
+        SysEventWriter.writeMessage(SystemInstrumentationEvent.Action.START, SystemInstrumentationEvent.Target.THREAD, threadName, outputPath);
     }
 }

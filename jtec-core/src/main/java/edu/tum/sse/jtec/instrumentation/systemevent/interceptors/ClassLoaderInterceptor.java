@@ -2,6 +2,7 @@ package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
 import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
 import edu.tum.sse.jtec.instrumentation.systemevent.SysEventWriter;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
 import net.bytebuddy.asm.Advice;
 
 public class ClassLoaderInterceptor {
@@ -10,6 +11,6 @@ public class ClassLoaderInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final String printedName, @AdviceOutput final String outputPath) {
-        SysEventWriter.writeMessage("OPEN", "RESOURCE", printedName, outputPath);
+        SysEventWriter.writeMessage(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, printedName, outputPath);
     }
 }

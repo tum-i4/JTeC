@@ -7,6 +7,8 @@ import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.ProcessStartInt
 import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.SocketInterceptor;
 import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.StringPathInterceptor;
 import edu.tum.sse.jtec.instrumentation.systemevent.interceptors.ThreadStartInterceptor;
+import edu.tum.sse.jtec.util.IOUtils;
+import edu.tum.sse.jtec.util.JSONUtils;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -16,6 +18,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
@@ -32,8 +35,8 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
             "java.nio.file.spi.FileSystemProvider|" +
             "sun.nio.fs.WindowsFileSystemProvider|" +
             "java.io.RandomAccessFile|" +
-            "java.net.Socket|" +
             "java.lang.ClassLoader|" +
+            "java.net.Socket|" +
             "java.lang.Thread|" +
             "java.lang.ProcessBuilder" +
             ")";
@@ -74,7 +77,21 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
                 .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                 .type(ElementMatchers.nameMatches(TYPES_TO_TRACE))
                 .transform(systemEventTransformer()).installOn(instrumentation);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::dumpEvents));
+
         return this;
+    }
+
+    public void dumpEvents() {
+        try {
+            final String json = JSONUtils.toJson(SysEventWriter.getEvents().toArray());
+            final Path outputFile = Paths.get(outputPath);
+            IOUtils.createFileAndEnclosingDir(outputFile);
+            IOUtils.appendToFile(outputFile, json, true);
+        } catch (final Exception exception) {
+            System.err.println("Failed to dump events: " + exception.getMessage());
+        }
     }
 
     @Override
@@ -101,7 +118,7 @@ public class SysEventInstrumentation extends AbstractInstrumentation<SysEventIns
                                 .on(ElementMatchers.nameMatches(PATH_PARAMETER_TRACED_METHODS).and(ElementMatchers.takesArgument(0, Path.class)))).
                         visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(ClassLoaderInterceptor.class)
-                                .on(ElementMatchers.nameMatches(CLASS_LOADER_TRACED_METHODS))).
+                                .on(ElementMatchers.nameMatches(CLASS_LOADER_TRACED_METHODS).and(ElementMatchers.takesArgument(0, TypeDescription.STRING)))).
                         visit(Advice.withCustomMapping().bind(AdviceOutput.class, outputPath)
                                 .to(ThreadStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(THREAD_CREATION_METHODS).and(ElementMatchers.takesArguments(0).and(ElementMatchers.returns(TypeDescription.VOID))))).

@@ -10,4 +10,9 @@ public class ThreadStarterTest {
     public void testDoSomething() throws InterruptedException {
         assertTrue(ThreadStarter.doSomething());
     }
+
+    @Test
+    public void testDoSomethingElse() {
+        assertTrue(true);
+    }
 }
