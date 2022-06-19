@@ -32,12 +32,12 @@ class AgentOptionsTest {
         String options = "jtec.out=" + tmpDir + "," +
                 "test.trace=true," +
                 "sys.trace=true," +
-                "sys.includes=.*," +
-                "sys.excludes=.*.class," +
+                "sys.includes=\".*\"," +
+                "sys.excludes=\".*.class\"," +
                 "cov.trace=true," +
                 "cov.instr," +
-                "cov.includes=.*foo.*," +
-                "cov.excludes=.*bar.*," +
+                "cov.includes=\".*foo.*\"," +
+                "cov.excludes=\".*bar.*\"," +
                 "cov.level=method," +
                 "init.cmd=run.bat";
 

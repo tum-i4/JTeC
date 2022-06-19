@@ -119,7 +119,7 @@ public class AgentOptions {
                             final int eqIndex = part.indexOf(VALUE_SEPARATOR);
                             if (eqIndex > 0) {
                                 return new AbstractMap.SimpleEntry<>(
-                                        part.substring(0, eqIndex), part.substring(eqIndex + 1));
+                                        part.substring(0, eqIndex), part.substring(eqIndex + 1).replaceAll("^\"|\"$", "").replaceAll("^'|'$", ""));
                             }
                             // We also allow boolean flags, if only a key is provided.
                             return new AbstractMap.SimpleEntry<>(part, "true");
@@ -161,13 +161,13 @@ public class AgentOptions {
         return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
-                OPTIONS_SEPARATOR + FILE_INCLUDES + VALUE_SEPARATOR + fileIncludes +
-                OPTIONS_SEPARATOR + FILE_EXCLUDES + VALUE_SEPARATOR + fileExcludes +
+                OPTIONS_SEPARATOR + FILE_INCLUDES + VALUE_SEPARATOR + "\"" + fileIncludes + "\"" +
+                OPTIONS_SEPARATOR + FILE_EXCLUDES + VALUE_SEPARATOR + "\"" + fileExcludes + "\"" +
                 OPTIONS_SEPARATOR + TRACE_COVERAGE + VALUE_SEPARATOR + traceCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_INSTRUMENT + VALUE_SEPARATOR + instrumentCoverage +
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
-                OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + coverageIncludes +
-                OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + coverageExcludes +
+                OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + "\"" + coverageIncludes + "\"" +
+                OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + "\"" + coverageExcludes + "\"" +
                 OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
     }
 
