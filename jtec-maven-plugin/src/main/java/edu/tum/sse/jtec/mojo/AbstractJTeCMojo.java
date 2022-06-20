@@ -1,19 +1,11 @@
 package edu.tum.sse.jtec.mojo;
 
-import edu.tum.sse.jtec.agent.JTeCAgent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public abstract class AbstractJTeCMojo extends AbstractMojo {
 
