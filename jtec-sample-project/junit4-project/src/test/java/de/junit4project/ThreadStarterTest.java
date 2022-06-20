@@ -1,11 +1,10 @@
-package de.junit5project;
+package de.junit4project;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Test;
 
-@ExtendWith(LifecycleExtension.class)
+import static org.junit.Assert.assertTrue;
+
 public class ThreadStarterTest {
 
     @Test

@@ -1,4 +1,4 @@
-package de.junit5project;
+package de.junit4project;
 
 import java.io.*;
 import java.net.URISyntaxException;
