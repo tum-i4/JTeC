@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AgentOptionsTest {
 
@@ -31,6 +30,7 @@ class AgentOptionsTest {
         // given
         String options = "jtec.out=" + tmpDir + "," +
                 "test.trace=true," +
+                "test.instr=false," +
                 "sys.trace=true," +
                 "sys.includes=\".*\"," +
                 "sys.excludes=\".*.class\"," +
@@ -51,6 +51,7 @@ class AgentOptionsTest {
         assertEquals(parsedOptions.getFileIncludes(), ".*");
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());
+        assertFalse(parsedOptions.shouldInstrumentTestEvents());
         assertTrue(parsedOptions.shouldTraceCoverage());
         assertTrue(parsedOptions.shouldInstrumentCoverage());
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);

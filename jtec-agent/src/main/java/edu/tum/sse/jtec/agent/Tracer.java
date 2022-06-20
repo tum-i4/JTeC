@@ -35,7 +35,7 @@ public class Tracer {
         if (options.shouldTraceTestEvents()) {
             final Path testEventOutput = options.getOutputPath().resolve(String.format("%s_%d_test.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(testEventOutput);
-            customInstrumentationList.add(new TestEventInstrumentation(testEventOutput.toString()).attach(instrumentation, tempFolder));
+            customInstrumentationList.add(new TestEventInstrumentation(testEventOutput.toString(), options.shouldInstrumentTestEvents()).attach(instrumentation, tempFolder));
         }
         if (options.shouldTraceSystemEvents()) {
             final Path sysEventOutput = options.getOutputPath().resolve(String.format("%s_%d_sys.log", getCurrentPid(), System.currentTimeMillis()));

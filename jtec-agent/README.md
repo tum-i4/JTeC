@@ -13,6 +13,7 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 |--------------|---------|---------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
 | jtec.out     | String  | `.`                                                                             | Output path for jtec output                                                                  |
 | test.trace   | Boolean | `false`                                                                         | Enables test event tracing                                                                   |
+| test.instr   | Boolean | `false`                                                                         | Enables class file instrumentation for JUnit classes (instead of providing custom listeners) |
 | sys.trace    | Boolean | `false`                                                                         | Enables system event tracing                                                                 |
 | sys.includes | String  | `.*`                                                                            | Regex for included files                                                                     |
 | sys.excludes | String  | `.*.(log\|tmp)`                                                                 | Regex for excluded files                                                                     |

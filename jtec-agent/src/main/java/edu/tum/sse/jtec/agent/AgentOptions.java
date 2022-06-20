@@ -16,6 +16,7 @@ public class AgentOptions {
 
     // Test event instrumentation.
     public static final String TRACE_TEST_EVENTS = "test.trace";
+    public static final String TEST_INSTRUMENT = "test.instr";
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
@@ -43,6 +44,7 @@ public class AgentOptions {
             false,
             false,
             false,
+            false,
             DEFAULT_COVERAGE_LEVEL,
             DEFAULT_COVERAGE_INCLUDES,
             DEFAULT_COVERAGE_EXCLUDES,
@@ -59,6 +61,7 @@ public class AgentOptions {
     private boolean traceTestEvents = false;
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
+    private boolean instrumentTestEvents = false;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
@@ -75,6 +78,7 @@ public class AgentOptions {
             final boolean traceSystemEvents,
             final boolean traceCoverage,
             final boolean instrumentCoverage,
+            final boolean instrumentTestEvents,
             final CoverageLevel coverageLevel,
             final String coverageIncludes,
             final String coverageExcludes,
@@ -87,6 +91,7 @@ public class AgentOptions {
         this.traceSystemEvents = traceSystemEvents;
         this.traceCoverage = traceCoverage;
         this.instrumentCoverage = instrumentCoverage;
+        this.instrumentTestEvents = instrumentTestEvents;
         this.coverageLevel = coverageLevel;
         this.coverageIncludes = coverageIncludes;
         this.coverageExcludes = coverageExcludes;
@@ -133,6 +138,7 @@ public class AgentOptions {
 
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
+        result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.get(TEST_INSTRUMENT));
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -160,6 +166,7 @@ public class AgentOptions {
     public String toAgentString() {
         return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
+                OPTIONS_SEPARATOR + TEST_INSTRUMENT + VALUE_SEPARATOR + instrumentTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
                 OPTIONS_SEPARATOR + FILE_INCLUDES + VALUE_SEPARATOR + "\"" + fileIncludes + "\"" +
                 OPTIONS_SEPARATOR + FILE_EXCLUDES + VALUE_SEPARATOR + "\"" + fileExcludes + "\"" +
@@ -217,5 +224,9 @@ public class AgentOptions {
 
     public String getFileExcludes() {
         return fileExcludes;
+    }
+
+    public boolean shouldInstrumentTestEvents() {
+        return instrumentTestEvents;
     }
 }
