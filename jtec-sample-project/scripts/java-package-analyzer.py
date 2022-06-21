@@ -2,7 +2,7 @@ import argparse
 import os
 import re
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional, Pattern, AnyStr
 
 
 def parse_arguments():
@@ -11,7 +11,8 @@ def parse_arguments():
         "root_dir",
         help="Root directory where to start searching for Java files.",
     )
-    parser.add_argument("--output", "-o", required=False, help="Output file")
+    parser.add_argument("--excludes", "-e", required=False, help="Regex to for excluded packages.")
+    parser.add_argument("--output", "-o", required=False, help="Output file for packages.")
     return parser.parse_args()
 
 
@@ -21,6 +22,9 @@ def main():
     if not root_dir.exists() or not root_dir.is_dir():
         print(f"Invalid root directory {root_dir}")
         exit(1)
+    regex: Optional[Pattern[AnyStr]] = None
+    if args.excludes is not None:
+        regex = re.compile(args.excludes, re.IGNORECASE)
     packages: Dict[str, str] = {}
     for root, dirs, files in os.walk(root_dir):
         for file in files:
@@ -34,7 +38,8 @@ def main():
                     match = re.search(r"package (\S*)\s*;", line)
                     if len(match.groups()) > 0:
                         package = match.groups()[0]
-                        packages[package] = filepath.__str__()
+                        if regex is None or not regex.match(package):
+                            packages[package] = filepath.__str__()
                         break
 
     if args.output is not None:
