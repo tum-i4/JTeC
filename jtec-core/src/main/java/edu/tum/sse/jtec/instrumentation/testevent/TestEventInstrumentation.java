@@ -8,14 +8,9 @@ import net.bytebuddy.asm.Advice;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
-import static edu.tum.sse.jtec.util.IOUtils.locateJar;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.*;
 
 /**
  * Adds test event instrumentation for the JUnit testing framework.
@@ -88,18 +83,10 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                     .transform(testEventTransformer()).installOn(instrumentation);
         } else {
             try {
-                Path jarFile = locateJar(getClass());
-                try (FileSystem zipFileSystem = FileSystems.newFileSystem(jarFile, null)) {
-                    Path junit5serviceLoaderManifest = zipFileSystem.getPath("META-INF/services/org.junit.platform.launcher.TestExecutionListener");
-                    Files.write(junit5serviceLoaderManifest, "edu.tum.sse.jtec.instrumentation.testevent.JUnitTestEventListener".getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
-                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                        try {
-                            Files.write(junit5serviceLoaderManifest, "".getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }));
-                }
+                replaceJunitTestListenerServiceLoaderManifest("edu.tum.sse.jtec.instrumentation.testevent.JUnitTestEventListener");
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    replaceJunitTestListenerServiceLoaderManifest("");
+                }));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
