@@ -31,9 +31,6 @@ public class Tracer {
         final File tempFolder = InstrumentationUtils.appendInstrumentationJarFile(instrumentation, getInstrumentationJarLocation());
         if (tempFolder == null) return;
 
-        // Reset any possibly transformed manifest from previous runs.
-        InstrumentationUtils.replaceJunitTestListenerServiceLoaderManifest("");
-
         // Order matters here: (1) test events, (2) system, (3) coverage
         if (options.shouldTraceTestEvents()) {
             final Path testEventOutput = options.getOutputPath().resolve(String.format("%s_%d_test.log", getCurrentPid(), System.currentTimeMillis()));
