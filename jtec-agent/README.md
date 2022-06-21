@@ -15,6 +15,10 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 | test.trace   | Boolean | `false`                                                                         | Enables test event tracing                                                                   |
 | test.instr   | Boolean | `true`                                                                          | Enables class file instrumentation for JUnit classes (instead of providing custom listeners) |
 | sys.trace    | Boolean | `false`                                                                         | Enables system event tracing                                                                 |
+| sys.file     | Boolean | `true`                                                                          | Enables file event tracing                                                                   |
+| sys.socket   | Boolean | `true`                                                                          | Enables socket event tracing                                                                 |
+| sys.thread   | Boolean | `true`                                                                          | Enables thread event tracing                                                                 |
+| sys.process  | Boolean | `true`                                                                          | Enables process event tracing                                                                |
 | sys.includes | String  | `.*`                                                                            | Regex for included files                                                                     |
 | sys.excludes | String  | `.*.(log\|tmp)`                                                                 | Regex for excluded files                                                                     |
 | cov.trace    | Boolean | `false`                                                                         | Enables coverage tracing                                                                     |
@@ -23,3 +27,4 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 | cov.includes | String  | `.*`                                                                            | Regex for included Java classes                                                              |
 | cov.excludes | String  | `(sun\|java\|com.sun\|edu.tum.sse.jtec\|net.bytebuddy\|org.apache.maven).*`     | Regex for excluded Java classes                                                              |
 | init.cmd     | String  | ``                                                                              | Command to execute upon JVM initialization (pre-test hook)                                   |
+

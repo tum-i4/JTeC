@@ -32,6 +32,10 @@ class AgentOptionsTest {
                 "test.trace=true," +
                 "test.instr=false," +
                 "sys.trace=true," +
+                "sys.file=true," +
+                "sys.socket=false," +
+                "sys.thread=true," +
+                "sys.process=false," +
                 "sys.includes=\".*\"," +
                 "sys.excludes=\".*.class\"," +
                 "cov.trace=true," +
@@ -48,6 +52,10 @@ class AgentOptionsTest {
         assertTrue(parsedOptions.getOutputPath().toFile().isDirectory());
         assertTrue(parsedOptions.getOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceSystemEvents());
+        assertTrue(parsedOptions.shouldInstrumentFileEvents());
+        assertTrue(parsedOptions.shouldInstrumentThreadEvents());
+        assertFalse(parsedOptions.shouldInstrumentSocketEvents());
+        assertFalse(parsedOptions.shouldInstrumentProcessEvents());
         assertEquals(parsedOptions.getFileIncludes(), ".*");
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());

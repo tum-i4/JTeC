@@ -40,7 +40,16 @@ public class Tracer {
         if (options.shouldTraceSystemEvents()) {
             final Path sysEventOutput = options.getOutputPath().resolve(String.format("%s_%d_sys.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(sysEventOutput);
-            customInstrumentationList.add(new SystemEventInstrumentation(sysEventOutput.toString(), options.getFileIncludes(), options.getFileExcludes()).attach(instrumentation, tempFolder));
+            customInstrumentationList.add(
+                    new SystemEventInstrumentation(
+                            sysEventOutput.toString(),
+                            options.getFileIncludes(),
+                            options.getFileExcludes(),
+                            options.shouldInstrumentFileEvents(),
+                            options.shouldInstrumentSocketEvents(),
+                            options.shouldInstrumentThreadEvents(),
+                            options.shouldInstrumentProcessEvents()
+                    ).attach(instrumentation, tempFolder));
         }
         if (options.shouldTraceCoverage()) {
             final Path covEventOutput = options.getOutputPath().resolve(String.format("%s_%d_cov.log", getCurrentPid(), System.currentTimeMillis()));
