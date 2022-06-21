@@ -10,6 +10,13 @@ public class ClassLoaderInterceptor {
      */
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final String printedName) {
+        String lowerCasedName = printedName.toLowerCase();
+        // If loading native libraries from the JVM, the extension often gets lost which makes it difficult to locate the shared libraries later on.
+        // Therefore, we also record the name with common shared library extensions added.
+        if (lowerCasedName.startsWith("lib") && !lowerCasedName.contains(".")) {
+            SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, (printedName + ".dll"));
+            SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, (printedName + ".so"));
+        }
         SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, printedName);
     }
 }
