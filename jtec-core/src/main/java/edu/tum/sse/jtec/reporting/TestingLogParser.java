@@ -5,7 +5,10 @@ import edu.tum.sse.jtec.instrumentation.testevent.TestTracingEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,8 +31,10 @@ public final class TestingLogParser {
         final String[] parts = testLog.getFileName().toString().split("_");
         final long globalStartTimestamp = Long.parseLong(parts[1]);
         boolean firstTestSuite = true;
+        boolean insideTestSuite = false;
         TestSuite currentTestSuite = new TestSuite();
-        for (String line: Files.readAllLines(testLog)) {
+        TestSuite lastTestSuite = null;
+        for (String line : Files.readAllLines(testLog)) {
             final Matcher matcher = testEventRegex.matcher(line);
             if (matcher.matches()) {
                 final MatchResult result = matcher.toMatchResult();
@@ -45,11 +50,20 @@ public final class TestingLogParser {
                     case SUITE_STARTED:
                         currentTestSuite = new TestSuite();
                         currentTestSuite.setStartTimestamp(timestamp);
+                        insideTestSuite = true;
                         break;
                     case SUITE_FINISHED:
-                        currentTestSuite.setEndTimestamp(timestamp);
-                        currentTestSuite.getSpawnedProcesses().add(testSuitePid);
-                        currentTestSuite.setDuration(currentTestSuite.getEndTimestamp() - currentTestSuite.getStartTimestamp());
+                        // We need to deal with the case that the SUITE_FINISHED event is triggered multiple times for the same test suite.
+                        // In those cases, we simply use the last seen test suite in the log (if available).
+                        if (!insideTestSuite && lastTestSuite != null) {
+                            currentTestSuite = lastTestSuite;
+                            currentTestSuite.setDuration(currentTestSuite.getDuration() + (timestamp - currentTestSuite.getEndTimestamp()));
+                            currentTestSuite.setEndTimestamp(timestamp);
+                        } else {
+                            currentTestSuite.setEndTimestamp(timestamp);
+                            currentTestSuite.getSpawnedProcesses().add(testSuitePid);
+                            currentTestSuite.setDuration(currentTestSuite.getEndTimestamp() - currentTestSuite.getStartTimestamp());
+                        }
                         // In case we are in forking mode, we want all events before the first test suite
                         // to be accounted for the first test suite and therefore override the start timestamp.
                         if (isForkingMode && firstTestSuite) {
@@ -64,10 +78,14 @@ public final class TestingLogParser {
                         currentTestSuite.setFailureCount(Integer.parseInt(eventDetailParts[2]));
                         currentTestSuite.setIgnoreCount(Integer.parseInt(eventDetailParts[3]));
 
-                        // Add test suite to map.
-                        testSuites.putIfAbsent(testSuitePid, new ArrayList<>());
-                        testSuites.get(testSuitePid).add(currentTestSuite);
+                        // Add test suite to map (only if this is the first found SUITE_FINISHED event).
+                        if (insideTestSuite) {
+                            testSuites.putIfAbsent(testSuitePid, new ArrayList<>());
+                            testSuites.get(testSuitePid).add(currentTestSuite);
+                        }
+                        lastTestSuite = currentTestSuite;
                         currentTestSuite = new TestSuite();
+                        insideTestSuite = false;
                         break;
                 }
             }
