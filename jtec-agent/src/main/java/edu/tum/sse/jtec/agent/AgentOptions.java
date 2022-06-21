@@ -44,7 +44,7 @@ public class AgentOptions {
             false,
             false,
             false,
-            false,
+            true,
             DEFAULT_COVERAGE_LEVEL,
             DEFAULT_COVERAGE_INCLUDES,
             DEFAULT_COVERAGE_EXCLUDES,
@@ -61,7 +61,7 @@ public class AgentOptions {
     private boolean traceTestEvents = false;
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
-    private boolean instrumentTestEvents = false;
+    private boolean instrumentTestEvents = true;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
@@ -138,7 +138,7 @@ public class AgentOptions {
 
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
-        result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.get(TEST_INSTRUMENT));
+        result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_INSTRUMENT, "true"));
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
