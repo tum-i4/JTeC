@@ -67,6 +67,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     public TestEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
         TestEventInterceptorUtility.testingLogFilePath = outputPath;
+        TestEventInterceptorUtility.testEventInstrumentation = shouldInstrument;
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()
                     .disableClassFormatChanges()
@@ -81,15 +82,6 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                             .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
                             .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_SPRING))))
                     .transform(testEventTransformer()).installOn(instrumentation);
-        } else {
-            try {
-                replaceJunitTestListenerServiceLoaderManifest("edu.tum.sse.jtec.instrumentation.testevent.JUnitTestEventListener");
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    replaceJunitTestListenerServiceLoaderManifest("");
-                }));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
 
         return this;

@@ -35,8 +35,8 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            String preparedAgentOpts = prepareAgentOpts();
             log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
+            String preparedAgentOpts = prepareAgentOpts();
             Path agentJar = locateJar(JTeCAgent.class);
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
@@ -59,7 +59,10 @@ public class JTeCMojo extends AbstractJTeCMojo {
             agentOptions = AgentOptions.fromString(agentOpts);
         }
         agentOptions.setOutputPath(outputDirectory.toPath());
-        return agentOptions.toAgentString();
+        String agentString = agentOptions.toAgentString();
+        // Fix for Win32 where a pipe character in a command line sometimes breaks process execution.
+        agentString = agentString.replace("|", AgentOptions.PIPE_REPLACEMENT);
+        return agentString;
     }
 
 }

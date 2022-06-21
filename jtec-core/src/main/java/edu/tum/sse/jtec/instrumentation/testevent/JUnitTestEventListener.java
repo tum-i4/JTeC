@@ -12,7 +12,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
 
     @Override
     public void executionStarted(final TestIdentifier testIdentifier) {
-        if (testIdentifier == null) {
+        if (TestEventInterceptorUtility.testEventInstrumentation || testIdentifier == null) {
             return;
         }
         TestEventInterceptorUtility.executionStarted(testIdentifier, TestEventInterceptorUtility.convertTestIdentifierToDescription(testIdentifier));
@@ -20,7 +20,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
 
     @Override
     public void executionFinished(final TestIdentifier testIdentifier, final TestExecutionResult executionResult) {
-        if (testIdentifier == null) {
+        if (TestEventInterceptorUtility.testEventInstrumentation ||testIdentifier == null) {
             return;
         }
         TestEventInterceptorUtility.executionFinished(testIdentifier, executionResult, TestEventInterceptorUtility.convertTestIdentifierToDescription(testIdentifier));
@@ -28,7 +28,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
 
     @Override
     public void testRunStarted(final Description testDescription) throws Exception {
-        if (testDescription == null) {
+        if (TestEventInterceptorUtility.testEventInstrumentation || testDescription == null) {
             return;
         }
         TestEventInterceptorUtility.testRunStarted(testDescription);
@@ -36,16 +36,25 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
 
     @Override
     public void testRunFinished(final Result result) throws Exception {
+        if (TestEventInterceptorUtility.testEventInstrumentation) {
+            return;
+        }
         TestEventInterceptorUtility.testRunFinished(result.getRunCount(), result.getFailureCount(), result.getIgnoreCount());
     }
 
     @Override
     public void testStarted(final Description testDescription) throws Exception {
+        if (TestEventInterceptorUtility.testEventInstrumentation) {
+            return;
+        }
         TestEventInterceptorUtility.testStarted(testDescription);
     }
 
     @Override
     public void testFinished(final Description testDescription) throws Exception {
+        if (TestEventInterceptorUtility.testEventInstrumentation) {
+            return;
+        }
         TestEventInterceptorUtility.testFinished();
     }
 }

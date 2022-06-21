@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AgentOptions {
+    // Address issue on Win32 where passing a pipe in a regex, e.g., (x|y), breaks the agent.
+    public static final String PIPE_REPLACEMENT = ";";
+
     // Output.
     public static final String AGENT_OUTPUT = "jtec.out";
     public static final String DEFAULT_AGENT_OUTPUT = "";
@@ -143,8 +146,8 @@ public class AgentOptions {
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceSystemEvents = Boolean.parseBoolean(optionsInput.get(TRACE_SYS_EVENTS));
-        result.fileIncludes = optionsInput.getOrDefault(FILE_INCLUDES, DEFAULT_FILE_INCLUDES);
-        result.fileExcludes = optionsInput.getOrDefault(FILE_EXCLUDES, DEFAULT_FILE_EXCLUDES);
+        result.fileIncludes = optionsInput.getOrDefault(FILE_INCLUDES, DEFAULT_FILE_INCLUDES).replace(PIPE_REPLACEMENT, "|");
+        result.fileExcludes = optionsInput.getOrDefault(FILE_EXCLUDES, DEFAULT_FILE_EXCLUDES).replace(PIPE_REPLACEMENT, "|");
     }
 
     private static void parseCoverageParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -155,8 +158,8 @@ public class AgentOptions {
         } else {
             result.instrumentCoverage = Boolean.parseBoolean(optionsInput.get(COVERAGE_INSTRUMENT));
         }
-        result.coverageIncludes = optionsInput.getOrDefault(COVERAGE_INCLUDES, DEFAULT_COVERAGE_INCLUDES);
-        result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES);
+        result.coverageIncludes = optionsInput.getOrDefault(COVERAGE_INCLUDES, DEFAULT_COVERAGE_INCLUDES).replace(PIPE_REPLACEMENT, "|");
+        result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES).replace(PIPE_REPLACEMENT, "|");
     }
 
     private static void parsePreTestParams(final AgentOptions result, final Map<String, String> optionsInput) {

@@ -16,6 +16,8 @@ import java.nio.file.StandardOpenOption;
 public class TestEventInterceptorUtility {
 
     public static String testingLogFilePath;
+    public static boolean testEventInstrumentation = false;
+
     public static TestRunResult currentTestRunResult = null;
 
     public static String currentTestSuite = "";
