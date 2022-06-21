@@ -11,8 +11,12 @@ def parse_arguments():
         "root_dir",
         help="Root directory where to start searching for Java files.",
     )
-    parser.add_argument("--excludes", "-e", required=False, help="Regex to for excluded packages.")
-    parser.add_argument("--output", "-o", required=False, help="Output file for packages.")
+    parser.add_argument(
+        "--excludes", "-e", required=False, help="Regex for excluded packages."
+    )
+    parser.add_argument(
+        "--output", "-o", required=False, help="Output file for packages."
+    )
     return parser.parse_args()
 
 
@@ -33,10 +37,10 @@ def main():
             if ext.lower() != ".java":
                 continue
 
-            with filepath.open("r") as fp:
+            with filepath.open("r", encoding="latin-1") as fp:
                 for line in fp.readlines():
                     match = re.search(r"package (\S*)\s*;", line)
-                    if len(match.groups()) > 0:
+                    if match is not None and len(match.groups()) > 0:
                         package = match.groups()[0]
                         if regex is None or not regex.match(package):
                             packages[package] = filepath.__str__()
