@@ -15,6 +15,9 @@ def parse_arguments():
         "--excludes", "-e", required=False, help="Regex for excluded packages."
     )
     parser.add_argument(
+        "--file-excludes", "-fe", required=False, help="Regex for excluding files."
+    )
+    parser.add_argument(
         "--output", "-o", required=False, help="Output file for packages."
     )
     return parser.parse_args()
@@ -29,12 +32,17 @@ def main():
     regex: Optional[Pattern[AnyStr]] = None
     if args.excludes is not None:
         regex = re.compile(args.excludes, re.IGNORECASE)
+    file_regex: Optional[Pattern[AnyStr]] = None
+    if args.excludes is not None:
+        file_regex = re.compile(args.file_excludes, re.IGNORECASE)
     packages: Dict[str, str] = {}
     for root, dirs, files in os.walk(root_dir):
         for file in files:
             filepath = Path(os.path.join(root, file))
             _, ext = os.path.splitext(file)
             if ext.lower() != ".java":
+                continue
+            if file_regex is not None and file_regex.match(filepath.__str__()):
                 continue
 
             with filepath.open("r", encoding="latin-1") as fp:
