@@ -10,7 +10,8 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.io.File;
 import java.lang.instrument.Instrumentation;
 
-import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.*;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
+import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE;
 
 /**
  * Adds test event instrumentation for the JUnit testing framework.
@@ -19,7 +20,6 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
 
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
     public static final String TEST_EXECUTION_LISTENER_JUNIT5 = "org.junit.platform.launcher.TestExecutionListener";
-    public static final String TEST_EXECUTION_LISTENER_SPRING = "org.springframework.test.context.TestExecutionListener";
     // public static final String TEST_RESULT = "junit.framework.TestResult";
     // junit 5 org.junit.platform.engine.support.hierarchicalNode might be an option
 
@@ -30,7 +30,6 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     public static final String EXECUTION_FINISHED = "executionFinished";
     public static final String TEST_RUN_STARTED = "testRunStarted";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
-    public static final String ORG_JUNIT = "org.junit";
     private final boolean shouldInstrument;
 
     private Instrumentation instrumentation;
@@ -79,8 +78,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                     .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                     .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
                     .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
-                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
-                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_SPRING))))
+                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5))))
                     .transform(testEventTransformer()).installOn(instrumentation);
         }
 
