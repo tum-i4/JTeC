@@ -4,11 +4,9 @@ package edu.tum.sse.jtec.instrumentation;
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
 import java.util.jar.JarFile;
 
-import static edu.tum.sse.jtec.util.IOUtils.locateJar;
 
 /**
  * Utilities and constants for instrumentation classes.
