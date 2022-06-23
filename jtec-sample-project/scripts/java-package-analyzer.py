@@ -33,7 +33,7 @@ def main():
     if args.excludes is not None:
         regex = re.compile(args.excludes, re.IGNORECASE)
     file_regex: Optional[Pattern[AnyStr]] = None
-    if args.excludes is not None:
+    if args.file_regex is not None:
         file_regex = re.compile(args.file_excludes, re.IGNORECASE)
     packages: Dict[str, str] = {}
     for root, dirs, files in os.walk(root_dir):
