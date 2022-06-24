@@ -20,13 +20,14 @@ public class JTeCAgent {
             return;
         }
         AgentOptions options = AgentOptions.fromString(arguments);
-        System.err.println("Attaching JTeC agent (" + agentCount++ + ") with args: " + options.toAgentString());
+        String pid = ProcessUtils.getCurrentPid();
+        System.err.println("Attaching JTeC agent (" + agentCount++ + ") to PID=" + pid + " with args: " + options.toAgentString());
 
         // Before we start tracing, we need to run the pre-test command, if specified.
         if (!options.getPreTestCommand().isEmpty()) {
             try {
                 Process process = ProcessUtils.run(options.getPreTestCommand(),
-                        Collections.singletonMap(PID_KEY, ProcessUtils.getCurrentPid()), false);
+                        Collections.singletonMap(PID_KEY, pid), false);
                 // Since the subprocess is non-blocking, we collect the output in a separate thread.
                 new Thread(() -> {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {

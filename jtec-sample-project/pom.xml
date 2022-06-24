@@ -14,6 +14,7 @@
     </properties>
 
     <modules>
+        <module>junit4-project</module>
         <module>junit5-project</module>
     </modules>
 

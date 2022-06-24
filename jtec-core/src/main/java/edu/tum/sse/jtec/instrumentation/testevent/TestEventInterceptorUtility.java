@@ -1,5 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
+import edu.tum.sse.jtec.util.ProcessUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -8,15 +9,21 @@ import org.junit.platform.launcher.TestIdentifier;
 import org.junit.runner.Description;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.Collections;
 
-import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
+import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
+import static edu.tum.sse.jtec.util.IOUtils.writeToFile;
 
 public class TestEventInterceptorUtility {
 
     public static String testingLogFilePath;
+    public static boolean testEventInstrumentation = true;
+
     public static TestRunResult currentTestRunResult = null;
 
     public static String currentTestSuite = "";
@@ -24,7 +31,7 @@ public class TestEventInterceptorUtility {
 
     public static boolean inTestSuite = false;
 
-    public static String currentPid = getCurrentPid();
+    public static String currentPid = ProcessUtils.getCurrentPid();
 
 
     /**
@@ -149,9 +156,11 @@ public class TestEventInterceptorUtility {
 
     public static void sendMessage(final String message) {
         try {
-            Files.write(Paths.get(testingLogFilePath), (message + "\n").getBytes(), StandardOpenOption.APPEND);
+            // No need to lock here, as we have one testing log per process, no two processes can interfere.
+            appendToFile(Paths.get(testingLogFilePath), message + "\n", false);
         } catch (final IOException e) {
-            System.err.println("Exception occurred: " + e.getMessage());
+            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

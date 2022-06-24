@@ -34,7 +34,7 @@ public class FileOpener {
             is.close();
         }
 
-        pause(1000);
+        pause(100);
 
         // java.io
         // FileInputStream
@@ -47,7 +47,7 @@ public class FileOpener {
         fis2.close();
         fis.close();
 
-        pause(1000);
+        pause(100);
 
         // FileOutputStream
         System.out.format("FileOutputStream (1), opens: %d\n", ++openCounter);
@@ -55,7 +55,7 @@ public class FileOpener {
         fos.write(0);
         fos.close();
 
-        pause(1000);
+        pause(100);
 
         // RandomAccessFile
         System.out.format("RandomAccessFile (1), opens: %d\n", ++openCounter);
@@ -63,7 +63,7 @@ public class FileOpener {
         raf.read();
         raf.close();
 
-        pause(1000);
+        pause(100);
 
         // ZipFile
         System.out.format("ZipFile (1), opens: %d\n", ++openCounter);
@@ -73,7 +73,7 @@ public class FileOpener {
         }
         zip.close();
 
-        pause(1000);
+        pause(100);
 
         // java.nio
 
@@ -84,7 +84,7 @@ public class FileOpener {
         Printer.printInputStream(is);
         is.close();
 
-        pause(1000);
+        pause(100);
 
         // Copy files
         System.out.format("Files.copy (1), opens: %d\n", ++openCounter);
@@ -92,14 +92,14 @@ public class FileOpener {
         tempFile.toFile().deleteOnExit();
         Files.copy(path, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
-        pause(1000);
+        pause(100);
 
         // Reading all bytes
         System.out.format("Files.readAllBytes (1), opens: %d\n", ++openCounter);
         final byte[] bytes = Files.readAllBytes(path);
         Printer.printBytes(bytes);
 
-        pause(1000);
+        pause(100);
 
         // FileChannel
         System.out.format("FileChannel.open (1), opens: %d\n", ++openCounter);

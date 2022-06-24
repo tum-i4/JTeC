@@ -7,6 +7,7 @@ import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 
 import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.BYTEBUDDY_PACKAGE;
@@ -19,7 +20,6 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
 
     public static final String RUN_LISTENER_JUNIT4 = "org.junit.runner.notification.RunListener";
     public static final String TEST_EXECUTION_LISTENER_JUNIT5 = "org.junit.platform.launcher.TestExecutionListener";
-    public static final String TEST_EXECUTION_LISTENER_SPRING = "org.springframework.test.context.TestExecutionListener";
     // public static final String TEST_RESULT = "junit.framework.TestResult";
     // junit 5 org.junit.platform.engine.support.hierarchicalNode might be an option
 
@@ -30,34 +30,17 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     public static final String EXECUTION_FINISHED = "executionFinished";
     public static final String TEST_RUN_STARTED = "testRunStarted";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
+    private final boolean shouldInstrument;
 
     private Instrumentation instrumentation;
     private ResettableClassFileTransformer transformer;
 
-    public TestEventInstrumentation(final String outputPath) {
+    public TestEventInstrumentation(final String outputPath, final boolean shouldInstrument) {
         super(outputPath);
+        this.shouldInstrument = shouldInstrument;
     }
 
-    @Override
-    public TestEventInstrumentation attach(final Instrumentation instrumentation) {
-        this.instrumentation = instrumentation;
-        TestEventInterceptorUtility.testingLogFilePath = outputPath;
-        transformer = new AgentBuilder.Default()
-                .disableClassFormatChanges()
-                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-                .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
-                .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
-                .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
-                .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
-                .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
-                .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
-                        .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5)))
-                        .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_SPRING))))
-                .transform(testEventTransformer()).installOn(instrumentation);
-        return this;
-    }
-
-    private AgentBuilder.Transformer testEventTransformer() {
+    private static AgentBuilder.Transformer testEventTransformer() {
         return (builder, typeDescription, classLoader, module) ->
                 builder.visit(Advice.withCustomMapping()
                                 .to(TestStartInterceptor.class)
@@ -77,6 +60,29 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                         .visit(Advice.withCustomMapping()
                                 .to(TestRunFinishedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(TEST_RUN_FINISHED)));
+    }
+
+    @Override
+    public TestEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
+        this.instrumentation = instrumentation;
+        TestEventInterceptorUtility.testingLogFilePath = outputPath;
+        TestEventInterceptorUtility.testEventInstrumentation = shouldInstrument;
+        if (shouldInstrument) {
+            transformer = new AgentBuilder.Default()
+                    .disableClassFormatChanges()
+                    .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+                    .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
+                    .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
+                    .with(new AgentBuilder.InjectionStrategy.UsingInstrumentation(instrumentation, tempFolder))
+                    .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
+                    .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
+                    .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
+                    .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
+                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5))))
+                    .transform(testEventTransformer()).installOn(instrumentation);
+        }
+
+        return this;
     }
 
     @Override

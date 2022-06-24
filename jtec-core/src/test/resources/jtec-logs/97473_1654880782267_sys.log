@@ -1,2 +1,2 @@
-{"timestamp": 1654880783198, "pid": "97473", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/Runnable.class"}
-{"timestamp": 1654880784086, "pid": "97473", "action": "START", "target": "THREAD", "value": "Thread-1"}
+[{"timestamp": 1654880783198, "pid": "97473", "action": "OPEN", "target": "RESOURCE", "value": "java/lang/Runnable.class"},
+{"timestamp": 1654880784086, "pid": "97473", "action": "START", "target": "THREAD", "value": "Thread-1"}]

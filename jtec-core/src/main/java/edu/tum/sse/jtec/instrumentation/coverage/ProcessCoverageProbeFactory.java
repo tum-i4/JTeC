@@ -1,6 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
+import edu.tum.sse.jtec.util.ProcessUtils;
 
 /**
  * A coverage probe factory that collects coverage probes per PID of the currently running process.
@@ -8,12 +8,12 @@ import static edu.tum.sse.jtec.util.ProcessUtils.getCurrentPid;
 public class ProcessCoverageProbeFactory implements CoverageProbeFactory {
 
     @Override
-    public ClassCoverageProbe createClassProbe(String className) {
-        return new ClassCoverageProbe(getCurrentPid(), className);
+    public ClassCoverageProbe createClassProbe(final String className) {
+        return new ClassCoverageProbe(ProcessUtils.getCurrentPid(), className);
     }
 
     @Override
-    public MethodCoverageProbe createMethodProbe(String className, String methodSignature, String returnType) {
-        return new MethodCoverageProbe(getCurrentPid(), className, methodSignature, returnType);
+    public MethodCoverageProbe createMethodProbe(final String className, final String methodSignature, final String returnType) {
+        return new MethodCoverageProbe(ProcessUtils.getCurrentPid(), className, methodSignature, returnType);
     }
 }

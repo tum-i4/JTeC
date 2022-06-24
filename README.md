@@ -55,6 +55,37 @@ the `jtec:report-aggregate` goal to your command line:
 $ mvn clean verify -fn -Djtec.opts="test.trace,sys.trace,cov.trace" jtec:report-aggregate
 ```
 
+## Advanced JUnit Usage
+
+If you do not want to use JTeC's default instrumentation for JUnit (4/5) test cases, you may pass the
+option `test.instr=false`, which prevents bytecode transformation for JUnit classes.
+Instead, for JUnit5 projects,
+the [service loader mechanism](https://junit.org/junit5/docs/current/user-guide/#launcher-api-listeners-custom) is used
+to dynamically register
+a [`TestExecutionListener`](https://junit.org/junit5/docs/current/api/org.junit.platform.launcher/org/junit/platform/launcher/TestExecutionListener.html)
+.
+For JUnit4 projects, you can register a
+JTeC [`RunListener`](https://junit.org/junit4/javadoc/4.12/org/junit/runner/notification/RunListener.html)
+with [Maven](https://maven.apache.org/surefire/maven-surefire-plugin/examples/junit.html#using-custom-listeners-and-reporters)
+in your `pom.xml` as follows:
+
+```xml
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId> <!-- same for failsafe -->
+    <version>3.0.0-M5</version>
+    <configuration>
+        <properties>
+            <property>
+                <name>listener</name>
+                <value>edu.tum.sse.jtec.instrumentation.testevent.JUnitTestEventListener</value>
+            </property>
+        </properties>
+    </configuration>
+</plugin>
+```
+
 ## Structure
 
 ```

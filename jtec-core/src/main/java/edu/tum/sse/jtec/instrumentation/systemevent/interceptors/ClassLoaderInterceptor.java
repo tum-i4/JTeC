@@ -1,28 +1,22 @@
 package edu.tum.sse.jtec.instrumentation.systemevent.interceptors;
 
-import edu.tum.sse.jtec.instrumentation.systemevent.AdviceOutput;
-import edu.tum.sse.jtec.instrumentation.systemevent.AdvicePid;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemEventMonitor;
+import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
 import net.bytebuddy.asm.Advice;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 public class ClassLoaderInterceptor {
     /**
      * Writes the given path to the location given in the {@code outputPath} parameter.
      */
     @Advice.OnMethodEnter
-    public static void enter(@Advice.Argument(0) final String printedName, @AdviceOutput final String outputPath, @AdvicePid final String currentPid) {
-        final Long timestamp = System.currentTimeMillis();
-        try {
-            final String message = String.format("{\"timestamp\": %d, \"pid\": \"%s\", \"action\": \"OPEN\", \"target\": \"RESOURCE\", \"value\": \"%s\"}\n",
-                    timestamp, currentPid, printedName);
-            Files.write(Paths.get(outputPath), message.getBytes(), StandardOpenOption.APPEND,
-                    StandardOpenOption.CREATE);
-        } catch (final Exception e) {
-            System.err.println("Exception, printedName is: " + printedName);
-            e.printStackTrace();
+    public static void enter(@Advice.Argument(0) final String printedName) {
+        String lowerCasedName = printedName.toLowerCase();
+        // If loading native libraries from the JVM, the extension often gets lost which makes it difficult to locate the shared libraries later on.
+        // Therefore, we also record the name with common shared library extensions added.
+        if (!lowerCasedName.contains(".") && (lowerCasedName.startsWith("lib") || lowerCasedName.endsWith("lib") || lowerCasedName.contains("library"))) {
+            SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, (printedName + ".dll"));
+            SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, (printedName + ".so"));
         }
+        SystemEventMonitor.record(SystemInstrumentationEvent.Action.OPEN, SystemInstrumentationEvent.Target.RESOURCE, printedName);
     }
 }

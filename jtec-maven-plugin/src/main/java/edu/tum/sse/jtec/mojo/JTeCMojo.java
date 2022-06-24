@@ -8,14 +8,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
+
+import static edu.tum.sse.jtec.util.IOUtils.locateJar;
 
 /**
  * This Mojo is used to attach the JTeC agent before tests are executed in a Surefire or Failsafe project.
@@ -39,13 +35,13 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            String preparedAgentOpts = prepareAgentOpts();
             log("Executing JTeC Maven plugin with agentOpts=" + agentOpts + " for project " + project.getName());
-            Path agentJar = locateAgentJar();
+            String preparedAgentOpts = prepareAgentOpts();
+            Path agentJar = locateJar(JTeCAgent.class);
             Properties properties = project.getProperties();
             for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
                 String oldValue = properties.getProperty(property);
-                String newValue = String.format("-javaagent:%s=%s%s", agentJar.toAbsolutePath(), preparedAgentOpts, (oldValue == null ? "" : " " + oldValue));
+                String newValue = String.format("%s-javaagent:%s=%s", (oldValue == null ? "" : oldValue + " "), agentJar.toAbsolutePath(), preparedAgentOpts);
                 properties.setProperty(property, newValue);
                 log(String.format("Changing Maven property %s to %s.", property, newValue));
             }
@@ -63,12 +59,10 @@ public class JTeCMojo extends AbstractJTeCMojo {
             agentOptions = AgentOptions.fromString(agentOpts);
         }
         agentOptions.setOutputPath(outputDirectory.toPath());
-        return agentOptions.toAgentString();
+        String agentString = agentOptions.toAgentString();
+        // Fix for Win32 where a pipe character in a command line sometimes breaks process execution.
+        agentString = agentString.replace("|", AgentOptions.PIPE_REPLACEMENT);
+        return agentString;
     }
 
-    private Path locateAgentJar() throws IOException, URISyntaxException {
-        URL url = JTeCAgent.class.getResource("/" + JTeCAgent.class.getName().replace('.', '/') + ".class");
-        URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
-        return Paths.get(jarURL);
-    }
 }
