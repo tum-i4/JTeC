@@ -78,7 +78,7 @@ class CoverageInstrumentationTest {
                     "",
                     true
             );
-            instr.attach(instrumentation, new File("/users/raphael/cqse"));
+            instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);
             fooType.getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
@@ -113,7 +113,7 @@ class CoverageInstrumentationTest {
                     "",
                     true
             );
-            instr.attach(instrumentation, new File("/users/raphael/cqse"));
+            instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);
             fooType.getDeclaredMethod("foo").invoke(fooType.getDeclaredConstructor().newInstance());
         } catch (final Exception e) {
