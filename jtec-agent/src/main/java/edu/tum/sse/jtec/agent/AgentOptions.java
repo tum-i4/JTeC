@@ -206,7 +206,7 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
                 OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + "\"" + coverageIncludes + "\"" +
                 OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + "\"" + coverageExcludes + "\"" +
-                OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
+                OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + "\"" + preTestCommand + "\"";
     }
 
     public CoverageLevel getCoverageLevel() {

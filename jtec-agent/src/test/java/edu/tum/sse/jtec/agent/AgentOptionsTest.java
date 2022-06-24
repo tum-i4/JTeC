@@ -43,7 +43,7 @@ class AgentOptionsTest {
                 "cov.includes=\".*foo.*\"," +
                 "cov.excludes=\".*bar.*\"," +
                 "cov.level=method," +
-                "init.cmd=run.bat";
+                "init.cmd=\"run.bat\"";
 
         // when
         AgentOptions parsedOptions = AgentOptions.fromString(options);
