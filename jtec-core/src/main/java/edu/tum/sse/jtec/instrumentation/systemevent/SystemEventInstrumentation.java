@@ -19,6 +19,8 @@ import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -31,18 +33,18 @@ import static edu.tum.sse.jtec.instrumentation.InstrumentationUtils.JTEC_PACKAGE
  */
 public class SystemEventInstrumentation extends AbstractInstrumentation<SystemEventInstrumentation> {
 
-    private static final String TYPES_TO_TRACE = "(" +
-            "java.io.FileInputStream|" +
-            "java.io.FileOutputStream|" +
-            "sun.nio.fs.UnixFileSystemProvider|" +
-            "java.nio.file.spi.FileSystemProvider|" +
-            "sun.nio.fs.WindowsFileSystemProvider|" +
-            "java.io.RandomAccessFile|" +
-            "java.lang.ClassLoader|" +
-            "java.net.Socket|" +
-            "java.lang.Thread|" +
-            "java.lang.ProcessBuilder" +
-            ")";
+    private static final List<String> FILE_TRACING_TYPES = Arrays.asList(
+            "java.io.FileInputStream",
+            "java.io.FileOutputStream",
+            "sun.nio.fs.UnixFileSystemProvider",
+            "java.nio.file.spi.FileSystemProvider",
+            "sun.nio.fs.WindowsFileSystemProvider",
+            "java.io.RandomAccessFile",
+            "java.lang.ClassLoader"
+    );
+    private static final List<String> SOCKET_TRACING_TYPES = Arrays.asList("java.net.Socket");
+    private static final List<String> THREAD_TRACING_TYPES = Arrays.asList("java.lang.Thread");
+    private static final List<String> PROCESS_TRACING_TYPES = Arrays.asList("java.lang.ProcessBuilder");
     private static final String CLASS_LOADER_TRACED_METHODS = "(" +
             "getResource|" +
             "findLibrary" +
@@ -60,34 +62,62 @@ public class SystemEventInstrumentation extends AbstractInstrumentation<SystemEv
     private static final String PROCESS_CREATION_METHODS = "start";
     private final String fileIncludes;
     private final String fileExcludes;
+    private final boolean instrumentFile;
+    private final boolean instrumentSocket;
+    private final boolean instrumentThread;
+    private final boolean instrumentProcess;
     private Instrumentation instrumentation;
     private ResettableClassFileTransformer transformer;
 
     public SystemEventInstrumentation(final String outputPath,
                                       final String fileIncludes,
-                                      final String fileExcludes
+                                      final String fileExcludes,
+                                      final boolean instrumentFile,
+                                      final boolean instrumentSocket,
+                                      final boolean instrumentThread,
+                                      final boolean instrumentProcess
     ) {
         super(outputPath);
         this.fileIncludes = fileIncludes;
         this.fileExcludes = fileExcludes;
+        this.instrumentFile = instrumentFile;
+        this.instrumentSocket = instrumentSocket;
+        this.instrumentThread = instrumentThread;
+        this.instrumentProcess = instrumentProcess;
     }
 
     @Override
     public SystemEventInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
-        this.transformer = new AgentBuilder.Default()
-                .disableClassFormatChanges()
-                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-                .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
-                .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
-                .with(new AgentBuilder.InjectionStrategy.UsingInstrumentation(instrumentation, tempFolder))
-                .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
-                .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
-                .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
-                .type(ElementMatchers.nameMatches(TYPES_TO_TRACE))
-                .transform(systemEventTransformer()).installOn(instrumentation);
+        List<String> typesToTrace = new ArrayList<>();
+        if (instrumentFile) {
+            typesToTrace.addAll(FILE_TRACING_TYPES);
+        }
+        if (instrumentSocket) {
+            typesToTrace.addAll(SOCKET_TRACING_TYPES);
+        }
+        if (instrumentThread) {
+            typesToTrace.addAll(THREAD_TRACING_TYPES);
+        }
+        if (instrumentProcess) {
+            typesToTrace.addAll(PROCESS_TRACING_TYPES);
+        }
+        if (typesToTrace.size() > 0) {
+            String joinedTracingTypes = String.format("(%s)", String.join("|", typesToTrace));
+            this.transformer = new AgentBuilder.Default()
+                    .disableClassFormatChanges()
+                    .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+                    .with(AgentBuilder.RedefinitionStrategy.Listener.StreamWriting.toSystemError())
+                    .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
+                    .with(new AgentBuilder.InjectionStrategy.UsingInstrumentation(instrumentation, tempFolder))
+                    .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
+                    .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
+                    .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError())
+                    .type(ElementMatchers.nameMatches(joinedTracingTypes))
+                    .transform(systemEventTransformer()).installOn(instrumentation);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this::dumpEvents));
+            Runtime.getRuntime().addShutdownHook(new Thread(this::dumpEvents));
+        }
 
         return this;
     }

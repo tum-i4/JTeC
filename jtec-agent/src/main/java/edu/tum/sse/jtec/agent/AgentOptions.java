@@ -10,15 +10,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AgentOptions {
+    // Address issue on Win32 where passing a pipe in a regex, e.g., (x|y), breaks the agent.
+    public static final String PIPE_REPLACEMENT = ";";
+
     // Output.
     public static final String AGENT_OUTPUT = "jtec.out";
     public static final String DEFAULT_AGENT_OUTPUT = "";
 
     // Test event instrumentation.
     public static final String TRACE_TEST_EVENTS = "test.trace";
+    public static final String TEST_INSTRUMENT = "test.instr";
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
+    public static final String TRACE_SYS_FILE = "sys.file";
+    public static final String TRACE_SYS_SOCKET = "sys.socket";
+    public static final String TRACE_SYS_THREAD = "sys.thread";
+    public static final String TRACE_SYS_PROCESS = "sys.process";
     public static final String FILE_INCLUDES = "sys.includes";
     public static final String FILE_EXCLUDES = "sys.excludes";
     public static final String DEFAULT_FILE_INCLUDES = ".*";
@@ -32,7 +40,7 @@ public class AgentOptions {
     public static final String COVERAGE_EXCLUDES = "cov.excludes";
     public static final CoverageLevel DEFAULT_COVERAGE_LEVEL = CoverageLevel.CLASS;
     public static final String DEFAULT_COVERAGE_INCLUDES = ".*";
-    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven|org.junit).*";
+    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven|org.junit).*";
 
     // Pre-test hook.
     public static final String PRE_TEST_COMMAND = "init.cmd";
@@ -40,7 +48,12 @@ public class AgentOptions {
 
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
+            true,
             false,
+            true,
+            true,
+            true,
+            true,
             false,
             false,
             DEFAULT_COVERAGE_LEVEL,
@@ -57,8 +70,13 @@ public class AgentOptions {
 
     private boolean traceSystemEvents = false;
     private boolean traceTestEvents = false;
+    private boolean instrumentFileEvents;
+    private boolean instrumentSocketEvents;
+    private boolean instrumentThreadEvents;
+    private boolean instrumentProcessEvents;
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
+    private boolean instrumentTestEvents = true;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
@@ -72,7 +90,12 @@ public class AgentOptions {
 
     private AgentOptions(
             final boolean traceTestEvents,
+            final boolean instrumentTestEvents,
             final boolean traceSystemEvents,
+            final boolean instrumentFileEvents,
+            final boolean instrumentSocketEvents,
+            final boolean instrumentThreadEvents,
+            final boolean instrumentProcessEvents,
             final boolean traceCoverage,
             final boolean instrumentCoverage,
             final CoverageLevel coverageLevel,
@@ -84,7 +107,12 @@ public class AgentOptions {
             final String fileExcludes
     ) {
         this.traceTestEvents = traceTestEvents;
+        this.instrumentTestEvents = instrumentTestEvents;
         this.traceSystemEvents = traceSystemEvents;
+        this.instrumentFileEvents = instrumentFileEvents;
+        this.instrumentSocketEvents = instrumentSocketEvents;
+        this.instrumentThreadEvents = instrumentThreadEvents;
+        this.instrumentProcessEvents = instrumentProcessEvents;
         this.traceCoverage = traceCoverage;
         this.instrumentCoverage = instrumentCoverage;
         this.coverageLevel = coverageLevel;
@@ -133,12 +161,17 @@ public class AgentOptions {
 
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
+        result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_INSTRUMENT, "true"));
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceSystemEvents = Boolean.parseBoolean(optionsInput.get(TRACE_SYS_EVENTS));
-        result.fileIncludes = optionsInput.getOrDefault(FILE_INCLUDES, DEFAULT_FILE_INCLUDES);
-        result.fileExcludes = optionsInput.getOrDefault(FILE_EXCLUDES, DEFAULT_FILE_EXCLUDES);
+        result.instrumentFileEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TRACE_SYS_FILE, "true"));
+        result.instrumentSocketEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TRACE_SYS_SOCKET, "true"));
+        result.instrumentThreadEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TRACE_SYS_THREAD, "true"));
+        result.instrumentProcessEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TRACE_SYS_PROCESS, "true"));
+        result.fileIncludes = optionsInput.getOrDefault(FILE_INCLUDES, DEFAULT_FILE_INCLUDES).replace(PIPE_REPLACEMENT, "|");
+        result.fileExcludes = optionsInput.getOrDefault(FILE_EXCLUDES, DEFAULT_FILE_EXCLUDES).replace(PIPE_REPLACEMENT, "|");
     }
 
     private static void parseCoverageParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -149,8 +182,8 @@ public class AgentOptions {
         } else {
             result.instrumentCoverage = Boolean.parseBoolean(optionsInput.get(COVERAGE_INSTRUMENT));
         }
-        result.coverageIncludes = optionsInput.getOrDefault(COVERAGE_INCLUDES, DEFAULT_COVERAGE_INCLUDES);
-        result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES);
+        result.coverageIncludes = optionsInput.getOrDefault(COVERAGE_INCLUDES, DEFAULT_COVERAGE_INCLUDES).replace(PIPE_REPLACEMENT, "|");
+        result.coverageExcludes = optionsInput.getOrDefault(COVERAGE_EXCLUDES, DEFAULT_COVERAGE_EXCLUDES).replace(PIPE_REPLACEMENT, "|");
     }
 
     private static void parsePreTestParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -160,7 +193,12 @@ public class AgentOptions {
     public String toAgentString() {
         return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
+                OPTIONS_SEPARATOR + TEST_INSTRUMENT + VALUE_SEPARATOR + instrumentTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
+                OPTIONS_SEPARATOR + TRACE_SYS_FILE + VALUE_SEPARATOR + instrumentFileEvents +
+                OPTIONS_SEPARATOR + TRACE_SYS_SOCKET + VALUE_SEPARATOR + instrumentSocketEvents +
+                OPTIONS_SEPARATOR + TRACE_SYS_THREAD + VALUE_SEPARATOR + instrumentThreadEvents +
+                OPTIONS_SEPARATOR + TRACE_SYS_PROCESS + VALUE_SEPARATOR + instrumentProcessEvents +
                 OPTIONS_SEPARATOR + FILE_INCLUDES + VALUE_SEPARATOR + "\"" + fileIncludes + "\"" +
                 OPTIONS_SEPARATOR + FILE_EXCLUDES + VALUE_SEPARATOR + "\"" + fileExcludes + "\"" +
                 OPTIONS_SEPARATOR + TRACE_COVERAGE + VALUE_SEPARATOR + traceCoverage +
@@ -168,7 +206,7 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + COVERAGE_LEVEL + VALUE_SEPARATOR + coverageLevel +
                 OPTIONS_SEPARATOR + COVERAGE_INCLUDES + VALUE_SEPARATOR + "\"" + coverageIncludes + "\"" +
                 OPTIONS_SEPARATOR + COVERAGE_EXCLUDES + VALUE_SEPARATOR + "\"" + coverageExcludes + "\"" +
-                OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + preTestCommand;
+                OPTIONS_SEPARATOR + PRE_TEST_COMMAND + VALUE_SEPARATOR + "\"" + preTestCommand + "\"";
     }
 
     public CoverageLevel getCoverageLevel() {
@@ -217,5 +255,25 @@ public class AgentOptions {
 
     public String getFileExcludes() {
         return fileExcludes;
+    }
+
+    public boolean shouldInstrumentTestEvents() {
+        return instrumentTestEvents;
+    }
+
+    public boolean shouldInstrumentFileEvents() {
+        return instrumentFileEvents;
+    }
+
+    public boolean shouldInstrumentSocketEvents() {
+        return instrumentSocketEvents;
+    }
+
+    public boolean shouldInstrumentThreadEvents() {
+        return instrumentThreadEvents;
+    }
+
+    public boolean shouldInstrumentProcessEvents() {
+        return instrumentProcessEvents;
     }
 }

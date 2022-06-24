@@ -2,16 +2,27 @@ package edu.tum.sse.jtec.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 
 public final class IOUtils {
+
+    public static <T> Path locateJar(Class<T> clazz) throws IOException, URISyntaxException {
+        URL url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class");
+        URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
+        return Paths.get(jarURL);
+    }
 
     public static void createFileAndEnclosingDir(final Path path) {
         if (Files.notExists(path)) {

@@ -35,12 +35,21 @@ public class Tracer {
         if (options.shouldTraceTestEvents()) {
             final Path testEventOutput = options.getOutputPath().resolve(String.format("%s_%d_test.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(testEventOutput);
-            customInstrumentationList.add(new TestEventInstrumentation(testEventOutput.toString()).attach(instrumentation, tempFolder));
+            customInstrumentationList.add(new TestEventInstrumentation(testEventOutput.toString(), options.shouldInstrumentTestEvents()).attach(instrumentation, tempFolder));
         }
         if (options.shouldTraceSystemEvents()) {
             final Path sysEventOutput = options.getOutputPath().resolve(String.format("%s_%d_sys.log", getCurrentPid(), System.currentTimeMillis()));
             createFileAndEnclosingDir(sysEventOutput);
-            customInstrumentationList.add(new SystemEventInstrumentation(sysEventOutput.toString(), options.getFileIncludes(), options.getFileExcludes()).attach(instrumentation, tempFolder));
+            customInstrumentationList.add(
+                    new SystemEventInstrumentation(
+                            sysEventOutput.toString(),
+                            options.getFileIncludes(),
+                            options.getFileExcludes(),
+                            options.shouldInstrumentFileEvents(),
+                            options.shouldInstrumentSocketEvents(),
+                            options.shouldInstrumentThreadEvents(),
+                            options.shouldInstrumentProcessEvents()
+                    ).attach(instrumentation, tempFolder));
         }
         if (options.shouldTraceCoverage()) {
             final Path covEventOutput = options.getOutputPath().resolve(String.format("%s_%d_cov.log", getCurrentPid(), System.currentTimeMillis()));

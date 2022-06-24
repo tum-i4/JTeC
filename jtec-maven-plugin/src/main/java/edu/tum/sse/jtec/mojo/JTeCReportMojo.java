@@ -7,8 +7,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 
 import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
 import static edu.tum.sse.jtec.util.IOUtils.createFileAndEnclosingDir;

@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AgentOptionsTest {
 
@@ -31,7 +30,12 @@ class AgentOptionsTest {
         // given
         String options = "jtec.out=" + tmpDir + "," +
                 "test.trace=true," +
+                "test.instr=false," +
                 "sys.trace=true," +
+                "sys.file=true," +
+                "sys.socket=false," +
+                "sys.thread=true," +
+                "sys.process=false," +
                 "sys.includes=\".*\"," +
                 "sys.excludes=\".*.class\"," +
                 "cov.trace=true," +
@@ -39,7 +43,7 @@ class AgentOptionsTest {
                 "cov.includes=\".*foo.*\"," +
                 "cov.excludes=\".*bar.*\"," +
                 "cov.level=method," +
-                "init.cmd=run.bat";
+                "init.cmd=\"run.bat\"";
 
         // when
         AgentOptions parsedOptions = AgentOptions.fromString(options);
@@ -48,9 +52,14 @@ class AgentOptionsTest {
         assertTrue(parsedOptions.getOutputPath().toFile().isDirectory());
         assertTrue(parsedOptions.getOutputPath().toFile().exists());
         assertTrue(parsedOptions.shouldTraceSystemEvents());
+        assertTrue(parsedOptions.shouldInstrumentFileEvents());
+        assertTrue(parsedOptions.shouldInstrumentThreadEvents());
+        assertFalse(parsedOptions.shouldInstrumentSocketEvents());
+        assertFalse(parsedOptions.shouldInstrumentProcessEvents());
         assertEquals(parsedOptions.getFileIncludes(), ".*");
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());
+        assertFalse(parsedOptions.shouldInstrumentTestEvents());
         assertTrue(parsedOptions.shouldTraceCoverage());
         assertTrue(parsedOptions.shouldInstrumentCoverage());
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
