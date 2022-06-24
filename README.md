@@ -91,6 +91,7 @@ in your `pom.xml` as follows:
 ```
 ├── jtec-agent              <- The JTeC agent is a simple Java agent that can be parameterized and attached to a JVM process.
 ├── jtec-core               <- The JTeC core package contains instrumentation and auxiliary code.
+├── jtec-instrumentation    <- The JTeC instrumentation package contains instrumentation code injected via the JTeC agent at runtime.
 ├── jtec-maven-plugin       <- The JTeC maven plugin provides a utility to attach the agent to the tests of a Maven project.
 └── jtec-sample-project     <- A sample project that demonstrates how to use JTeC in a Maven multi-module project.
 ```
