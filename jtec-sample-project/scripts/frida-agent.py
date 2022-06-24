@@ -16,7 +16,7 @@ class FridaApplication(object):
     Taken from: https://github.com/frida/frida-python/blob/main/examples/child_gating.py
     """
 
-    def __init__(self, tracing_log: Path, includes_regex: str):
+    def __init__(self, tracing_log: Path, includes_regex: str, excludes_regex: str):
         self._stop_requested = threading.Event()
         self._reactor = Reactor(
             run_until_return=lambda reactor: self._stop_requested.wait()
@@ -37,6 +37,7 @@ class FridaApplication(object):
 
         self._tracing_log = tracing_log
         self._includes_regex = re.compile(includes_regex)
+        self._excludes_regex = re.compile(excludes_regex)
 
     def run_command(self, command: str):
         self._reactor.schedule(lambda: self._start(command))
@@ -85,7 +86,8 @@ class FridaApplication(object):
 
         # NOTE: The script could be in a separate JS file,
         # but for the sake of easy reuse we keep it inside the Python script.
-        script = session.create_script(r"""
+        script = session.create_script(
+            r"""
 "use strict";
 
 /**
@@ -210,7 +212,8 @@ const instrumentSyscalls = () => {
 };
 
 instrumentSyscalls();
-""")
+"""
+        )
         script.on(
             "message",
             lambda message, data: self._reactor.schedule(
@@ -251,7 +254,9 @@ instrumentSyscalls();
     def _on_message(self, pid, message):
         if "payload" in message and "syscall" in message["payload"]:
             filepath: str = message["payload"]["syscall"]
-            if self._includes_regex.match(filepath):
+            if self._includes_regex.match(filepath) and not self._excludes_regex.match(
+                filepath
+            ):
                 self._reactor.schedule(
                     lambda: self._write_tracing_log(
                         '{"timestamp": %d, "pid": "%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
@@ -283,6 +288,12 @@ def parse_arguments():
         default=rf".*\{os.sep}.*\..*",
     )
     parser.add_argument(
+        "--excludes",
+        "-e",
+        help="Regex for filtering matched files.",
+        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar\$;\\pom.xml$;tmp$;log$;class$)",
+    )
+    parser.add_argument(
         "--output", "-o", help="Output file", default=f"{os.getpid()}_syscalls.log"
     )
     return parser.parse_args()
@@ -301,7 +312,11 @@ def main():
     output_file.parent.mkdir(parents=True, exist_ok=True)
     output_file.touch()
 
-    app = FridaApplication(tracing_log=output_file, includes_regex=args.includes)
+    app = FridaApplication(
+        tracing_log=output_file,
+        includes_regex=args.includes,
+        excludes_regex=args.excludes,
+    )
     if args.target is not None:
         app.run_command(args.target)
     else:
