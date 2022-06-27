@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import re
 import sys
@@ -6,9 +7,12 @@ import threading
 import time
 from pathlib import Path
 from shlex import split
+from typing import List, Pattern, AnyStr
 
 import frida
 from frida_tools.application import Reactor
+
+PIPE_REPLACEMENT_CHAR: str = ";"
 
 
 class FridaApplication(object):
@@ -35,9 +39,14 @@ class FridaApplication(object):
         #     lambda child: self._reactor.schedule(lambda: self._on_child_removed(child)),
         # )
 
-        self._tracing_log = tracing_log
-        self._includes_regex = re.compile(includes_regex)
-        self._excludes_regex = re.compile(excludes_regex)
+        self._system_events: List[str] = []
+        self._tracing_log: Path = tracing_log
+        self._includes_regex: Pattern[AnyStr] = re.compile(
+            includes_regex, re.IGNORECASE
+        )
+        self._excludes_regex: Pattern[AnyStr] = re.compile(
+            excludes_regex, re.IGNORECASE
+        )
 
     def run_command(self, command: str):
         self._reactor.schedule(lambda: self._start(command))
@@ -53,7 +62,7 @@ class FridaApplication(object):
                 break
         if pid == -1:
             print(f"Could not find process identifier {process_name}.", file=sys.stderr)
-            self._stop_requested.set()
+            self._terminate()
         else:
             self._reactor.schedule(lambda: self._instrument(pid))
             self._reactor.run()
@@ -64,11 +73,15 @@ class FridaApplication(object):
             self._instrument(pid, True)
         except Exception as e:
             print(f"Failed to spawn process for ({command}): {e}", file=sys.stderr)
-            self._stop_requested.set()
+            self._terminate()
+
+    def _terminate(self):
+        self._write_tracing_log()
+        self._stop_requested.set()
 
     def _stop_if_idle(self):
         if len(self._sessions) == 0:
-            self._stop_requested.set()
+            self._terminate()
 
     def _instrument(self, pid, resume=False):
         print("attach(pid={})".format(pid))
@@ -230,11 +243,9 @@ instrumentSyscalls();
     def _on_child_added(self, child):
         print("child_added: {}".format(child.pid))
         self._instrument(child.pid)
-        self._reactor.schedule(
-            lambda: self._write_tracing_log(
-                '{"timestamp": %d, "pid": "%d", "action": "SPAWN", "target": "PROCESS", "value": "%d"}'
-                % (time.time_ns() / 1_000_000, child.parent_pid, child.pid)
-            )
+        self._system_events.append(
+            '{"timestamp":%d,"pid":"%d","action":"SPAWN","target":"PROCESS","value":"%d"}'
+            % (time.time_ns() / 1_000_000, child.parent_pid, child.pid)
         )
 
     def _on_child_removed(self, child):
@@ -247,9 +258,9 @@ instrumentSyscalls();
             self._instrument(pid)
         self._reactor.schedule(self._stop_if_idle, delay=0.5)
 
-    def _write_tracing_log(self, message):
-        with self._tracing_log.open(mode="a+") as f:
-            f.write(f"{message}\n")
+    def _write_tracing_log(self):
+        with self._tracing_log.open(mode="w+") as f:
+            f.write(f"[{','.join(self._system_events)}]")
 
     def _on_message(self, pid, message):
         if "payload" in message and "syscall" in message["payload"]:
@@ -257,11 +268,9 @@ instrumentSyscalls();
             if self._includes_regex.match(filepath) and not self._excludes_regex.match(
                 filepath
             ):
-                self._reactor.schedule(
-                    lambda: self._write_tracing_log(
-                        '{"timestamp": %d, "pid": "%d", "action": "OPEN", "target": "FILE", "value": "%s"}'
-                        % (time.time_ns() / 1_000_000, pid, filepath)
-                    )
+                self._system_events.append(
+                    '{"timestamp":%d,"pid":"%d","action":"OPEN","target":"FILE","value":"%s"}'
+                    % (time.time_ns() / 1_000_000, pid, filepath)
                 )
 
 
@@ -291,10 +300,10 @@ def parse_arguments():
         "--excludes",
         "-e",
         help="Regex for filtering matched files.",
-        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar\$;\\pom.xml$;tmp$;log$;class$)",
+        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar\$;\\pom.xml$;tmp$;log$;class$;pdb$)",
     )
     parser.add_argument(
-        "--output", "-o", help="Output file", default=f"{os.getpid()}_syscalls.log"
+        "--output", "-o", help="Output file", default=f"{os.getpid()}_{time.time_ns() / 1_000_000}_sys.log"
     )
     return parser.parse_args()
 
@@ -314,8 +323,9 @@ def main():
 
     app = FridaApplication(
         tracing_log=output_file,
-        includes_regex=args.includes,
-        excludes_regex=args.excludes,
+        # in cmd.exe, the pipe operator is sometimes not working as expected; therefore, we use a replacement character.
+        includes_regex=args.includes.replace(PIPE_REPLACEMENT_CHAR, "|"),
+        excludes_regex=args.excludes.replace(PIPE_REPLACEMENT_CHAR, "|"),
     )
     if args.target is not None:
         app.run_command(args.target)
