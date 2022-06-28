@@ -87,7 +87,7 @@
     <mockito.version>4.5.1</mockito.version>
     <junit-platform.version>1.7.0</junit-platform.version>
     <bytebuddy.version>1.12.10</bytebuddy.version>
-    <junit4.version>4.13</junit4.version>
+    <junit4.version>4.13.1</junit4.version>
     <junit5.version>5.7.0</junit5.version>
   </properties>
 </project>
