@@ -29,44 +29,49 @@ public final class SystemEventLogParser {
         // (this will also support multiple levels of child processes).
         Map<String, List<TestSuite>> spawnedProcessTestSuiteMap = new HashMap<>();
 
-        Type type = new TypeToken<List<SystemInstrumentationEvent>>() {}.getType();
-        List<SystemInstrumentationEvent> events = fromJson(sysLog, type);
-        for (SystemInstrumentationEvent event : events) {
-            switch (event.getAction()) {
-                case OPEN:
-                    if (event.getTarget() == SystemInstrumentationEvent.Target.FILE || event.getTarget() == SystemInstrumentationEvent.Target.RESOURCE) {
-                        TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
-                                .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
-                        if (testSuite != null) testSuite.getOpenedFiles().add(event.getValue());
-                    }
-                    break;
-                case CONNECT:
-                    if (event.getTarget() == SystemInstrumentationEvent.Target.SOCKET) {
-                        TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
-                                .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
-                        if (testSuite != null) testSuite.getConnectedSockets().add(event.getValue());
-                    }
-                    break;
-                case START:
-                    if (event.getTarget() == SystemInstrumentationEvent.Target.THREAD) {
-                        TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
-                                .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
-                        if (testSuite != null) testSuite.getStartedThreads().add(event.getValue());
-                    }
-                    break;
-                case SPAWN:
-                    if (event.getTarget() == SystemInstrumentationEvent.Target.PROCESS) {
-                        TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
-                                .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
-                        if (testSuite != null) {
-                            String targetPid = event.getValue();
-                            testSuite.getSpawnedProcesses().add(targetPid);
-                            spawnedProcessTestSuiteMap.putIfAbsent(targetPid, new ArrayList<>());
-                            spawnedProcessTestSuiteMap.get(targetPid).add(testSuite);
+        try {
+            Type type = new TypeToken<List<SystemInstrumentationEvent>>() {
+            }.getType();
+            List<SystemInstrumentationEvent> events = fromJson(sysLog, type);
+            for (SystemInstrumentationEvent event : events) {
+                switch (event.getAction()) {
+                    case OPEN:
+                        if (event.getTarget() == SystemInstrumentationEvent.Target.FILE || event.getTarget() == SystemInstrumentationEvent.Target.RESOURCE) {
+                            TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
+                                    .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
+                            if (testSuite != null) testSuite.getOpenedFiles().add(event.getValue());
                         }
-                    }
-                    break;
+                        break;
+                    case CONNECT:
+                        if (event.getTarget() == SystemInstrumentationEvent.Target.SOCKET) {
+                            TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
+                                    .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
+                            if (testSuite != null) testSuite.getConnectedSockets().add(event.getValue());
+                        }
+                        break;
+                    case START:
+                        if (event.getTarget() == SystemInstrumentationEvent.Target.THREAD) {
+                            TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
+                                    .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
+                            if (testSuite != null) testSuite.getStartedThreads().add(event.getValue());
+                        }
+                        break;
+                    case SPAWN:
+                        if (event.getTarget() == SystemInstrumentationEvent.Target.PROCESS) {
+                            TestSuite testSuite = findMatchingTestSuite(event, testSuiteMap.get(event.getPid()))
+                                    .orElseGet(() -> findMatchingTestSuite(event, spawnedProcessTestSuiteMap.getOrDefault(event.getPid(), Collections.emptyList())).orElse(null));
+                            if (testSuite != null) {
+                                String targetPid = event.getValue();
+                                testSuite.getSpawnedProcesses().add(targetPid);
+                                spawnedProcessTestSuiteMap.putIfAbsent(targetPid, new ArrayList<>());
+                                spawnedProcessTestSuiteMap.get(targetPid).add(testSuite);
+                            }
+                        }
+                        break;
+                }
             }
+        } catch (Exception e) {
+            System.err.println("Failed to read system events from " + sysLog + ".");
         }
     }
 }

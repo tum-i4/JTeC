@@ -256,7 +256,7 @@ instrumentSyscalls();
         self._sessions.remove(session)
         if reason == "process-replaced":
             self._instrument(pid)
-        self._reactor.schedule(self._stop_if_idle, delay=0.5)
+        self._reactor.schedule(self._stop_if_idle, delay=0.01)  # potentially increase delay with child-gating enabled
 
     def _write_tracing_log(self):
         with self._tracing_log.open(mode="w+") as f:
@@ -300,7 +300,7 @@ def parse_arguments():
         "--excludes",
         "-e",
         help="Regex for filtering matched files.",
-        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar\$;\\pom.xml$;tmp$;log$;class$;pdb$)",
+        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar$;\\pom.xml$;tmp$;log$;class$;pdb$)",
     )
     parser.add_argument(
         "--output", "-o", help="Output file", default=f"{os.getpid()}_{time.time_ns() / 1_000_000}_sys.log"
