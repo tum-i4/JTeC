@@ -264,7 +264,7 @@ instrumentSyscalls();
 
     def _on_message(self, pid, message):
         if "payload" in message and "syscall" in message["payload"]:
-            filepath: str = message["payload"]["syscall"]
+            filepath: str = message["payload"]["syscall"].translate(str.maketrans({"\\": r"\\"}))
             if self._includes_regex.match(filepath) and not self._excludes_regex.match(
                 filepath
             ):
@@ -300,7 +300,7 @@ def parse_arguments():
         "--excludes",
         "-e",
         help="Regex for filtering matched files.",
-        default=r".*(java\\jdk.*;c\:\\windows\\.*;surefire.*;failsafe.*;jar$;\\pom.xml$;tmp$;log$;class$;pdb$)",
+        default=r".*(java\\jdk.*;c\:\\windows\\.*;\\.repostitory\\.*;\\.m2\\.*;surefire.*;failsafe.*;jar$;\\pom.xml$;tmp$;log$;class$;pdb$)",
     )
     parser.add_argument(
         "--output", "-o", help="Output file", default=f"{os.getpid()}_{time.time_ns() / 1_000_000}_sys.log"
