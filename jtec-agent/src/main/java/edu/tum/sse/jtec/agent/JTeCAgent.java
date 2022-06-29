@@ -1,11 +1,13 @@
 package edu.tum.sse.jtec.agent;
 
+import edu.tum.sse.jtec.util.OSUtils;
 import edu.tum.sse.jtec.util.ProcessUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
+
 
 public class JTeCAgent {
 
@@ -25,9 +27,12 @@ public class JTeCAgent {
 
         // Before we start tracing, we need to run the pre-test command, if specified.
         if (!options.getPreTestCommand().isEmpty()) {
+            // Fix for `Jenkinsfile`s where batch scripts are defined as strings and escaping environment
+            // variables with %% sometimes will not work.
+            String preTestCommand = OSUtils.wrapEnvironmentVariable(options.getPreTestCommand(), PID_KEY);
+            System.err.println("Executing preTestCommand: " + preTestCommand);
             try {
-                Process process = ProcessUtils.run(options.getPreTestCommand(),
-                        Collections.singletonMap(PID_KEY, pid), false);
+                Process process = ProcessUtils.run(preTestCommand, Collections.singletonMap(PID_KEY, pid), false);
                 // Since the subprocess is non-blocking, we collect the output in a separate thread.
                 new Thread(() -> {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -41,8 +46,7 @@ public class JTeCAgent {
                     }
                 }).start();
             } catch (Exception e) {
-                System.err.println(
-                        "Failed to run pre-test command " + options.getPreTestCommand() + " : " + e.getMessage());
+                System.err.println("Failed to run pre-test command " + options.getPreTestCommand() + " : " + e.getMessage());
             }
         }
 
