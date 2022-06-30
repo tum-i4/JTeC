@@ -1,6 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.systemevent;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SystemEventMonitor {
@@ -13,16 +13,14 @@ public class SystemEventMonitor {
     }
 
     public static void record(final SystemInstrumentationEvent.Action action, final SystemInstrumentationEvent.Target target, final String value) {
-        SystemInstrumentationEvent event = new SystemInstrumentationEvent(
+        final SystemInstrumentationEvent event = new SystemInstrumentationEvent(
                 System.currentTimeMillis(),
                 pid,
                 action,
                 target,
                 value
         );
-        events.add(
-                event
-        );
+        events.add(event);
     }
 
 }
