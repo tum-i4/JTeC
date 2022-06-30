@@ -15,4 +15,21 @@
     <name>JTeC Instrumentation Package</name>
     <packaging>jar</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <finalName>
+                        jtec-instrumentation
+                    </finalName>
+                    <outputDirectory>
+                        ../jtec-agent/src/main/resources
+                    </outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

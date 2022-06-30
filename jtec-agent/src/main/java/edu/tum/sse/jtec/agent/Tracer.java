@@ -8,9 +8,7 @@ import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class Tracer {
         this.instrumentation = instrumentation;
         customInstrumentationList = new ArrayList<>();
 
-        final File tempFolder = InstrumentationUtils.appendInstrumentationJarFile(instrumentation, getInstrumentationJarLocation());
+        final File tempFolder = InstrumentationUtils.appendInstrumentationJarFile(instrumentation);
         if (tempFolder == null) return;
 
         // Order matters here: (1) test events, (2) system, (3) coverage
@@ -61,18 +59,6 @@ public class Tracer {
                             options.getCoverageExcludes(),
                             options.shouldInstrumentCoverage()
                     ).attach(instrumentation, tempFolder));
-        }
-    }
-
-    private String getInstrumentationJarLocation() {
-        try {
-            final String jarPath = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toString().replace("jtec-agent", "jtec-instrumentation");
-            if (Files.exists(Paths.get(jarPath))) {
-                return jarPath;
-            }
-            throw new RuntimeException("Instrumentation JAR not found at " + jarPath);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }
