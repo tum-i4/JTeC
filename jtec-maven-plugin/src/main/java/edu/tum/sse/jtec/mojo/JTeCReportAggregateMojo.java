@@ -9,7 +9,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -45,13 +44,15 @@ public class JTeCReportAggregateMojo extends AbstractJTeCReportMojo {
                         .collect(Collectors.toList());
                 ReportGenerator reportGenerator = new ReportGenerator(outputDirectory.toPath(), true);
                 TestReport testReport = reportGenerator.aggregateReports(project.getName(), testReports);
-                storeTestReport(testReport);
-                log("Writing aggregated JTeC report to " + outputDirectory.toPath());
                 session.setProjects(Collections.emptyList());
+                if (!storeTestReport(testReport)) {
+                    throw new MojoFailureException("Failed to create aggregated JTeC test report, found only empty reports.");
+                }
             }
         } catch (final Exception exception) {
             getLog().error("Failed to aggregate JTeC reports in project " + project.getName());
             exception.printStackTrace();
+            throw new MojoFailureException(exception.getMessage());
         }
     }
 

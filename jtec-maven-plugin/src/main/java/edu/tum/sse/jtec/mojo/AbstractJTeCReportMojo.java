@@ -3,6 +3,7 @@ package edu.tum.sse.jtec.mojo;
 import edu.tum.sse.jtec.reporting.TestReport;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
@@ -14,10 +15,15 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
 
     final static String TEST_REPORT_FILENAME = "test-report.json";
 
-    void storeTestReport(TestReport testReport) throws IOException {
-        final String jsonTestReport = toJson(testReport);
+    boolean storeTestReport(TestReport testReport) throws IOException {
         Path jsonFile = outputDirectory.toPath().resolve(TEST_REPORT_FILENAME);
-        createFileAndEnclosingDir(jsonFile);
-        writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.deleteIfExists(jsonFile);
+        if (testReport.getTestSuites().size() > 0) {
+            final String jsonTestReport = toJson(testReport);
+            createFileAndEnclosingDir(jsonFile);
+            writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
+        }
+        return false;
     }
 }
