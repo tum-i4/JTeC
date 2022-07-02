@@ -32,6 +32,9 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Parameter(property = "jtec.opts", readonly = true)
     String agentOpts;
 
+    @Parameter(property = "jtec.argLine", readonly = true)
+    String argLine;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -39,7 +42,13 @@ public class JTeCMojo extends AbstractJTeCMojo {
             String preparedAgentOpts = prepareAgentOpts();
             Path agentJar = locateJar(JTeCAgent.class);
             Properties properties = project.getProperties();
-            for (String property : new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION}) {
+            String[] propertiesToChanges;
+            if (argLine != null && !argLine.isEmpty()) {
+                propertiesToChanges = new String[]{argLine};
+            } else {
+                propertiesToChanges = new String[]{SUREFIRE_DEBUG_OPTION, FAILSAFE_DEBUG_OPTION};
+            }
+            for (String property : propertiesToChanges) {
                 String oldValue = properties.getProperty(property);
                 String newValue = String.format("%s-javaagent:%s=%s", (oldValue == null ? "" : oldValue + " "), agentJar.toAbsolutePath(), preparedAgentOpts);
                 properties.setProperty(property, newValue);
