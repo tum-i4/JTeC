@@ -16,7 +16,7 @@ public class JTeCAgent {
 
     public static void premain(String arguments, Instrumentation instrumentation) {
         if (arguments == null) {
-            throw new RuntimeException("Missing arguments with log file path for instrumentation.");
+            throw new RuntimeException("Missing arguments for JTeC agent.");
         }
         if (agentCount > 0) {
             return;
