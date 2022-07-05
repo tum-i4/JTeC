@@ -31,7 +31,7 @@ public abstract class AbstractJTeCMojo extends AbstractMojo {
         if (debug) {
             getLog().warn(message);
         } else {
-            getLog().info(message);
+            getLog().debug(message);
         }
     }
 }
