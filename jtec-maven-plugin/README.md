@@ -33,7 +33,7 @@ for using JTeC.
 The JTeC agent can be configured using `-Djtec.opts` as follows:
 
 ```shell
-$ mvn test -Djtec.opts=traceTestEvents=true,...
+$ mvn test -Djtec.opts="test.trace,sys.trace,cov.trace,..."
 ```
 
 However, there are already some reasonable defaults for the JTeC agent defined (e.g., store log files to the current
