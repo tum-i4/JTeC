@@ -4,7 +4,7 @@ import edu.tum.sse.jtec.instrumentation.testevent.TestEventInterceptorUtility;
 import net.bytebuddy.asm.Advice;
 import org.junit.platform.launcher.TestIdentifier;
 
-public class ExecutionStartedInterceptor {
+public class JUnit5ExecutionStartedInterceptor {
 
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final TestIdentifier testIdentifier) {

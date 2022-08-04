@@ -9,15 +9,9 @@ import org.junit.platform.launcher.TestIdentifier;
 import org.junit.runner.Description;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
-import static edu.tum.sse.jtec.util.IOUtils.writeToFile;
 
 public class TestEventInterceptorUtility {
 
@@ -72,9 +66,6 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest()) {
                 testStarted(description);
-            } else {
-                setupTestResult(testIdentifier.getUniqueId());
-                testRunStarted(description);
             }
         }
     }
@@ -89,7 +80,6 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest() && !currentTestCase.isEmpty()) {
                 testFinished();
-                incrementRunCount();
                 switch (testExecutionResult.getStatus()) {
                     case FAILED:
                         incrementFailureCount();
@@ -98,8 +88,8 @@ public class TestEventInterceptorUtility {
                         incrementIgnoreCount();
                         break;
                 }
-            } else {
-                testRunFinished();
+            } else if (inTestSuite) {
+                testSuiteFinished();
             }
         }
     }
@@ -121,6 +111,13 @@ public class TestEventInterceptorUtility {
             return;
         }
         currentTestCase = getTestCaseName(description);
+        if (!currentTestSuite.equals(getTestSuiteName(description))) {
+            if (!currentTestSuite.equals("")) {
+                testSuiteFinished();
+            }
+            setupTestResult(description.getDisplayName());
+            testSuiteStarted();
+        }
         currentTestSuite = getTestSuiteName(description);
         sendMessage(String.format("%d %s %s %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.TEST_STARTED.name(), currentTestSuite, currentTestCase));
     }
@@ -129,11 +126,12 @@ public class TestEventInterceptorUtility {
         if (currentTestCase.equals("")) {
             return;
         }
+        incrementRunCount();
         sendMessage(String.format("%d %s %s %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.TEST_FINISHED.name(), currentTestSuite, currentTestCase));
         currentTestCase = "";
     }
 
-    public static void testRunStarted(final Description description) {
+    public static void testSuiteStarted() {
         if (inTestSuite) {
             return;
         }
@@ -141,11 +139,11 @@ public class TestEventInterceptorUtility {
         sendMessage(String.format("%d %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_STARTED.name()));
     }
 
-    public static void testRunFinished() {
-        testRunFinished(currentTestRunResult.getRunCount(), currentTestRunResult.getFailureCount(), currentTestRunResult.getIgnoreCount());
+    public static void testSuiteFinished() {
+        testSuiteFinished(currentTestRunResult.getRunCount(), currentTestRunResult.getFailureCount(), currentTestRunResult.getIgnoreCount());
     }
 
-    public static void testRunFinished(final int runCount, final int failureCount, final int ignoreCount) {
+    public static void testSuiteFinished(final int runCount, final int failureCount, final int ignoreCount) {
         if (currentTestSuite.equals("")) {
             return;
         }

@@ -20,30 +20,30 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
 
     @Override
     public void executionFinished(final TestIdentifier testIdentifier, final TestExecutionResult executionResult) {
-        if (TestEventInterceptorUtility.testEventInstrumentation ||testIdentifier == null) {
+        if (TestEventInterceptorUtility.testEventInstrumentation || testIdentifier == null) {
             return;
         }
         TestEventInterceptorUtility.executionFinished(testIdentifier, executionResult, TestEventInterceptorUtility.convertTestIdentifierToDescription(testIdentifier));
     }
 
     @Override
-    public void testRunStarted(final Description testDescription) throws Exception {
+    public void testRunStarted(final Description testDescription) {
         if (TestEventInterceptorUtility.testEventInstrumentation || testDescription == null) {
             return;
         }
-        TestEventInterceptorUtility.testRunStarted(testDescription);
+        TestEventInterceptorUtility.testSuiteStarted();
     }
 
     @Override
-    public void testRunFinished(final Result result) throws Exception {
+    public void testRunFinished(final Result result) {
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
         }
-        TestEventInterceptorUtility.testRunFinished(result.getRunCount(), result.getFailureCount(), result.getIgnoreCount());
+        TestEventInterceptorUtility.testSuiteFinished(result.getRunCount(), result.getFailureCount(), result.getIgnoreCount());
     }
 
     @Override
-    public void testStarted(final Description testDescription) throws Exception {
+    public void testStarted(final Description testDescription) {
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
         }
@@ -51,7 +51,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
     }
 
     @Override
-    public void testFinished(final Description testDescription) throws Exception {
+    public void testFinished(final Description testDescription) {
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
         }

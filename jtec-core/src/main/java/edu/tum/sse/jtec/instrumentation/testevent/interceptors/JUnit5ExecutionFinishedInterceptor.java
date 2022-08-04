@@ -5,7 +5,7 @@ import net.bytebuddy.asm.Advice;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestIdentifier;
 
-public class ExecutionFinishedInterceptor {
+public class JUnit5ExecutionFinishedInterceptor {
 
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final TestIdentifier testIdentifier, @Advice.Argument(1) final TestExecutionResult executionResult) {
