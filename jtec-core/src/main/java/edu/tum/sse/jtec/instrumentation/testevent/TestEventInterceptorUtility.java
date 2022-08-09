@@ -70,7 +70,7 @@ public class TestEventInterceptorUtility {
         }
     }
 
-    public static void setupTestResult(final String testId) {
+    public static void setupTestRunResult(final String testId) {
         if (currentTestRunResult == null || !(currentTestRunResult.getTestIdentifier().equals(testId))) {
             currentTestRunResult = new TestRunResult(testId);
         }
@@ -107,18 +107,21 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testStarted(final Description description) {
-        if (currentTestCase.equals(getTestCaseName(description))) {
+        final String testName = getTestCaseName(description);
+        if (currentTestCase.equals(testName)) {
             return;
         }
-        currentTestCase = getTestCaseName(description);
-        if (!currentTestSuite.equals(getTestSuiteName(description))) {
+        currentTestCase = testName;
+
+        final String suiteName = getTestSuiteName(description);
+        if (!currentTestSuite.equals(suiteName)) {
             if (!currentTestSuite.equals("")) {
                 testSuiteFinished();
             }
-            setupTestResult(description.getDisplayName());
+            setupTestRunResult(suiteName);
             testSuiteStarted();
+            currentTestSuite = suiteName;
         }
-        currentTestSuite = getTestSuiteName(description);
         sendMessage(String.format("%d %s %s %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.TEST_STARTED.name(), currentTestSuite, currentTestCase));
     }
 

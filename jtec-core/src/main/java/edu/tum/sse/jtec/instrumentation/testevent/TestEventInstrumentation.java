@@ -31,7 +31,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
 
     // TODO use RunNotifier instead of runListener perhaps
     public static final String TEST_STARTED = "testStarted";
-    public static final String TEST_ENDED = "testFinished";
+    public static final String TEST_FINISHED = "testFinished";
     public static final String EXECUTION_STARTED = "executionStarted";
     public static final String EXECUTION_FINISHED = "executionFinished";
     public static final String TEST_FAILED = "testFailure";
@@ -54,7 +54,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                                 .on(ElementMatchers.nameMatches(TEST_STARTED)))
                         .visit(Advice.withCustomMapping()
                                 .to(JUnit4TestEndInterceptor.class)
-                                .on(ElementMatchers.nameMatches(TEST_ENDED)))
+                                .on(ElementMatchers.nameMatches(TEST_FINISHED)))
                         .visit(Advice.withCustomMapping()
                                 .to(JUnit5ExecutionStartedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(EXECUTION_STARTED)))
@@ -85,6 +85,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                     .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
                     .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                     .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
+                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)))
                             .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5))))
                     .transform(testEventTransformer())
                     .installOn(instrumentation);

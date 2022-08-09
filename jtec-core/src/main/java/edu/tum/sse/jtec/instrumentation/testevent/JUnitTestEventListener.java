@@ -27,14 +27,6 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
     }
 
     @Override
-    public void testRunStarted(final Description testDescription) {
-        if (TestEventInterceptorUtility.testEventInstrumentation || testDescription == null) {
-            return;
-        }
-        TestEventInterceptorUtility.testSuiteStarted();
-    }
-
-    @Override
     public void testRunFinished(final Result result) {
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
