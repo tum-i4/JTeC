@@ -1,7 +1,13 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.*;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestEndInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestFailedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestIgnoredInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestRunFinishedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestStartInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit5ExecutionFinishedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit5ExecutionStartedInterceptor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -25,10 +31,11 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
 
     // TODO use RunNotifier instead of runListener perhaps
     public static final String TEST_STARTED = "testStarted";
-    public static final String TEST_ENDED = "testFinished";
+    public static final String TEST_FINISHED = "testFinished";
     public static final String EXECUTION_STARTED = "executionStarted";
     public static final String EXECUTION_FINISHED = "executionFinished";
-    public static final String TEST_RUN_STARTED = "testRunStarted";
+    public static final String TEST_FAILED = "testFailure";
+    public static final String TEST_IGNORED = "testIgnored";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
     private final boolean shouldInstrument;
 
@@ -43,22 +50,25 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     private static AgentBuilder.Transformer testEventTransformer() {
         return (builder, typeDescription, classLoader, module) ->
                 builder.visit(Advice.withCustomMapping()
-                                .to(TestStartInterceptor.class)
+                                .to(JUnit4TestStartInterceptor.class)
                                 .on(ElementMatchers.nameMatches(TEST_STARTED)))
                         .visit(Advice.withCustomMapping()
-                                .to(TestEndInterceptor.class)
-                                .on(ElementMatchers.nameMatches(TEST_ENDED)))
+                                .to(JUnit4TestEndInterceptor.class)
+                                .on(ElementMatchers.nameMatches(TEST_FINISHED)))
                         .visit(Advice.withCustomMapping()
-                                .to(ExecutionStartedInterceptor.class)
+                                .to(JUnit5ExecutionStartedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(EXECUTION_STARTED)))
                         .visit(Advice.withCustomMapping()
-                                .to(ExecutionFinishedInterceptor.class)
+                                .to(JUnit5ExecutionFinishedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(EXECUTION_FINISHED)))
                         .visit(Advice.withCustomMapping()
-                                .to(TestRunStartedInterceptor.class)
-                                .on(ElementMatchers.nameMatches(TEST_RUN_STARTED)))
+                                .to(JUnit4TestFailedInterceptor.class)
+                                .on(ElementMatchers.nameMatches(TEST_FAILED)))
                         .visit(Advice.withCustomMapping()
-                                .to(TestRunFinishedInterceptor.class)
+                                .to(JUnit4TestIgnoredInterceptor.class)
+                                .on(ElementMatchers.nameMatches(TEST_IGNORED)))
+                        .visit(Advice.withCustomMapping()
+                                .to(JUnit4TestRunFinishedInterceptor.class)
                                 .on(ElementMatchers.nameMatches(TEST_RUN_FINISHED)));
     }
 
@@ -75,6 +85,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                     .ignore(ElementMatchers.nameStartsWith(BYTEBUDDY_PACKAGE))
                     .ignore(ElementMatchers.nameStartsWith(JTEC_PACKAGE))
                     .type(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)
+                            .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(RUN_LISTENER_JUNIT4)))
                             .or(ElementMatchers.hasSuperType(ElementMatchers.nameMatches(TEST_EXECUTION_LISTENER_JUNIT5))))
                     .transform(testEventTransformer())
                     .installOn(instrumentation);

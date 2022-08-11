@@ -4,7 +4,7 @@ import edu.tum.sse.jtec.instrumentation.testevent.TestEventInterceptorUtility;
 import net.bytebuddy.asm.Advice;
 import org.junit.platform.launcher.TestIdentifier;
 
-public class ExecutionStartedInterceptor {
+public class JUnit5ExecutionStartedInterceptor {
 
     @Advice.OnMethodEnter
     public static void enter(@Advice.Argument(0) final TestIdentifier testIdentifier) {
@@ -14,7 +14,7 @@ public class ExecutionStartedInterceptor {
         try {
             TestEventInterceptorUtility.executionStarted(testIdentifier, TestEventInterceptorUtility.convertTestIdentifierToDescription(testIdentifier));
         } catch (final Exception e) {
-            System.err.println("Exception, printedName is: " + testIdentifier);
+            System.err.println("Exception, testIdentifier is: " + testIdentifier);
             e.printStackTrace();
         }
     }

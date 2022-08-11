@@ -9,15 +9,9 @@ import org.junit.platform.launcher.TestIdentifier;
 import org.junit.runner.Description;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static edu.tum.sse.jtec.util.IOUtils.appendToFile;
-import static edu.tum.sse.jtec.util.IOUtils.writeToFile;
 
 public class TestEventInterceptorUtility {
 
@@ -72,16 +66,13 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest()) {
                 testStarted(description);
-            } else {
-                setupTestResult(testIdentifier.getUniqueId());
-                testRunStarted(description);
             }
         }
     }
 
-    public static void setupTestResult(final String testId) {
-        if (currentTestRunResult == null || !(currentTestRunResult.getTestIdentifier().equals(testId))) {
-            currentTestRunResult = new TestRunResult(testId);
+    public static void setupTestRunResult(final String testSuiteName) {
+        if (currentTestRunResult == null || !(currentTestRunResult.getTestSuiteName().equals(testSuiteName))) {
+            currentTestRunResult = new TestRunResult(testSuiteName);
         }
     }
 
@@ -89,7 +80,6 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest() && !currentTestCase.isEmpty()) {
                 testFinished();
-                incrementRunCount();
                 switch (testExecutionResult.getStatus()) {
                     case FAILED:
                         incrementFailureCount();
@@ -98,8 +88,8 @@ public class TestEventInterceptorUtility {
                         incrementIgnoreCount();
                         break;
                 }
-            } else {
-                testRunFinished();
+            } else if (inTestSuite) {
+                testSuiteFinished();
             }
         }
     }
@@ -117,23 +107,34 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testStarted(final Description description) {
-        if (currentTestCase.equals(getTestCaseName(description))) {
+        final String testName = getTestCaseName(description);
+        if (currentTestCase.equals(testName)) {
             return;
         }
-        currentTestCase = getTestCaseName(description);
-        currentTestSuite = getTestSuiteName(description);
+        currentTestCase = testName;
+
+        final String suiteName = getTestSuiteName(description);
+        if (!currentTestSuite.equals(suiteName)) {
+            if (!currentTestSuite.isEmpty()) {
+                testSuiteFinished();
+            }
+            setupTestRunResult(suiteName);
+            testSuiteStarted();
+            currentTestSuite = suiteName;
+        }
         sendMessage(String.format("%d %s %s %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.TEST_STARTED.name(), currentTestSuite, currentTestCase));
     }
 
     public static void testFinished() {
-        if (currentTestCase.equals("")) {
+        if (currentTestCase.isEmpty()) {
             return;
         }
+        incrementRunCount();
         sendMessage(String.format("%d %s %s %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.TEST_FINISHED.name(), currentTestSuite, currentTestCase));
         currentTestCase = "";
     }
 
-    public static void testRunStarted(final Description description) {
+    public static void testSuiteStarted() {
         if (inTestSuite) {
             return;
         }
@@ -141,12 +142,12 @@ public class TestEventInterceptorUtility {
         sendMessage(String.format("%d %s %s", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_STARTED.name()));
     }
 
-    public static void testRunFinished() {
-        testRunFinished(currentTestRunResult.getRunCount(), currentTestRunResult.getFailureCount(), currentTestRunResult.getIgnoreCount());
+    public static void testSuiteFinished() {
+        testSuiteFinished(currentTestRunResult.getRunCount(), currentTestRunResult.getFailureCount(), currentTestRunResult.getIgnoreCount());
     }
 
-    public static void testRunFinished(final int runCount, final int failureCount, final int ignoreCount) {
-        if (currentTestSuite.equals("")) {
+    public static void testSuiteFinished(final int runCount, final int failureCount, final int ignoreCount) {
+        if (currentTestSuite.isEmpty()) {
             return;
         }
         sendMessage(String.format("%d %s %s %s %d %d %d", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_FINISHED.name(), currentTestSuite, runCount, failureCount, ignoreCount));
