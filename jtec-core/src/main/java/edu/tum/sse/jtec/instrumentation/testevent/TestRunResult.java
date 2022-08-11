@@ -1,17 +1,17 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
 public class TestRunResult {
-    private final String testId;
+    private final String testSuiteName;
     private int runCount = 0;
     private int failureCount = 0;
     private int ignoreCount = 0;
 
-    public TestRunResult(final String testId) {
-        this.testId = testId;
+    public TestRunResult(final String testSuiteName) {
+        this.testSuiteName = testSuiteName;
     }
 
-    public String getTestIdentifier() {
-        return testId;
+    public String getTestSuiteName() {
+        return testSuiteName;
     }
 
     public int getRunCount() {

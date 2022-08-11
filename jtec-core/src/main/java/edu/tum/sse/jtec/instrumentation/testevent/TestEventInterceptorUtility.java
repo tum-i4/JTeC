@@ -70,9 +70,9 @@ public class TestEventInterceptorUtility {
         }
     }
 
-    public static void setupTestRunResult(final String testId) {
-        if (currentTestRunResult == null || !(currentTestRunResult.getTestIdentifier().equals(testId))) {
-            currentTestRunResult = new TestRunResult(testId);
+    public static void setupTestRunResult(final String testSuiteName) {
+        if (currentTestRunResult == null || !(currentTestRunResult.getTestSuiteName().equals(testSuiteName))) {
+            currentTestRunResult = new TestRunResult(testSuiteName);
         }
     }
 

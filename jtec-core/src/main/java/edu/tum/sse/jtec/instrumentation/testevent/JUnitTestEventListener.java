@@ -31,7 +31,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
         }
-        TestEventInterceptorUtility.testSuiteFinished(result.getRunCount(), result.getFailureCount(), result.getIgnoreCount());
+        TestEventInterceptorUtility.testSuiteFinished();
     }
 
     @Override
