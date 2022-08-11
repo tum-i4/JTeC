@@ -14,7 +14,7 @@ public class JUnit5ExecutionStartedInterceptor {
         try {
             TestEventInterceptorUtility.executionStarted(testIdentifier, TestEventInterceptorUtility.convertTestIdentifierToDescription(testIdentifier));
         } catch (final Exception e) {
-            System.err.println("Exception, printedName is: " + testIdentifier);
+            System.err.println("Exception, testIdentifier is: " + testIdentifier);
             e.printStackTrace();
         }
     }

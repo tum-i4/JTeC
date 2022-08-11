@@ -10,7 +10,7 @@ public class JUnit4TestFailedInterceptor {
         try {
             TestEventInterceptorUtility.incrementFailureCount();
         } catch (final Exception e) {
-            System.err.println("Exception in increaseIgnoreCount: " + e.getMessage());
+            System.err.println("Exception in increaseFailureCount: " + e.getMessage());
             e.printStackTrace();
         }
     }

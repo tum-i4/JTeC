@@ -115,7 +115,7 @@ public class TestEventInterceptorUtility {
 
         final String suiteName = getTestSuiteName(description);
         if (!currentTestSuite.equals(suiteName)) {
-            if (!currentTestSuite.equals("")) {
+            if (!currentTestSuite.isEmpty()) {
                 testSuiteFinished();
             }
             setupTestRunResult(suiteName);
@@ -126,7 +126,7 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testFinished() {
-        if (currentTestCase.equals("")) {
+        if (currentTestCase.isEmpty()) {
             return;
         }
         incrementRunCount();
@@ -147,7 +147,7 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testSuiteFinished(final int runCount, final int failureCount, final int ignoreCount) {
-        if (currentTestSuite.equals("")) {
+        if (currentTestSuite.isEmpty()) {
             return;
         }
         sendMessage(String.format("%d %s %s %s %d %d %d", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_FINISHED.name(), currentTestSuite, runCount, failureCount, ignoreCount));

@@ -9,7 +9,7 @@ public class JUnit4TestRunFinishedInterceptor {
         try {
             TestEventInterceptorUtility.testSuiteFinished();
         } catch (final Exception e) {
-            System.err.println("Exception in test run finished is: " + e.getMessage());
+            System.err.println("Exception in test suite end is: " + e.getMessage());
             e.printStackTrace();
         }
     }
