@@ -7,11 +7,11 @@
     <parent>
         <groupId>edu.tum.sse</groupId>
         <artifactId>jtec</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>jtec-agent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>JTeC Agent</name>
     <packaging>jar</packaging>
 
