@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -40,5 +41,33 @@ public class CoverageMap {
 
     public ConcurrentMap<String, Set<String>> getCollectedProbes() {
         return collectedProbes;
+    }
+
+    public String toJson() {
+        StringBuilder json = new StringBuilder().append('{');
+        for (Map.Entry<String, Set<String>> entry: collectedProbes.entrySet()) {
+            addInQuotes(json, entry.getKey());
+            json.append(":[");
+            for (String covered: entry.getValue()) {
+                addInQuotes(json, covered);
+                json.append(',');
+            }
+            deleteLast(json);
+            json.append("],");
+        }
+        deleteLast(json);
+        json.append('}');
+
+        return json.toString();
+    }
+
+    private void addInQuotes(StringBuilder sb, String value) {
+        sb.append('"');
+        sb.append(value);
+        sb.append('"');
+    }
+
+    private void deleteLast(StringBuilder sb) {
+        sb.deleteCharAt(sb.length() - 1);
     }
 }

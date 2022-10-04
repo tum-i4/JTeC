@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.instrumentation.coverage.test.Foo;
+import edu.tum.sse.jtec.util.JSONUtils;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
@@ -14,6 +15,11 @@ import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

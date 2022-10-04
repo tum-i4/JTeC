@@ -1,21 +1,23 @@
 package edu.tum.sse.jtec.util;
 
 import edu.tum.sse.jtec.instrumentation.systemevent.SystemInstrumentationEvent;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import static edu.tum.sse.jtec.util.IOUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JSONUtilsTest {
+
+    @Test
+    void testa() {
+        ConcurrentMap<String, Set<String>> testMap = new ConcurrentHashMap<>();
+        testMap.put("Test1", new HashSet<>(Arrays.asList("value1", "value2", "value3")));
+        testMap.put("Test2", new HashSet<>(Arrays.asList("value1", "value2", "value3")));
+        System.out.println(JSONUtils.toJson(testMap));
+    }
 
     @Test
     void shouldSerializeEvent() {
