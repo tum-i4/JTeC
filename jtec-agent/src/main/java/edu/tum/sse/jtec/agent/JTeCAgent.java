@@ -23,7 +23,8 @@ public class JTeCAgent {
         }
         AgentOptions options = AgentOptions.fromString(arguments);
         String pid = ProcessUtils.getCurrentPid();
-        System.err.println("Attaching JTeC agent (" + agentCount++ + ") to PID=" + pid + " with args: " + options.toAgentString());
+        // TODO remove branch log
+        System.err.println("BRANCH - Attaching JTeC agent (" + agentCount++ + ") to PID=" + pid + " with args: " + options.toAgentString());
 
         // Before we start tracing, we need to run the pre-test command, if specified.
         if (!options.getPreTestCommand().isEmpty()) {
