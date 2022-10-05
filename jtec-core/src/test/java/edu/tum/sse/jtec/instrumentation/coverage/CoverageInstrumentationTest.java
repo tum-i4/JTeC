@@ -38,7 +38,7 @@ class CoverageInstrumentationTest {
     @BeforeEach
     void setUp() throws IOException {
         tmpDir = Files.createTempDirectory("tmpDirPrefix");
-        coverageMonitorSpy = spy(CoverageMonitor.create(new ProcessCoverageProbeFactory()));
+        coverageMonitorSpy = spy(CoverageMonitor.create());
 
         classLoader = new ByteArrayClassLoader.ChildFirst(
                 this.getClass().getClassLoader(),
@@ -64,7 +64,7 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
@@ -99,7 +99,7 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
