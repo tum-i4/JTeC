@@ -34,10 +34,6 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
         this.shouldInstrument = shouldInstrument;
     }
 
-    private static CoverageProbeFactory createCoverageProbeFactory() {
-        return new ProcessCoverageProbeFactory();
-    }
-
     @Override
     public void reset() {
         if (instrumentation != null && transformer != null) {
@@ -48,7 +44,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     @Override
     public CoverageInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
-        coverageMonitor = CoverageMonitor.create(createCoverageProbeFactory());
+        coverageMonitor = CoverageMonitor.create();
         GlobalCoverageMonitor.set(coverageMonitor);
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()

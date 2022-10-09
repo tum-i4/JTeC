@@ -22,18 +22,6 @@ public class CoverageMap {
         collectedProbes.get(key).add(value);
     }
 
-    public boolean remove(String key, String value) {
-        Set<String> set = collectedProbes.get(key);
-        if (set != null) {
-            return set.remove(value);
-        }
-        return false;
-    }
-
-    public boolean contains(String key, String value) {
-        return collectedProbes.containsKey(key) && collectedProbes.get(key).contains(value);
-    }
-
     public void clear() {
         collectedProbes.clear();
     }

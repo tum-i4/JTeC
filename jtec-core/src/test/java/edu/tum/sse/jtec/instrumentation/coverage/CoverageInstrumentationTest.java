@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Files;
@@ -17,12 +16,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class CoverageInstrumentationTest {
 
@@ -44,7 +38,7 @@ class CoverageInstrumentationTest {
     @BeforeEach
     void setUp() throws IOException {
         tmpDir = Files.createTempDirectory("tmpDirPrefix");
-        coverageMonitorSpy = spy(CoverageMonitor.create(new ProcessCoverageProbeFactory()));
+        coverageMonitorSpy = spy(CoverageMonitor.create());
 
         classLoader = new ByteArrayClassLoader.ChildFirst(
                 this.getClass().getClassLoader(),
@@ -70,7 +64,7 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
@@ -105,7 +99,7 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
