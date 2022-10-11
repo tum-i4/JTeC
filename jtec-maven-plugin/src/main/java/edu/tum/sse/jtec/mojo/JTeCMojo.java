@@ -104,7 +104,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             result.append(';');
         }
         result.deleteCharAt(result.length() - 1);
-        return result.toString();
+        return result.toString().replace('/', '.');
     }
 
 }
