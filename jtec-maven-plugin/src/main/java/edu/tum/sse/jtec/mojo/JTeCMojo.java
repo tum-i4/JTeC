@@ -8,7 +8,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,8 +70,16 @@ public class JTeCMojo extends AbstractJTeCMojo {
         }
         agentOptions.setOutputPath(outputDirectory.toPath());
         if (autoinclude) {
-            String autoincludePatterns = findAutoincludePatterns(project.getBuild().getOutputDirectory());
-            agentOptions.setFileIncludes(autoincludePatterns);
+            String autoincludePatterns = "";
+            try {
+                autoincludePatterns = findAutoincludePatterns(project.getBuild().getOutputDirectory());
+            } catch (IOException e) {
+                log("No Class dir found!");
+                log(e.getMessage());
+            }
+            if (!autoincludePatterns.isEmpty()) {
+                agentOptions.setFileIncludes(autoincludePatterns);
+            }
         }
         String agentString = agentOptions.toAgentString();
         // Fix for Win32 where a pipe character in a command line sometimes breaks process execution.
@@ -82,6 +89,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
 
     private String findAutoincludePatterns(String path) throws IOException {
         List<Path> paths = new ArrayList<>();
+        log("Searching for autoinclude Patterns!");
         Files.list(Paths.get(path)).forEach(filePath -> {
             if (!filePath.getFileName().toString().equals(META_INF)) {
                 paths.add(filePath);
