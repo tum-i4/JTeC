@@ -75,12 +75,10 @@ public class JTeCMojo extends AbstractJTeCMojo {
                 autoincludePatterns = findAutoincludePatterns(Paths.get(project.getBuild().getSourceDirectory()));
                 autoincludePatterns = "(" + autoincludePatterns + ")" + ".*";
             } catch (IOException e) {
-                log("No Source dir found!");
-                log(e.getMessage());
-                e.printStackTrace();
+                getLog().warn("No Source dir found!", e);
             }
             if (!autoincludePatterns.isEmpty()) {
-                agentOptions.setFileIncludes(autoincludePatterns);
+                agentOptions.setCoverageIncludes(autoincludePatterns);
             }
         }
         String agentString = agentOptions.toAgentString();
