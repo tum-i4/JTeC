@@ -42,6 +42,8 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Parameter(property = "jtec.autoinclude", readonly = true)
     Boolean autoinclude;
 
+    String sourceDirectory = project.getBuild().getSourceDirectory();
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -72,7 +74,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         if (autoinclude) {
             String autoincludePatterns = "";
             try {
-                autoincludePatterns = findAutoincludePatterns(Paths.get(project.getBuild().getSourceDirectory()));
+                autoincludePatterns = findAutoincludePatterns(Paths.get(sourceDirectory));
                 autoincludePatterns = "(" + autoincludePatterns + ")" + ".*";
             } catch (IOException e) {
                 getLog().warn("No Source dir found!", e);
@@ -96,7 +98,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             }
         });
         if (paths.stream().anyMatch(currentPath -> !Files.isDirectory(currentPath))) {
-            return path.toString().substring(1);
+            return path.toString().substring(sourceDirectory.length());
         }
         StringBuilder result = new StringBuilder();
         for (Path currentPath : paths) {
