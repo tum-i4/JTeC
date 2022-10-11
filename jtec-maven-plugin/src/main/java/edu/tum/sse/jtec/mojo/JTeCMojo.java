@@ -25,7 +25,7 @@ import static edu.tum.sse.jtec.util.IOUtils.locateJar;
  * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#debugForkedProcess">Surefire</a> or
  * <a href="https://maven.apache.org/surefire/maven-failsafe-plugin/integration-test-mojo.html#debugForkedProcess">Failsafe</a> debug option.
  */
-@Mojo(name = "jtec", defaultPhase = LifecyclePhase.PROCESS_TEST_RESOURCES, threadSafe = true)
+@Mojo(name = "jtec", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true)
 public class JTeCMojo extends AbstractJTeCMojo {
 
     private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
@@ -61,7 +61,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         }
     }
 
-    private String prepareAgentOpts() throws IOException {
+    private String prepareAgentOpts() {
         AgentOptions agentOptions;
         if (agentOpts == null) {
             agentOptions = AgentOptions.DEFAULT_OPTIONS;
@@ -72,9 +72,10 @@ public class JTeCMojo extends AbstractJTeCMojo {
         if (autoinclude) {
             String autoincludePatterns = "";
             try {
-                autoincludePatterns = findAutoincludePatterns(project.getBuild().getOutputDirectory());
+                autoincludePatterns = findAutoincludePatterns(Paths.get(project.getBuild().getSourceDirectory()));
+                autoincludePatterns = "(" + autoincludePatterns + ")" + ".*";
             } catch (IOException e) {
-                log("No Class dir found!");
+                log("No Source dir found!");
                 log(e.getMessage());
             }
             if (!autoincludePatterns.isEmpty()) {
@@ -87,18 +88,24 @@ public class JTeCMojo extends AbstractJTeCMojo {
         return agentString;
     }
 
-    private String findAutoincludePatterns(String path) throws IOException {
+    private String findAutoincludePatterns(Path path) throws IOException {
         List<Path> paths = new ArrayList<>();
         log("Searching for autoinclude Patterns!");
-        Files.list(Paths.get(path)).forEach(filePath -> {
+        Files.list(path).forEach(filePath -> {
             if (!filePath.getFileName().toString().equals(META_INF)) {
                 paths.add(filePath);
             }
         });
-        if (paths.size() != 1) {
-            return "";
+        if (paths.stream().anyMatch(currentPath -> currentPath.endsWith(".java"))) {
+            return path.toString();
         }
-        return paths.get(0).getFileName().toString() + findAutoincludePatterns(paths.get(0).toString());
+        StringBuilder result = new StringBuilder();
+        for (Path currentPath : paths) {
+            result.append(findAutoincludePatterns(currentPath));
+            result.append(';');
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
     }
 
 }
