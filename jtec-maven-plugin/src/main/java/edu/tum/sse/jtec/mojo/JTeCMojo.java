@@ -25,7 +25,7 @@ import static edu.tum.sse.jtec.util.IOUtils.locateJar;
  * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#debugForkedProcess">Surefire</a> or
  * <a href="https://maven.apache.org/surefire/maven-failsafe-plugin/integration-test-mojo.html#debugForkedProcess">Failsafe</a> debug option.
  */
-@Mojo(name = "jtec", defaultPhase = LifecyclePhase.INITIALIZE, threadSafe = true)
+@Mojo(name = "jtec", defaultPhase = LifecyclePhase.PROCESS_TEST_RESOURCES, threadSafe = true)
 public class JTeCMojo extends AbstractJTeCMojo {
 
     private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
