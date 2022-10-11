@@ -8,7 +8,13 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static edu.tum.sse.jtec.util.IOUtils.locateJar;
@@ -25,12 +31,17 @@ public class JTeCMojo extends AbstractJTeCMojo {
 
     private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
     private static final String FAILSAFE_DEBUG_OPTION = "maven.failsafe.debug";
+    private static final String META_INF = "META-INF";
+
 
     /**
      * JTeC options passed to the JTeC agent.
      */
     @Parameter(property = "jtec.opts", readonly = true)
     String agentOpts;
+
+    @Parameter(property = "jtec.autoinclude", readonly = true)
+    Boolean autoinclude;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -51,7 +62,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         }
     }
 
-    private String prepareAgentOpts() {
+    private String prepareAgentOpts() throws IOException {
         AgentOptions agentOptions;
         if (agentOpts == null) {
             agentOptions = AgentOptions.DEFAULT_OPTIONS;
@@ -59,10 +70,27 @@ public class JTeCMojo extends AbstractJTeCMojo {
             agentOptions = AgentOptions.fromString(agentOpts);
         }
         agentOptions.setOutputPath(outputDirectory.toPath());
+        if (autoinclude) {
+            String autoincludePatterns = findAutoincludePatterns(project.getBuild().getOutputDirectory());
+            agentOptions.setFileIncludes(autoincludePatterns);
+        }
         String agentString = agentOptions.toAgentString();
         // Fix for Win32 where a pipe character in a command line sometimes breaks process execution.
         agentString = agentString.replace("|", AgentOptions.PIPE_REPLACEMENT);
         return agentString;
+    }
+
+    private String findAutoincludePatterns(String path) throws IOException {
+        List<Path> paths = new ArrayList<>();
+        Files.list(Paths.get(path)).forEach(filePath -> {
+            if (!filePath.getFileName().toString().equals(META_INF)) {
+                paths.add(filePath);
+            }
+        });
+        if (paths.size() != 1) {
+            return "";
+        }
+        return paths.get(0).getFileName().toString() + findAutoincludePatterns(paths.get(0).toString());
     }
 
 }

@@ -82,6 +82,11 @@ public class AgentOptions {
     private String coverageExcludes;
     private String preTestCommand;
     private Path outputPath;
+
+    public void setFileIncludes(String fileIncludes) {
+        this.fileIncludes = fileIncludes;
+    }
+
     private String fileIncludes;
     private String fileExcludes;
 
