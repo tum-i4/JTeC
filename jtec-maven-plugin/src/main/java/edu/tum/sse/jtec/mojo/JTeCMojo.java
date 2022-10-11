@@ -97,7 +97,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             }
         });
         if (paths.stream().anyMatch(currentPath -> !Files.isDirectory(currentPath))) {
-            return path.toString().substring(remainingPath.length());
+            return path.toString().substring(remainingPath.length() + 1);
         }
         StringBuilder result = new StringBuilder();
         for (Path currentPath : paths) {
