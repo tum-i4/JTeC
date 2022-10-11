@@ -77,6 +77,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
             } catch (IOException e) {
                 log("No Source dir found!");
                 log(e.getMessage());
+                e.printStackTrace();
             }
             if (!autoincludePatterns.isEmpty()) {
                 agentOptions.setFileIncludes(autoincludePatterns);
@@ -90,13 +91,13 @@ public class JTeCMojo extends AbstractJTeCMojo {
 
     private String findAutoincludePatterns(Path path) throws IOException {
         List<Path> paths = new ArrayList<>();
-        log("Searching for autoinclude Patterns!");
+        log("Searching for autoinclude Patterns in " + path);
         Files.list(path).forEach(filePath -> {
-            if (!filePath.getFileName().toString().equals(META_INF)) {
+            if (!filePath.getFileName().endsWith(META_INF)) {
                 paths.add(filePath);
             }
         });
-        if (paths.stream().anyMatch(currentPath -> currentPath.endsWith(".java"))) {
+        if (paths.stream().anyMatch(currentPath -> !Files.isDirectory(currentPath))) {
             return path.toString();
         }
         StringBuilder result = new StringBuilder();
