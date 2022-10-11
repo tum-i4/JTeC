@@ -42,8 +42,6 @@ public class JTeCMojo extends AbstractJTeCMojo {
     @Parameter(property = "jtec.autoinclude", readonly = true)
     Boolean autoinclude;
 
-    String sourceDirectory = project.getBuild().getSourceDirectory();
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -74,7 +72,8 @@ public class JTeCMojo extends AbstractJTeCMojo {
         if (autoinclude) {
             String autoincludePatterns = "";
             try {
-                autoincludePatterns = findAutoincludePatterns(Paths.get(sourceDirectory));
+                String sourceDirectory = project.getBuild().getSourceDirectory();
+                autoincludePatterns = findAutoincludePatterns(Paths.get(sourceDirectory), sourceDirectory);
                 autoincludePatterns = "(" + autoincludePatterns + ")" + ".*";
             } catch (IOException e) {
                 getLog().warn("No Source dir found!", e);
@@ -89,7 +88,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         return agentString;
     }
 
-    private String findAutoincludePatterns(Path path) throws IOException {
+    private String findAutoincludePatterns(Path path, String remainingPath) throws IOException {
         List<Path> paths = new ArrayList<>();
         log("Searching for autoinclude Patterns in " + path);
         Files.list(path).forEach(filePath -> {
@@ -98,11 +97,11 @@ public class JTeCMojo extends AbstractJTeCMojo {
             }
         });
         if (paths.stream().anyMatch(currentPath -> !Files.isDirectory(currentPath))) {
-            return path.toString().substring(sourceDirectory.length());
+            return path.toString().substring(remainingPath.length());
         }
         StringBuilder result = new StringBuilder();
         for (Path currentPath : paths) {
-            result.append(findAutoincludePatterns(currentPath));
+            result.append(findAutoincludePatterns(currentPath, remainingPath));
             result.append(';');
         }
         result.deleteCharAt(result.length() - 1);
