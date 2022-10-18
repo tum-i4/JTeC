@@ -71,4 +71,8 @@ public final class IOUtils {
         }
     }
 
+    public static String readFromFile(final Path file) throws IOException {
+        return new String(Files.readAllBytes(file));
+    }
+
 }
