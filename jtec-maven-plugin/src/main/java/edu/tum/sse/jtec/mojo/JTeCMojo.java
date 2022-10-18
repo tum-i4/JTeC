@@ -34,7 +34,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
     public static final char PACKAGE_SEPARATOR = '.';
     private static final String SUREFIRE_DEBUG_OPTION = "maven.surefire.debug";
     private static final String FAILSAFE_DEBUG_OPTION = "maven.failsafe.debug";
-    private static final String META_INF = "META-INF";
+
     /**
      * JTeC options passed to the JTeC agent.
      */
