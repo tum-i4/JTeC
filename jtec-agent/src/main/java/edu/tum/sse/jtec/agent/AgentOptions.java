@@ -82,6 +82,7 @@ public class AgentOptions {
     private String coverageExcludes;
     private String preTestCommand;
     private Path outputPath;
+
     private String fileIncludes;
     private String fileExcludes;
 
@@ -215,6 +216,10 @@ public class AgentOptions {
 
     public String getCoverageIncludes() {
         return coverageIncludes;
+    }
+
+    public void setCoverageIncludes(String fileIncludes) {
+        this.coverageIncludes = fileIncludes;
     }
 
     public String getCoverageExcludes() {
