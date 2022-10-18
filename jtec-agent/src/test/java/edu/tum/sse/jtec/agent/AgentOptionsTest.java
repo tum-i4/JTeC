@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.agent;
 
 import edu.tum.sse.jtec.instrumentation.coverage.CoverageLevel;
+import edu.tum.sse.jtec.util.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,9 +27,12 @@ class AgentOptionsTest {
     }
 
     @Test
-    void shouldParseOptionsFromString() {
+    void shouldParseOptionsFromString() throws IOException {
         // given
+        Path optionsFile = tmpDir.resolve("jtec.txt");
+        IOUtils.writeToFile(optionsFile, "sys.socket=true,test.trace=true", false);
         String options = "jtec.out=" + tmpDir + "," +
+                "jtec.optsfile=" + optionsFile + "," +
                 "test.trace=true," +
                 "test.instr=false," +
                 "sys.trace=true," +
@@ -51,10 +55,11 @@ class AgentOptionsTest {
         // then
         assertTrue(parsedOptions.getOutputPath().toFile().isDirectory());
         assertTrue(parsedOptions.getOutputPath().toFile().exists());
+        assertTrue(parsedOptions.getOptionsFile().toFile().exists());
         assertTrue(parsedOptions.shouldTraceSystemEvents());
         assertTrue(parsedOptions.shouldInstrumentFileEvents());
         assertTrue(parsedOptions.shouldInstrumentThreadEvents());
-        assertFalse(parsedOptions.shouldInstrumentSocketEvents());
+        assertTrue(parsedOptions.shouldInstrumentSocketEvents());  // set via options file
         assertFalse(parsedOptions.shouldInstrumentProcessEvents());
         assertEquals(parsedOptions.getFileIncludes(), ".*");
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");

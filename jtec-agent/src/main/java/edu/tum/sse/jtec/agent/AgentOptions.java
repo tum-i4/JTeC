@@ -1,7 +1,9 @@
 package edu.tum.sse.jtec.agent;
 
 import edu.tum.sse.jtec.instrumentation.coverage.CoverageLevel;
+import edu.tum.sse.jtec.util.IOUtils;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
@@ -12,6 +14,10 @@ import java.util.stream.Stream;
 public class AgentOptions {
     // Address issue on Win32 where passing a pipe in a regex, e.g., (x|y), breaks the agent.
     public static final String PIPE_REPLACEMENT = ";";
+
+    // Options via file.
+    public static final String AGENT_OPTIONS_FILE = "jtec.optsfile";
+    public static final String DEFAULT_AGENT_OPTIONS_FILE = "jtec.txt";
 
     // Output.
     public static final String AGENT_OUTPUT = "jtec.out";
@@ -62,7 +68,8 @@ public class AgentOptions {
             DEFAULT_PRE_TEST_COMMAND,
             Paths.get(DEFAULT_AGENT_OUTPUT).toAbsolutePath(),
             DEFAULT_FILE_INCLUDES,
-            DEFAULT_FILE_EXCLUDES
+            DEFAULT_FILE_EXCLUDES,
+            Paths.get(DEFAULT_AGENT_OPTIONS_FILE).toAbsolutePath()
     );
 
     private static final String OPTIONS_SEPARATOR = ",";
@@ -84,6 +91,7 @@ public class AgentOptions {
     private Path outputPath;
     private String fileIncludes;
     private String fileExcludes;
+    private Path optionsFile;
 
     private AgentOptions() {
     }
@@ -104,7 +112,8 @@ public class AgentOptions {
             final String preTestCommand,
             final Path outputPath,
             final String fileIncludes,
-            final String fileExcludes
+            final String fileExcludes,
+            final Path optionsFile
     ) {
         this.traceTestEvents = traceTestEvents;
         this.instrumentTestEvents = instrumentTestEvents;
@@ -122,11 +131,23 @@ public class AgentOptions {
         this.outputPath = outputPath;
         this.fileIncludes = fileIncludes;
         this.fileExcludes = fileExcludes;
+        this.optionsFile = optionsFile;
     }
 
     public static AgentOptions fromString(final String options) {
         final AgentOptions result = new AgentOptions();
-        final Map<String, String> optionsInput = extractOptions(options);
+        Map<String, String> optionsInput = extractOptions(options);
+        final Path optionsFile = Paths.get(optionsInput.getOrDefault(AGENT_OPTIONS_FILE, DEFAULT_AGENT_OPTIONS_FILE)).toAbsolutePath();
+        result.setOptionsFile(optionsFile);
+        if (optionsFile.toFile().exists()) {
+            try {
+                String additionalOptions = IOUtils.readFromFile(optionsFile);
+                optionsInput.putAll(extractOptions(additionalOptions));
+            } catch (IOException exception) {
+                System.err.println("Failed to parse options from " + optionsFile);
+                exception.printStackTrace();
+            }
+        }
         parseOutputDirectory(result, optionsInput);
         parseTestEventParams(result, optionsInput);
         parseSysEventParams(result, optionsInput);
@@ -192,6 +213,7 @@ public class AgentOptions {
 
     public String toAgentString() {
         return AGENT_OUTPUT + VALUE_SEPARATOR + outputPath +
+                OPTIONS_SEPARATOR + AGENT_OPTIONS_FILE + VALUE_SEPARATOR + optionsFile +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TEST_INSTRUMENT + VALUE_SEPARATOR + instrumentTestEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
@@ -275,5 +297,13 @@ public class AgentOptions {
 
     public boolean shouldInstrumentProcessEvents() {
         return instrumentProcessEvents;
+    }
+
+    public Path getOptionsFile() {
+        return optionsFile;
+    }
+
+    public void setOptionsFile(final Path optionsFile) {
+        this.optionsFile = optionsFile;
     }
 }
