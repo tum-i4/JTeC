@@ -1,5 +1,7 @@
 # JTeC: Java Testwise Coverage
 
+![CI](https://github.com/tum-i4/JTeC/actions/workflows/maven.yml/badge.svg)
+
 JTeC is a tool that enables researchers to obtain testwise coverage for programs that run in the JVM.
 It targets research in regression testing, such as test selection, prioritization, or flaky test analysis.
 To analyze tests beyond code coverage, JTeC also supports instrumenting APIs that open external files (e.g., `java.io`
