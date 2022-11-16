@@ -1,8 +1,10 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Simple concurrent data structure to store coverage probes.
@@ -34,7 +36,11 @@ public class CoverageMap {
     }
 
     public void dump(String dumpId) {
-        collectedProbes.put(dumpId, new HashSet<>(currentCoverage));
+        if (collectedProbes.containsKey(dumpId)) {
+            collectedProbes.get(dumpId).addAll(currentCoverage);
+        } else {
+            collectedProbes.put(dumpId, new HashSet<>(currentCoverage));
+        }
         currentCoverage.clear();
     }
 }
