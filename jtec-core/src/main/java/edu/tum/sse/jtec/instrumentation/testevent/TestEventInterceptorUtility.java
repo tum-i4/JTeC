@@ -69,7 +69,17 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest()) {
                 testStarted(description);
+            } else if (testIdentifier.isContainer() && testIdentifier.getSource().isPresent()) {
+                maybeTriggerGlobalSetupCoverageDump();
             }
+        }
+    }
+
+    public static void maybeTriggerGlobalSetupCoverageDump() {
+        if (!hasTestingStarted) {
+            // Trigger dump of global test setup coverage, before first test suite executes its test setup code.
+            hasTestingStarted = true;
+            maybeTriggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
         }
     }
 
@@ -116,13 +126,6 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testStarted(final Description description) {
-        if (!hasTestingStarted) {
-            // Before the first test that is executed, we dump the global test setup coverage.
-            // This is slightly imprecise, though, as the test(-suite)-specific setup has also been executed before
-            // and is (wrongly) attributed to the global test setup coverage.
-            hasTestingStarted = true;
-            maybeTriggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
-        }
         final String testName = getTestCaseName(description);
         if (currentTestCase.equals(testName)) {
             return;

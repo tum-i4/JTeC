@@ -22,7 +22,7 @@ public class CoverageMonitor {
     }
 
     public void registerMethodCall(final String className, final String methodSignature, final String returnType) {
-        registerCoverage(className + methodSignature + returnType);
+        registerCoverage(className + "#" + methodSignature + returnType);
     }
 
     private void registerCoverage(String value) {
