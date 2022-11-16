@@ -70,7 +70,8 @@ class CoverageInstrumentationTest {
                     coverageLevel,
                     fooClass,
                     "",
-                    true
+                    true,
+                    PIDStrategy.getInstance()
             );
             instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);
@@ -105,7 +106,8 @@ class CoverageInstrumentationTest {
                     coverageLevel,
                     fooClass,
                     "",
-                    true
+                    true,
+                    PIDStrategy.getInstance()
             );
             instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);

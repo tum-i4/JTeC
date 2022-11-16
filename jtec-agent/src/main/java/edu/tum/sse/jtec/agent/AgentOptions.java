@@ -26,6 +26,7 @@ public class AgentOptions {
     // Test event instrumentation.
     public static final String TRACE_TEST_EVENTS = "test.trace";
     public static final String TEST_INSTRUMENT = "test.instr";
+    public static final String TEST_FORKED_MODE = "test.fork";
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
@@ -54,6 +55,7 @@ public class AgentOptions {
 
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
+            true,
             true,
             false,
             true,
@@ -84,6 +86,7 @@ public class AgentOptions {
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
     private boolean instrumentTestEvents = true;
+    private boolean forkTestMode = true;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
@@ -100,6 +103,7 @@ public class AgentOptions {
     private AgentOptions(
             final boolean traceTestEvents,
             final boolean instrumentTestEvents,
+            final boolean forkTestMode,
             final boolean traceSystemEvents,
             final boolean instrumentFileEvents,
             final boolean instrumentSocketEvents,
@@ -118,6 +122,7 @@ public class AgentOptions {
     ) {
         this.traceTestEvents = traceTestEvents;
         this.instrumentTestEvents = instrumentTestEvents;
+        this.forkTestMode = forkTestMode;
         this.traceSystemEvents = traceSystemEvents;
         this.instrumentFileEvents = instrumentFileEvents;
         this.instrumentSocketEvents = instrumentSocketEvents;
@@ -184,6 +189,7 @@ public class AgentOptions {
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
         result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_INSTRUMENT, "true"));
+        result.forkTestMode = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_FORKED_MODE, "true"));
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -217,6 +223,7 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + AGENT_OPTIONS_FILE + VALUE_SEPARATOR + optionsFile +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TEST_INSTRUMENT + VALUE_SEPARATOR + instrumentTestEvents +
+                OPTIONS_SEPARATOR + TEST_FORKED_MODE + VALUE_SEPARATOR + forkTestMode +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_FILE + VALUE_SEPARATOR + instrumentFileEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_SOCKET + VALUE_SEPARATOR + instrumentSocketEvents +
@@ -310,5 +317,9 @@ public class AgentOptions {
 
     public void setOptionsFile(final Path optionsFile) {
         this.optionsFile = optionsFile;
+    }
+
+    public boolean isForkTestMode() {
+        return forkTestMode;
     }
 }

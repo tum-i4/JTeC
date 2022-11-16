@@ -11,11 +11,18 @@ import java.nio.file.Paths;
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
 
-    private CoverageMonitor() {
+    private final CoverageIdStrategy coverageIdStrategy;
+
+    private CoverageMonitor(CoverageIdStrategy coverageIdStrategy) {
+        this.coverageIdStrategy = coverageIdStrategy;
     }
 
     public static CoverageMonitor create() {
-        return new CoverageMonitor();
+        return new CoverageMonitor(PIDStrategy.getInstance());
+    }
+
+    public static CoverageMonitor create(CoverageIdStrategy coverageIdStrategy) {
+        return new CoverageMonitor(coverageIdStrategy);
     }
 
     public void registerClass(final String className) {
@@ -27,12 +34,15 @@ public class CoverageMonitor {
     }
 
     private void registerCoverage(String value) {
-        String pid = ProcessUtils.getCurrentPid();
-        coverageMap.put(pid, value);
+        coverageMap.put(coverageIdStrategy.getId(), value);
     }
 
     public void clearCoverage() {
         coverageMap.clear();
+    }
+
+    public CoverageMap getCoverageMap() {
+        return coverageMap;
     }
 
     public void dumpCoverage(final String outputPath) throws IOException {

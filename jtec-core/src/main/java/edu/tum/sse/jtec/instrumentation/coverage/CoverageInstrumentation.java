@@ -17,6 +17,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     private final String includePattern;
     private final String excludePattern;
     private final boolean shouldInstrument;
+    private final CoverageIdStrategy coverageIdStrategy;
 
     private Instrumentation instrumentation;
     private ClassFileTransformer transformer;
@@ -26,12 +27,14 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
                                    final CoverageLevel coverageLevel,
                                    final String includePattern,
                                    final String excludePattern,
-                                   final boolean shouldInstrument) {
+                                   final boolean shouldInstrument,
+                                   final CoverageIdStrategy coverageIdStrategy) {
         super(outputPath);
         this.coverageLevel = coverageLevel;
         this.includePattern = includePattern;
         this.excludePattern = excludePattern;
         this.shouldInstrument = shouldInstrument;
+        this.coverageIdStrategy = coverageIdStrategy;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     @Override
     public CoverageInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
-        coverageMonitor = CoverageMonitor.create();
+        coverageMonitor = CoverageMonitor.create(coverageIdStrategy);
         GlobalCoverageMonitor.set(coverageMonitor);
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()

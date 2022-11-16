@@ -35,6 +35,7 @@ class AgentOptionsTest {
                 "jtec.optsfile=" + optionsFile + "," +
                 "test.trace=true," +
                 "test.instr=false," +
+                "test.fork=false," +
                 "sys.trace=true," +
                 "sys.file=true," +
                 "sys.socket=false," +
@@ -65,6 +66,7 @@ class AgentOptionsTest {
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());
         assertFalse(parsedOptions.shouldInstrumentTestEvents());
+        assertFalse(parsedOptions.isForkTestMode());
         assertTrue(parsedOptions.shouldTraceCoverage());
         assertTrue(parsedOptions.shouldInstrumentCoverage());
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
