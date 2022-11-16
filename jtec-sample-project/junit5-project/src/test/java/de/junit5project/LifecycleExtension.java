@@ -3,6 +3,13 @@ package de.junit5project;
 import org.junit.jupiter.api.extension.*;
 
 public class LifecycleExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+    static {
+        init();
+    }
+
+    private static void init() {
+        System.out.println("Init LifecycleExtension");
+    }
 
     @Override
     public void afterAll(final ExtensionContext extensionContext) throws Exception {
