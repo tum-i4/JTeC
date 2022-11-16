@@ -37,7 +37,7 @@ public class AgentOptions {
     public static final String FILE_INCLUDES = "sys.includes";
     public static final String FILE_EXCLUDES = "sys.excludes";
     public static final String DEFAULT_FILE_INCLUDES = ".*";
-    public static final String DEFAULT_FILE_EXCLUDES = ".*.(log|tmp)";
+    public static final String DEFAULT_FILE_EXCLUDES = ".*.(class|log|tmp)";
 
     // Coverage instrumentation.
     public static final String TRACE_COVERAGE = "cov.trace";

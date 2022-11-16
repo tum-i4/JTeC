@@ -21,7 +21,7 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 | sys.thread   | Boolean | `true`                                                                          | Enables thread event tracing                                                                 |
 | sys.process  | Boolean | `true`                                                                          | Enables process event tracing                                                                |
 | sys.includes | String  | `.*`                                                                            | Regex for included files                                                                     |
-| sys.excludes | String  | `.*.(log\|tmp)`                                                                 | Regex for excluded files                                                                     |
+| sys.excludes | String  | `.*.(class\|log\|tmp)`                                                          | Regex for excluded files                                                                     |
 | cov.trace    | Boolean | `false`                                                                         | Enables coverage tracing                                                                     |
 | cov.level    | String  | `class`                                                                         | Coverage level: `class` or `method`                                                          |
 | cov.instr    | Boolean | `false` (`true` if `cov.level=method`)                                          | Enables class file instrumentation (only needed for `method` or non-forked `class` coverage) |
