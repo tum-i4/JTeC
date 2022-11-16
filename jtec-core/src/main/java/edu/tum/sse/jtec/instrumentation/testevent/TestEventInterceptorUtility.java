@@ -107,12 +107,6 @@ public class TestEventInterceptorUtility {
         }
     }
 
-    private static void maybeTriggerCoverageDump(final String dumpId) {
-        if (GlobalCoverageMonitor.isMonitoringCoverage() && !CoverageDumpStrategy.getInstance().isForked()) {
-            GlobalCoverageMonitor.get().registerDump(dumpId);
-        }
-    }
-
     public static void incrementFailureCount() {
         currentTestRunResult.incrementFailureCount();
     }
@@ -182,6 +176,12 @@ public class TestEventInterceptorUtility {
         } catch (final IOException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private static void maybeTriggerCoverageDump(final String dumpId) {
+        if (GlobalCoverageMonitor.isMonitoringCoverage() && !CoverageDumpStrategy.getInstance().isForked()) {
+            GlobalCoverageMonitor.get().registerDump(dumpId);
         }
     }
 
