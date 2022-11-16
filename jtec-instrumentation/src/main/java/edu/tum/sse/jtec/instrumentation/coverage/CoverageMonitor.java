@@ -2,7 +2,6 @@ package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.util.IOUtils;
 import edu.tum.sse.jtec.util.JSONUtils;
-import edu.tum.sse.jtec.util.ProcessUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -11,18 +10,11 @@ import java.nio.file.Paths;
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
 
-    private final CoverageIdStrategy coverageIdStrategy;
-
-    private CoverageMonitor(CoverageIdStrategy coverageIdStrategy) {
-        this.coverageIdStrategy = coverageIdStrategy;
+    private CoverageMonitor() {
     }
 
     public static CoverageMonitor create() {
-        return new CoverageMonitor(PIDStrategy.getInstance());
-    }
-
-    public static CoverageMonitor create(CoverageIdStrategy coverageIdStrategy) {
-        return new CoverageMonitor(coverageIdStrategy);
+        return new CoverageMonitor();
     }
 
     public void registerClass(final String className) {
@@ -34,7 +26,7 @@ public class CoverageMonitor {
     }
 
     private void registerCoverage(String value) {
-        coverageMap.put(coverageIdStrategy.getId(), value);
+        coverageMap.put(value);
     }
 
     public void clearCoverage() {
@@ -45,7 +37,11 @@ public class CoverageMonitor {
         return coverageMap;
     }
 
-    public void dumpCoverage(final String outputPath) throws IOException {
+    public void registerDump(final String dumpId) {
+        coverageMap.dump(dumpId);
+    }
+
+    public void saveCoverage(final String outputPath) throws IOException {
         final String json = JSONUtils.toJson(coverageMap.getCollectedProbes());
         final Path outputFile = Paths.get(outputPath);
         IOUtils.createFileAndEnclosingDir(outputFile);

@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
+import edu.tum.sse.jtec.util.ProcessUtils;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -17,7 +18,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     private final String includePattern;
     private final String excludePattern;
     private final boolean shouldInstrument;
-    private final CoverageIdStrategy coverageIdStrategy;
+    private final boolean isForked;
 
     private Instrumentation instrumentation;
     private ClassFileTransformer transformer;
@@ -28,13 +29,13 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
                                    final String includePattern,
                                    final String excludePattern,
                                    final boolean shouldInstrument,
-                                   final CoverageIdStrategy coverageIdStrategy) {
+                                   final boolean isForked) {
         super(outputPath);
         this.coverageLevel = coverageLevel;
         this.includePattern = includePattern;
         this.excludePattern = excludePattern;
         this.shouldInstrument = shouldInstrument;
-        this.coverageIdStrategy = coverageIdStrategy;
+        this.isForked = isForked;
     }
 
     @Override
@@ -47,7 +48,8 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     @Override
     public CoverageInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
-        coverageMonitor = CoverageMonitor.create(coverageIdStrategy);
+        coverageMonitor = CoverageMonitor.create();
+        CoverageDumpStrategy.getInstance().setStrategy(isForked ? CoverageDumpStrategy.CoverageDumpTrigger.PER_PROCESS : CoverageDumpStrategy.CoverageDumpTrigger.PER_TEST);
         GlobalCoverageMonitor.set(coverageMonitor);
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()
@@ -73,8 +75,13 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     }
 
     public void dumpCoverage() {
+        if (CoverageDumpStrategy.getInstance().isForked()) {
+            coverageMonitor.registerDump(ProcessUtils.getCurrentPid());
+        } else {
+            coverageMonitor.registerDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_TEARDOWN.toString());
+        }
         try {
-            coverageMonitor.dumpCoverage(outputPath);
+            coverageMonitor.saveCoverage(outputPath);
         } catch (final Exception exception) {
             System.err.println("Failed to dump coverage: " + exception.getMessage());
         }

@@ -1,5 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
+import edu.tum.sse.jtec.instrumentation.coverage.CoverageDumpStrategy;
+import edu.tum.sse.jtec.instrumentation.coverage.GlobalCoverageMonitor;
 import edu.tum.sse.jtec.util.ProcessUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -24,6 +26,7 @@ public class TestEventInterceptorUtility {
     public static String currentTestCase = "";
 
     public static boolean inTestSuite = false;
+    public static boolean hasTestingStarted = false;
 
     public static String currentPid = ProcessUtils.getCurrentPid();
 
@@ -94,6 +97,12 @@ public class TestEventInterceptorUtility {
         }
     }
 
+    private static void maybeTriggerCoverageDump(final String dumpId) {
+        if (GlobalCoverageMonitor.isMonitoringCoverage() && !CoverageDumpStrategy.getInstance().isForked()) {
+            GlobalCoverageMonitor.get().registerDump(dumpId);
+        }
+    }
+
     public static void incrementFailureCount() {
         currentTestRunResult.incrementFailureCount();
     }
@@ -107,6 +116,13 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testStarted(final Description description) {
+        if (!hasTestingStarted) {
+            // Before the first test that is executed, we dump the global test setup coverage.
+            // This is slightly imprecise, though, as the test(-suite)-specific setup has also been executed before
+            // and is (wrongly) attributed to the global test setup coverage.
+            hasTestingStarted = true;
+            maybeTriggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
+        }
         final String testName = getTestCaseName(description);
         if (currentTestCase.equals(testName)) {
             return;
@@ -151,6 +167,7 @@ public class TestEventInterceptorUtility {
             return;
         }
         sendMessage(String.format("%d %s %s %s %d %d %d", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_FINISHED.name(), currentTestSuite, runCount, failureCount, ignoreCount));
+        maybeTriggerCoverageDump(currentTestSuite);
         currentTestSuite = "";
         inTestSuite = false;
     }

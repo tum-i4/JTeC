@@ -64,14 +64,14 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
                     fooClass,
                     "",
                     true,
-                    PIDStrategy.getInstance()
+                    true
             );
             instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);
@@ -100,14 +100,14 @@ class CoverageInstrumentationTest {
         // when
         CoverageInstrumentation instr = null;
         try (final MockedStatic<CoverageMonitor> monitorMockedStatic = mockStatic(CoverageMonitor.class)) {
-            monitorMockedStatic.when(() -> CoverageMonitor.create(any())).thenReturn(coverageMonitorSpy);
+            monitorMockedStatic.when(CoverageMonitor::create).thenReturn(coverageMonitorSpy);
             instr = new CoverageInstrumentation(
                     tmpDir.resolve("cov.log").toAbsolutePath().toString(),
                     coverageLevel,
                     fooClass,
                     "",
                     true,
-                    PIDStrategy.getInstance()
+                    true
             );
             instr.attach(instrumentation, tmpDir.toFile());
             final Class<?> fooType = classLoader.loadClass(fooClass);

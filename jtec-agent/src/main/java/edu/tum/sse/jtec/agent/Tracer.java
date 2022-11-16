@@ -3,8 +3,6 @@ package edu.tum.sse.jtec.agent;
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
 import edu.tum.sse.jtec.instrumentation.InstrumentationUtils;
 import edu.tum.sse.jtec.instrumentation.coverage.CoverageInstrumentation;
-import edu.tum.sse.jtec.instrumentation.coverage.PIDStrategy;
-import edu.tum.sse.jtec.instrumentation.coverage.TestIdStrategy;
 import edu.tum.sse.jtec.instrumentation.systemevent.SystemEventInstrumentation;
 import edu.tum.sse.jtec.instrumentation.testevent.TestEventInstrumentation;
 
@@ -60,7 +58,7 @@ public class Tracer {
                             options.getCoverageIncludes(),
                             options.getCoverageExcludes(),
                             options.shouldInstrumentCoverage(),
-                            options.isForkTestMode() ? PIDStrategy.getInstance() : TestIdStrategy.getInstance()
+                            options.isForkTestMode()
                     ).attach(instrumentation, tempFolder));
         }
     }

@@ -3,15 +3,18 @@ package edu.tum.sse.jtec.instrumentation.coverage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.util.collections.Sets;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
-import static org.mockito.Mockito.*;
 
 class CoverageMonitorTest {
 
@@ -28,45 +31,40 @@ class CoverageMonitorTest {
     }
 
     @Test
-    void shouldDumpCoverageWithPidStrategy() throws IOException {
+    void shouldSaveCoverageMapToFile() throws IOException {
         // given
-        final CoverageIdStrategy strategy = spy(PIDStrategy.getInstance());
-        final CoverageMonitor coverageMonitor = CoverageMonitor.create(strategy);
-        when(strategy.getId()).thenReturn("123");
+        final CoverageMonitor coverageMonitor = CoverageMonitor.create();
         coverageMonitor.registerClass("Foo");
         coverageMonitor.registerClass("Bar");
-        when(strategy.getId()).thenReturn("234");
+        coverageMonitor.registerDump("123");
         coverageMonitor.registerClass("Foo");
+        coverageMonitor.registerDump("234");
 
         // when
-        coverageMonitor.dumpCoverage(output.toAbsolutePath().toString());
+        coverageMonitor.saveCoverage(output.toAbsolutePath().toString());
 
         // then
         assertLinesMatch(Collections.singletonList("{\"123\":[\"Bar\",\"Foo\"],\"234\":[\"Foo\"]}"), Files.readAllLines(output));
     }
 
     @Test
-    void shouldCorrectlyMapCoverageWithTestIdStrategy() throws IOException {
+    void shouldDumpCoverageWithTestSuiteNames() throws IOException {
         // given
-        final TestIdStrategy strategy = TestIdStrategy.getInstance();
-        final CoverageMonitor coverageMonitor = CoverageMonitor.create(strategy);
+        final CoverageMonitor coverageMonitor = CoverageMonitor.create();
         coverageMonitor.registerClass("Foo");
-        strategy.setTestId("FooTest");
+        coverageMonitor.registerDump("FooTest");
         coverageMonitor.registerClass("Foo");
         coverageMonitor.registerClass("Bar");
-        strategy.setTestId("BarTest");
+        coverageMonitor.registerDump("BarTest");
         coverageMonitor.registerClass("Baz");
-        CoverageMap expectedMap = new CoverageMap();
-        expectedMap
-                .put(TestIdStrategy.TestPhaseId.GLOBAL_SETUP.toString(), "Foo")
-                .put("FooTest", "Foo")
-                .put("FooTest", "Bar")
-                .put("BarTest", "Baz");
+        Map<String, Set<String>> expectedMap = new HashMap<>();
+        expectedMap.put("FooTest", Sets.newSet("Foo"));
+        expectedMap.put("BarTest", Sets.newSet("Foo", "Bar"));
 
         // when
         CoverageMap actualMap = coverageMonitor.getCoverageMap();
 
         // then
-        assertEquals(expectedMap, actualMap);
+        assertEquals(expectedMap, actualMap.getCollectedProbes());
     }
 }

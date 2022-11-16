@@ -1,8 +1,6 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -12,36 +10,31 @@ import java.util.concurrent.ConcurrentMap;
 public class CoverageMap {
 
     /**
-     * Stores a set of covered probes for each coverageRunId (e.g., PID).
+     * Current coverage probes that have been recorded.
      */
-    private final ConcurrentMap<String, Set<String>> collectedProbes = new ConcurrentHashMap<>();
+    private final Set<String> currentCoverage = ConcurrentHashMap.newKeySet();
 
-    public CoverageMap put(String key, String value) {
-        if (!collectedProbes.containsKey(key)) {
-            collectedProbes.putIfAbsent(key, ConcurrentHashMap.newKeySet());
-        }
-        collectedProbes.get(key).add(value);
+    /**
+     * Stores a set of covered probes for each dump ID (e.g., PID).
+     */
+    private final Map<String, Set<String>> collectedProbes = new HashMap<>();
+
+    public CoverageMap put(String value) {
+        currentCoverage.add(value);
         return this;
     }
 
     public void clear() {
+        currentCoverage.clear();
         collectedProbes.clear();
     }
 
-    public ConcurrentMap<String, Set<String>> getCollectedProbes() {
+    public Map<String, Set<String>> getCollectedProbes() {
         return collectedProbes;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final CoverageMap that = (CoverageMap) o;
-        return Objects.equals(collectedProbes, that.collectedProbes);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(collectedProbes);
+    public void dump(String dumpId) {
+        collectedProbes.put(dumpId, new HashSet<>(currentCoverage));
+        currentCoverage.clear();
     }
 }
