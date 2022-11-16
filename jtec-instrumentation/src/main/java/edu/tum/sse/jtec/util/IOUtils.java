@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,8 +72,14 @@ public final class IOUtils {
         }
     }
 
+    public static String readFromFile(final Path file, final Charset encoding) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(file);
+        return new String(encoded, encoding);
+    }
+
     public static String readFromFile(final Path file) throws IOException {
-        return new String(Files.readAllBytes(file));
+        return readFromFile(file, StandardCharsets.UTF_8);
     }
 
 }
