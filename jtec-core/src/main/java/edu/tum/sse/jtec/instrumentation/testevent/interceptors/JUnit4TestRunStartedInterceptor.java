@@ -7,7 +7,7 @@ public class JUnit4TestRunStartedInterceptor {
     @Advice.OnMethodEnter
     public static void enter() {
         try {
-            TestEventInterceptorUtility.maybeTriggerGlobalSetupCoverageDump();
+            TestEventInterceptorUtility.triggerGlobalSetupCoverageDump();
         } catch (final Exception e) {
             System.err.println("Exception in test run start is: " + e.getMessage());
             e.printStackTrace();

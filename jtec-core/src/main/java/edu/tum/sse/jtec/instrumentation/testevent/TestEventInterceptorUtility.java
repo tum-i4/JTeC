@@ -69,17 +69,19 @@ public class TestEventInterceptorUtility {
         if (description != null) {
             if (testIdentifier.isTest()) {
                 testStarted(description);
-            } else if (testIdentifier.isContainer() && testIdentifier.getSource().isPresent()) {
-                maybeTriggerGlobalSetupCoverageDump();
+            }
+            // The first test suite will be the first container that has a source.
+            else if (testIdentifier.isContainer() && testIdentifier.getSource().isPresent()) {
+                triggerGlobalSetupCoverageDump();
             }
         }
     }
 
-    public static void maybeTriggerGlobalSetupCoverageDump() {
+    public static void triggerGlobalSetupCoverageDump() {
         if (!hasTestingStarted) {
             // Trigger dump of global test setup coverage, before first test suite executes its test setup code.
             hasTestingStarted = true;
-            maybeTriggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
+            triggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
         }
     }
 
@@ -164,7 +166,7 @@ public class TestEventInterceptorUtility {
             return;
         }
         sendMessage(String.format("%d %s %s %s %d %d %d", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_FINISHED.name(), currentTestSuite, runCount, failureCount, ignoreCount));
-        maybeTriggerCoverageDump(currentTestSuite);
+        triggerCoverageDump(currentTestSuite);
         currentTestSuite = "";
         inTestSuite = false;
     }
@@ -179,7 +181,7 @@ public class TestEventInterceptorUtility {
         }
     }
 
-    private static void maybeTriggerCoverageDump(final String dumpId) {
+    private static void triggerCoverageDump(final String dumpId) {
         if (GlobalCoverageMonitor.isMonitoringCoverage() && CoverageDumpStrategy.getInstance().isReusingForks()) {
             GlobalCoverageMonitor.get().registerDump(dumpId);
         }

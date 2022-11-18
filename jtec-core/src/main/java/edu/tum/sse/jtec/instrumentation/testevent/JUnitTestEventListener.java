@@ -47,7 +47,7 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;
         }
-        TestEventInterceptorUtility.maybeTriggerGlobalSetupCoverageDump();
+        TestEventInterceptorUtility.triggerGlobalSetupCoverageDump();
     }
 
     @Override
