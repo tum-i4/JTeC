@@ -13,7 +13,7 @@ public final class CoverageDumpStrategy {
         this.trigger = trigger;
     }
 
-    public boolean isReusingFork() {
+    public boolean isReusingForks() {
         return trigger == CoverageDumpTrigger.PER_TEST;
     }
 

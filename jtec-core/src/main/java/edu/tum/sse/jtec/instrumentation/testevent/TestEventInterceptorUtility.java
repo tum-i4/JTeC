@@ -180,7 +180,7 @@ public class TestEventInterceptorUtility {
     }
 
     private static void maybeTriggerCoverageDump(final String dumpId) {
-        if (GlobalCoverageMonitor.isMonitoringCoverage() && CoverageDumpStrategy.getInstance().isReusingFork()) {
+        if (GlobalCoverageMonitor.isMonitoringCoverage() && CoverageDumpStrategy.getInstance().isReusingForks()) {
             GlobalCoverageMonitor.get().registerDump(dumpId);
         }
     }

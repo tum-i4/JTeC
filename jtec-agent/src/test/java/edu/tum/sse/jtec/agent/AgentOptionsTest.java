@@ -66,7 +66,7 @@ class AgentOptionsTest {
         assertEquals(parsedOptions.getFileExcludes(), ".*.class");
         assertTrue(parsedOptions.shouldTraceTestEvents());
         assertFalse(parsedOptions.shouldInstrumentTestEvents());
-        assertTrue(parsedOptions.isReusingFork());
+        assertTrue(parsedOptions.isReusingForks());
         assertTrue(parsedOptions.shouldTraceCoverage());
         assertTrue(parsedOptions.shouldInstrumentCoverage());
         assertEquals(parsedOptions.getCoverageLevel(), CoverageLevel.METHOD);
