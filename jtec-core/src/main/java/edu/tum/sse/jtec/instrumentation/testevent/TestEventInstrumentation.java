@@ -1,13 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestEndInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestFailedInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestIgnoredInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestRunFinishedInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit4TestStartInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit5ExecutionFinishedInterceptor;
-import edu.tum.sse.jtec.instrumentation.testevent.interceptors.JUnit5ExecutionStartedInterceptor;
+import edu.tum.sse.jtec.instrumentation.testevent.interceptors.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.asm.Advice;
@@ -37,6 +31,7 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
     public static final String TEST_FAILED = "testFailure";
     public static final String TEST_IGNORED = "testIgnored";
     public static final String TEST_RUN_FINISHED = "testRunFinished";
+    public static final String TEST_RUN_STARTED = "testRunStarted";
     private final boolean shouldInstrument;
 
     private Instrumentation instrumentation;
@@ -69,7 +64,10 @@ public class TestEventInstrumentation extends AbstractInstrumentation<TestEventI
                                 .on(ElementMatchers.nameMatches(TEST_IGNORED)))
                         .visit(Advice.withCustomMapping()
                                 .to(JUnit4TestRunFinishedInterceptor.class)
-                                .on(ElementMatchers.nameMatches(TEST_RUN_FINISHED)));
+                                .on(ElementMatchers.nameMatches(TEST_RUN_FINISHED)))
+                        .visit(Advice.withCustomMapping()
+                                .to(JUnit4TestRunStartedInterceptor.class)
+                                .on(ElementMatchers.nameMatches(TEST_RUN_STARTED)));
     }
 
     @Override

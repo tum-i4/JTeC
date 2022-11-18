@@ -70,6 +70,7 @@ class CoverageInstrumentationTest {
                     coverageLevel,
                     fooClass,
                     "",
+                    true,
                     true
             );
             instr.attach(instrumentation, tmpDir.toFile());
@@ -105,6 +106,7 @@ class CoverageInstrumentationTest {
                     coverageLevel,
                     fooClass,
                     "",
+                    true,
                     true
             );
             instr.attach(instrumentation, tmpDir.toFile());

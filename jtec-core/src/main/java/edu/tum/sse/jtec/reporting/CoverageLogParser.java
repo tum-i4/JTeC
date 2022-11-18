@@ -1,7 +1,5 @@
 package edu.tum.sse.jtec.reporting;
 
-import edu.tum.sse.jtec.instrumentation.coverage.CoverageMap;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +41,8 @@ public final class CoverageLogParser {
                             break;
                         }
                     }
+                    // TODO: If in non-forked mode, we could add all global test setup and
+                    //  global test teardown coverage to all test suites here.
                 }
             }
         }

@@ -2,7 +2,6 @@ package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.util.IOUtils;
 import edu.tum.sse.jtec.util.JSONUtils;
-import edu.tum.sse.jtec.util.ProcessUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,19 +22,26 @@ public class CoverageMonitor {
     }
 
     public void registerMethodCall(final String className, final String methodSignature, final String returnType) {
-        registerCoverage(className + methodSignature + returnType);
+        registerCoverage(className + "#" + methodSignature + returnType);
     }
 
     private void registerCoverage(String value) {
-        String pid = ProcessUtils.getCurrentPid();
-        coverageMap.put(pid, value);
+        coverageMap.put(value);
     }
 
     public void clearCoverage() {
         coverageMap.clear();
     }
 
-    public void dumpCoverage(final String outputPath) throws IOException {
+    public CoverageMap getCoverageMap() {
+        return coverageMap;
+    }
+
+    public void registerDump(final String dumpId) {
+        coverageMap.dump(dumpId);
+    }
+
+    public void saveCoverage(final String outputPath) throws IOException {
         final String json = JSONUtils.toJson(coverageMap.getCollectedProbes());
         final Path outputFile = Paths.get(outputPath);
         IOUtils.createFileAndEnclosingDir(outputFile);

@@ -57,7 +57,8 @@ public class Tracer {
                             options.getCoverageLevel(),
                             options.getCoverageIncludes(),
                             options.getCoverageExcludes(),
-                            options.shouldInstrumentCoverage()
+                            options.shouldInstrumentCoverage(),
+                            options.isReusingForks()
                     ).attach(instrumentation, tempFolder));
         }
     }

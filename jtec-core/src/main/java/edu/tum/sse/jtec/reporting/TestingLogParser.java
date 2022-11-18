@@ -5,10 +5,7 @@ import edu.tum.sse.jtec.instrumentation.testevent.TestTracingEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,7 +70,8 @@ public final class TestingLogParser {
 
                         // Parse details of test suite end event.
                         String[] eventDetailParts = result.group(4).split(" ");
-                        currentTestSuite.setTestId(eventDetailParts[0]);
+                        final String currentTestId = eventDetailParts[0];
+                        currentTestSuite.setTestId(currentTestId);
                         currentTestSuite.setRunCount(Integer.parseInt(eventDetailParts[1]));
                         currentTestSuite.setFailureCount(Integer.parseInt(eventDetailParts[2]));
                         currentTestSuite.setIgnoreCount(Integer.parseInt(eventDetailParts[3]));
@@ -81,7 +79,24 @@ public final class TestingLogParser {
                         // Add test suite to map (only if this is the first found SUITE_FINISHED event).
                         if (insideTestSuite) {
                             testSuites.putIfAbsent(testSuitePid, new ArrayList<>());
-                            testSuites.get(testSuitePid).add(currentTestSuite);
+
+                            // It may happen that a test suite is listed twice in the test log.
+                            // In those cases, we simply update the already existing test suite entry.
+                            Optional<TestSuite> maybeExistingTestSuite = testSuites.get(testSuitePid)
+                                    .stream()
+                                    .filter((ts) -> ts.getTestId().equals(currentTestId))
+                                    .findFirst();
+                            if (maybeExistingTestSuite.isPresent()) {
+                                final TestSuite existingTestSuite = maybeExistingTestSuite.get();
+                                existingTestSuite.setDuration(existingTestSuite.getDuration() + currentTestSuite.getDuration());
+                                existingTestSuite.setEndTimestamp(currentTestSuite.getEndTimestamp());
+                                existingTestSuite.setRunCount(currentTestSuite.getRunCount());
+                                existingTestSuite.setFailureCount(currentTestSuite.getFailureCount());
+                                existingTestSuite.setIgnoreCount(currentTestSuite.getIgnoreCount());
+                                currentTestSuite = existingTestSuite;
+                            } else {
+                                testSuites.get(testSuitePid).add(currentTestSuite);
+                            }
                         }
                         lastTestSuite = currentTestSuite;
                         currentTestSuite = new TestSuite();

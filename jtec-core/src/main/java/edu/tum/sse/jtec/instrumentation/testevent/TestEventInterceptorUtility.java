@@ -1,5 +1,7 @@
 package edu.tum.sse.jtec.instrumentation.testevent;
 
+import edu.tum.sse.jtec.instrumentation.coverage.CoverageDumpStrategy;
+import edu.tum.sse.jtec.instrumentation.coverage.GlobalCoverageMonitor;
 import edu.tum.sse.jtec.util.ProcessUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -24,6 +26,7 @@ public class TestEventInterceptorUtility {
     public static String currentTestCase = "";
 
     public static boolean inTestSuite = false;
+    public static boolean hasTestingStarted = false;
 
     public static String currentPid = ProcessUtils.getCurrentPid();
 
@@ -67,6 +70,18 @@ public class TestEventInterceptorUtility {
             if (testIdentifier.isTest()) {
                 testStarted(description);
             }
+            // The first test suite will be the first container that has a source.
+            else if (testIdentifier.isContainer() && testIdentifier.getSource().isPresent()) {
+                triggerGlobalSetupCoverageDump();
+            }
+        }
+    }
+
+    public static void triggerGlobalSetupCoverageDump() {
+        if (!hasTestingStarted) {
+            // Trigger dump of global test setup coverage, before first test suite executes its test setup code.
+            hasTestingStarted = true;
+            triggerCoverageDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_SETUP.toString());
         }
     }
 
@@ -151,6 +166,7 @@ public class TestEventInterceptorUtility {
             return;
         }
         sendMessage(String.format("%d %s %s %s %d %d %d", System.currentTimeMillis(), currentPid, TestTracingEvent.SUITE_FINISHED.name(), currentTestSuite, runCount, failureCount, ignoreCount));
+        triggerCoverageDump(currentTestSuite);
         currentTestSuite = "";
         inTestSuite = false;
     }
@@ -162,6 +178,12 @@ public class TestEventInterceptorUtility {
         } catch (final IOException e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private static void triggerCoverageDump(final String dumpId) {
+        if (GlobalCoverageMonitor.isMonitoringCoverage() && CoverageDumpStrategy.getInstance().isReusingForks()) {
+            GlobalCoverageMonitor.get().registerDump(dumpId);
         }
     }
 

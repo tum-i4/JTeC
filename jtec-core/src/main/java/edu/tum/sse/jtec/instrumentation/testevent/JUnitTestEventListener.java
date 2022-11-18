@@ -43,6 +43,14 @@ public class JUnitTestEventListener extends RunListener implements TestExecution
     }
 
     @Override
+    public void testRunStarted(final Description description) {
+        if (TestEventInterceptorUtility.testEventInstrumentation) {
+            return;
+        }
+        TestEventInterceptorUtility.triggerGlobalSetupCoverageDump();
+    }
+
+    @Override
     public void testFinished(final Description testDescription) {
         if (TestEventInterceptorUtility.testEventInstrumentation) {
             return;

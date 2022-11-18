@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class ProcessUtils {
-    private static String currentPid = java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+    private static final String currentPid = java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 
     public static Process run(String command, boolean blocking) throws IOException, InterruptedException {
         return run(command, Collections.emptyMap(), blocking);

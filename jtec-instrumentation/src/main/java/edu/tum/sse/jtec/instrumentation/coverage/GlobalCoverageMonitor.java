@@ -8,6 +8,10 @@ public class GlobalCoverageMonitor {
         GlobalCoverageMonitor.coverageMonitor = coverageMonitor;
     }
 
+    public static boolean isMonitoringCoverage() {
+        return coverageMonitor != null;
+    }
+
     public static CoverageMonitor get() {
         if (coverageMonitor == null) {
             throw new RuntimeException(
