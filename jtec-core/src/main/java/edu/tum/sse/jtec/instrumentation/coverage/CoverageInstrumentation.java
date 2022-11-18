@@ -18,7 +18,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     private final String includePattern;
     private final String excludePattern;
     private final boolean shouldInstrument;
-    private final boolean isForked;
+    private final boolean reusingFork;
 
     private Instrumentation instrumentation;
     private ClassFileTransformer transformer;
@@ -29,13 +29,13 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
                                    final String includePattern,
                                    final String excludePattern,
                                    final boolean shouldInstrument,
-                                   final boolean isForked) {
+                                   final boolean reusingFork) {
         super(outputPath);
         this.coverageLevel = coverageLevel;
         this.includePattern = includePattern;
         this.excludePattern = excludePattern;
         this.shouldInstrument = shouldInstrument;
-        this.isForked = isForked;
+        this.reusingFork = reusingFork;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     public CoverageInstrumentation attach(final Instrumentation instrumentation, final File tempFolder) {
         this.instrumentation = instrumentation;
         coverageMonitor = CoverageMonitor.create();
-        CoverageDumpStrategy.getInstance().setStrategy(isForked ? CoverageDumpStrategy.CoverageDumpTrigger.PER_PROCESS : CoverageDumpStrategy.CoverageDumpTrigger.PER_TEST);
+        CoverageDumpStrategy.getInstance().setStrategy(reusingFork ? CoverageDumpStrategy.CoverageDumpTrigger.PER_TEST : CoverageDumpStrategy.CoverageDumpTrigger.PER_PROCESS);
         GlobalCoverageMonitor.set(coverageMonitor);
         if (shouldInstrument) {
             transformer = new AgentBuilder.Default()
@@ -75,10 +75,10 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
     }
 
     public void dumpCoverage() {
-        if (CoverageDumpStrategy.getInstance().isForked()) {
-            coverageMonitor.registerDump(ProcessUtils.getCurrentPid());
-        } else {
+        if (CoverageDumpStrategy.getInstance().isReusingFork()) {
             coverageMonitor.registerDump(CoverageDumpStrategy.TestPhaseDump.GLOBAL_TEARDOWN.toString());
+        } else {
+            coverageMonitor.registerDump(ProcessUtils.getCurrentPid());
         }
         try {
             coverageMonitor.saveCoverage(outputPath);

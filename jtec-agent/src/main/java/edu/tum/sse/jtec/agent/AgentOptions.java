@@ -56,7 +56,7 @@ public class AgentOptions {
     public static final AgentOptions DEFAULT_OPTIONS = new AgentOptions(
             false,
             true,
-            true,
+            false,
             false,
             true,
             true,
@@ -86,7 +86,7 @@ public class AgentOptions {
     private boolean traceCoverage = false;
     private boolean instrumentCoverage = false;
     private boolean instrumentTestEvents = true;
-    private boolean forkTestMode = true;
+    private boolean reusingFork = false;
     private CoverageLevel coverageLevel;
     private String coverageIncludes;
     private String coverageExcludes;
@@ -103,7 +103,7 @@ public class AgentOptions {
     private AgentOptions(
             final boolean traceTestEvents,
             final boolean instrumentTestEvents,
-            final boolean forkTestMode,
+            final boolean reusingFork,
             final boolean traceSystemEvents,
             final boolean instrumentFileEvents,
             final boolean instrumentSocketEvents,
@@ -122,7 +122,7 @@ public class AgentOptions {
     ) {
         this.traceTestEvents = traceTestEvents;
         this.instrumentTestEvents = instrumentTestEvents;
-        this.forkTestMode = forkTestMode;
+        this.reusingFork = reusingFork;
         this.traceSystemEvents = traceSystemEvents;
         this.instrumentFileEvents = instrumentFileEvents;
         this.instrumentSocketEvents = instrumentSocketEvents;
@@ -189,7 +189,7 @@ public class AgentOptions {
     private static void parseTestEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
         result.traceTestEvents = Boolean.parseBoolean(optionsInput.get(TRACE_TEST_EVENTS));
         result.instrumentTestEvents = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_INSTRUMENT, "true"));
-        result.forkTestMode = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_FORKED_MODE, "true"));
+        result.reusingFork = Boolean.parseBoolean(optionsInput.getOrDefault(TEST_FORKED_MODE, "false"));
     }
 
     private static void parseSysEventParams(final AgentOptions result, final Map<String, String> optionsInput) {
@@ -223,7 +223,7 @@ public class AgentOptions {
                 OPTIONS_SEPARATOR + AGENT_OPTIONS_FILE + VALUE_SEPARATOR + optionsFile +
                 OPTIONS_SEPARATOR + TRACE_TEST_EVENTS + VALUE_SEPARATOR + traceTestEvents +
                 OPTIONS_SEPARATOR + TEST_INSTRUMENT + VALUE_SEPARATOR + instrumentTestEvents +
-                OPTIONS_SEPARATOR + TEST_FORKED_MODE + VALUE_SEPARATOR + forkTestMode +
+                OPTIONS_SEPARATOR + TEST_FORKED_MODE + VALUE_SEPARATOR + reusingFork +
                 OPTIONS_SEPARATOR + TRACE_SYS_EVENTS + VALUE_SEPARATOR + traceSystemEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_FILE + VALUE_SEPARATOR + instrumentFileEvents +
                 OPTIONS_SEPARATOR + TRACE_SYS_SOCKET + VALUE_SEPARATOR + instrumentSocketEvents +
@@ -319,7 +319,7 @@ public class AgentOptions {
         this.optionsFile = optionsFile;
     }
 
-    public boolean isForkTestMode() {
-        return forkTestMode;
+    public boolean isReusingFork() {
+        return reusingFork;
     }
 }

@@ -13,8 +13,8 @@ public final class CoverageDumpStrategy {
         this.trigger = trigger;
     }
 
-    public boolean isForked() {
-        return trigger == CoverageDumpTrigger.PER_PROCESS;
+    public boolean isReusingFork() {
+        return trigger == CoverageDumpTrigger.PER_TEST;
     }
 
     public enum CoverageDumpTrigger {
