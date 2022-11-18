@@ -14,7 +14,7 @@ provided as key value pairs `-javaagent:/path/to/agent.jar=key1=val1,key2=val2,.
 | jtec.out     | String  | `.`                                                                             | Output path for jtec output                                                                  |
 | jtec.optsfile| String  | `jtec.txt`                                                                      | Options file containing JTeC options                                                         |
 | test.trace   | Boolean | `false`                                                                         | Enables test event tracing                                                                   |
-| test.fork    | Boolean | `false`                                                                         | Enables forked test execution (not one test suite per JVM)                                   |
+| test.reuseFork | Boolean | `false`                                                                         | Enables forked test execution (not one test suite per JVM)                                   |
 | test.instr   | Boolean | `true`                                                                          | Enables class file instrumentation for JUnit classes (instead of providing custom listeners) |
 | sys.trace    | Boolean | `false`                                                                         | Enables system event tracing                                                                 |
 | sys.file     | Boolean | `true`                                                                          | Enables file event tracing                                                                   |

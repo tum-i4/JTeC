@@ -35,7 +35,7 @@ class AgentOptionsTest {
                 "jtec.optsfile=" + optionsFile + "," +
                 "test.trace=true," +
                 "test.instr=false," +
-                "test.fork=true," +
+                "test.reuseFork=true," +
                 "sys.trace=true," +
                 "sys.file=true," +
                 "sys.socket=false," +
