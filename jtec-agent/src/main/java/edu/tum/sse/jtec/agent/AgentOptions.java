@@ -26,7 +26,7 @@ public class AgentOptions {
     // Test event instrumentation.
     public static final String TRACE_TEST_EVENTS = "test.trace";
     public static final String TEST_INSTRUMENT = "test.instr";
-    public static final String TEST_FORKED_MODE = "test.reuseFork";
+    public static final String TEST_FORKED_MODE = "test.reuseForks";
 
     // System event instrumentation.
     public static final String TRACE_SYS_EVENTS = "sys.trace";
