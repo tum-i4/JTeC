@@ -19,6 +19,8 @@ import java.util.Comparator;
 
 public final class IOUtils {
 
+    public final static Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+
     public static <T> Path locateJar(Class<T> clazz) throws IOException, URISyntaxException {
         URL url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class");
         URI jarURL = ((JarURLConnection) url.openConnection()).getJarFileURL().toURI();
@@ -53,7 +55,7 @@ public final class IOUtils {
     }
 
     public static void writeToFile(final Path file, final String message, final boolean lock, final StandardOpenOption... options) throws IOException {
-        final byte[] messageAsByteArray = message.getBytes(StandardCharsets.UTF_8);
+        final byte[] messageAsByteArray = message.getBytes(DEFAULT_CHARSET);
         if (lock) {
             FileLock fileLock = null;
             try (final FileChannel fileChannel = FileChannel.open(file, options)) {
@@ -79,7 +81,7 @@ public final class IOUtils {
     }
 
     public static String readFromFile(final Path file) throws IOException {
-        return readFromFile(file, StandardCharsets.UTF_8);
+        return readFromFile(file, DEFAULT_CHARSET);
     }
 
 }
