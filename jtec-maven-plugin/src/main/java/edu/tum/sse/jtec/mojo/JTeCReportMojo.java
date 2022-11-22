@@ -19,6 +19,7 @@ public class JTeCReportMojo extends AbstractJTeCReportMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (!Files.exists(outputDirectory.toPath())) {
+                getLog().error("Report generator could not find JTeC output directory: " + outputDirectory.toString());
                 return;
             }
             final ReportGenerator generator = new ReportGenerator(outputDirectory.toPath(), true);

@@ -18,12 +18,13 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
     boolean storeTestReport(TestReport testReport) throws IOException {
         Path jsonFile = outputDirectory.toPath().resolve(TEST_REPORT_FILENAME);
         Files.deleteIfExists(jsonFile);
-        if (testReport.getTestSuites().size() > 0) {
-            final String jsonTestReport = toJson(testReport);
-            createFileAndEnclosingDir(jsonFile);
-            writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
-            return true;
+        if (testReport.getTestSuites().size() == 0) {
+            getLog().warn("No Test Suites found during report generation.");
+            return false;
         }
-        return false;
+        final String jsonTestReport = toJson(testReport);
+        createFileAndEnclosingDir(jsonFile);
+        writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
+        return true;
     }
 }
