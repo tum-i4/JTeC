@@ -77,11 +77,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         agentOptions.setOutputPath(outputDirectory.toPath());
         if (autoinclude && Files.exists(Paths.get(project.getBuild().getOutputDirectory()))) {
             String autoincludePatterns = "";
-            try {
-                autoincludePatterns = buildAutoIncludePattern();
-            } catch (final IOException e) {
-                getLog().warn("No Source dir found!", e);
-            }
+            autoincludePatterns = buildAutoIncludePattern();
             if (!autoincludePatterns.isEmpty()) {
                 agentOptions.setCoverageIncludes(autoincludePatterns);
             }
@@ -92,7 +88,7 @@ public class JTeCMojo extends AbstractJTeCMojo {
         return agentString;
     }
 
-    private String buildAutoIncludePattern() throws IOException {
+    private String buildAutoIncludePattern() {
         final Set<String> includePaths = new HashSet<>();
         final String classDirectory = project.getBuild().getOutputDirectory();
         findAutoincludePatterns(Paths.get(classDirectory), classDirectory, includePaths);
@@ -110,10 +106,16 @@ public class JTeCMojo extends AbstractJTeCMojo {
         return "(" + includePackages + ")" + ".*";
     }
 
-    private void findAutoincludePatterns(final Path path, final String classDir, final Set<String> includePaths) throws IOException {
+    private void findAutoincludePatterns(final Path path, final String classDir, final Set<String> includePaths) {
         final List<Path> paths = new ArrayList<>();
         log("Searching for autoinclude Patterns in " + path);
-        Files.list(path).forEach(paths::add);
+        try {
+            Files.list(path).forEach(paths::add);
+        } catch (IOException e) {
+            getLog().warn("ClassDir" + classDir + "not found for autoinclude. Ignoring this location.");
+            e.printStackTrace();
+            return;
+        }
         if (paths.stream().anyMatch(currentPath -> currentPath.toString().endsWith(".class"))) {
             includePaths.add(path.toString().substring(classDir.length() + 1));
             return;
