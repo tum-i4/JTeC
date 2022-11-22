@@ -114,7 +114,11 @@ public class TestEventInterceptorUtility {
     }
 
     public static void incrementIgnoreCount() {
-        currentTestRunResult.incrementIgnoreCount();
+        if (currentTestRunResult != null) {
+            // We might not count an ignore at the start of a test suite but since we don't currently use the ignore count
+            // it should be alright for now.
+            currentTestRunResult.incrementIgnoreCount();
+        }
     }
 
     public static void incrementRunCount() {
