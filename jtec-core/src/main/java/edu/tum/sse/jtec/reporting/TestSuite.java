@@ -3,7 +3,7 @@ package edu.tum.sse.jtec.reporting;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class TestSuite {
+public class TestSuite {
     private String testId;
     private long duration;
     private long startTimestamp;
