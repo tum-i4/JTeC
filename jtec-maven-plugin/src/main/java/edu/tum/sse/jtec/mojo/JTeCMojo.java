@@ -117,7 +117,12 @@ public class JTeCMojo extends AbstractJTeCMojo {
             return;
         }
         if (paths.stream().anyMatch(currentPath -> currentPath.toString().endsWith(".class"))) {
-            includePaths.add(path.toString().substring(classDir.length() + 1));
+            if (path.toString().length() > classDir.length() + 1) {
+                includePaths.add(path.toString().substring(classDir.length() + 1));
+            } else {
+                // We are at the root and there are already class files, so we have to include everything.
+                includePaths.add("");
+            }
             return;
         }
         for (final Path currentPath : paths) {
