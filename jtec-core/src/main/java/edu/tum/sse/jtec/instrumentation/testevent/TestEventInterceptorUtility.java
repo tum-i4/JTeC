@@ -114,11 +114,12 @@ public class TestEventInterceptorUtility {
     }
 
     public static void incrementIgnoreCount() {
-        if (currentTestRunResult != null) {
+        if (currentTestRunResult == null) {
             // We might not count an ignore at the start of a test suite but since we don't currently use the ignore count
             // it should be alright for now.
-            currentTestRunResult.incrementIgnoreCount();
+            return;
         }
+        currentTestRunResult.incrementIgnoreCount();
     }
 
     public static void incrementRunCount() {
@@ -162,6 +163,10 @@ public class TestEventInterceptorUtility {
     }
 
     public static void testSuiteFinished() {
+        if (currentTestRunResult == null) {
+            // Relevant for example if a test suite only contains ignored test cases and no TestRunResult is created.
+            return;
+        }
         testSuiteFinished(currentTestRunResult.getRunCount(), currentTestRunResult.getFailureCount(), currentTestRunResult.getIgnoreCount());
     }
 
