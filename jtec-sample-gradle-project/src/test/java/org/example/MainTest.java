@@ -8,5 +8,7 @@ class MainTest {
     @Test
     public void mainTest() {
         System.out.println("Running mainTest");
+        Main main = new Main();
+        assert true;
     }
 }
