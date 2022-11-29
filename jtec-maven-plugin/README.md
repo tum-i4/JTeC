@@ -53,3 +53,9 @@ of a Maven multi-module project:
 ```shell
 $ mvn clean verify -Djtec.opts="test.trace,sys.trace,cov.trace" jtec:report-aggregate
 ```
+
+## Troubleshooting
+
+In large projects, one might experience JVM shutdown initiated by Surefire before JTeC is done writing its test report to disk.
+This will likely manifest in a JVM "crash" being reported by Maven Surefire.
+In those cases, you can simply increase [Surefire's exit timeout timespan](https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#forkedProcessExitTimeoutInSeconds) by setting `-Dsurefire.exitTimeout=150` (default are 30 seconds).
