@@ -1,6 +1,6 @@
 plugins {
-    id 'edu.tum.sse.java-conventions'
     id 'java-gradle-plugin'
+    id 'maven-publish'
 }
 
 repositories {
@@ -9,8 +9,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'edu.tum.sse:jtec-agent:0.0.3-SNAPSHOT'
 }
 
@@ -19,6 +17,14 @@ gradlePlugin {
         jtecGradlePlugin {
             id = 'edu.tum.sse.jtec.jtec-gradle-plugin'
             implementationClass = 'edu.tum.sse.jtec.JTeCGradlePlugin'
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
         }
     }
 }

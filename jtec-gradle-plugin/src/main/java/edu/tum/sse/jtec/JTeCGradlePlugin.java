@@ -4,6 +4,9 @@ import edu.tum.sse.jtec.reporting.ReportGenerator;
 import edu.tum.sse.jtec.reporting.TestReport;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency;
 import org.gradle.api.tasks.testing.Test;
 import edu.tum.sse.jtec.agent.AgentOptions;
 import edu.tum.sse.jtec.agent.JTeCAgent;
@@ -18,6 +21,10 @@ import static edu.tum.sse.jtec.util.IOUtils.*;
 import static edu.tum.sse.jtec.util.JSONUtils.toJson;
 
 public class JTeCGradlePlugin implements Plugin<Project> {
+
+    private static final String JTEC = "jtec";
+    private static final String JTEC_GROUP = "edu.tum.sse";
+    private static final String JTEC_NAME = "jtec-agent";
     File outputDirectory;
 
     public void apply(Project project) {
@@ -31,22 +38,21 @@ public class JTeCGradlePlugin implements Plugin<Project> {
             System.out.println("Executing JTeC Gradle plugin for project " + project.getName());
             System.out.println("Out dir: " + this.outputDirectory);
             final String preparedAgentOpts = prepareAgentOpts(project);
-            final Path agentJar = locateJar(JTeCAgent.class);
-            System.out.println(agentJar.toAbsolutePath());
 
-            final String agentPath = "/Users/roland/.m2/repository/edu/tum/sse/jtec-agent/0.0.3-SNAPSHOT/jtec-agent-0.0.3-SNAPSHOT.jar";
+            JTeCExtension extension = project.getExtensions().create(JTEC, JTeCExtension.class);
+            project.getRepositories().add(project.getRepositories().mavenLocal());
+            Configuration agentConfig = project.getConfigurations().detachedConfiguration(
+                    new DefaultExternalModuleDependency(JTEC_GROUP, JTEC_NAME, extension.getVersion()));
+            final String agentPath = agentConfig.getFiles().iterator().next().getAbsolutePath();
 
             project.afterEvaluate(p ->
                     {
                         p.getTasks().withType(Test.class).forEach(task ->
                                 {
                                     final List<String> jvmArgs = task.getJvmArgs();
-                                    final String newValue = String.format("-javaagent:%s=%s", agentJar.toAbsolutePath(), preparedAgentOpts);
-                                    // final String newValue = String.format("-javaagent:%s=%s", agentPath, preparedAgentOpts);
+                                    final String newValue = String.format("-javaagent:%s=%s", agentPath, preparedAgentOpts);
                                     jvmArgs.add(newValue);
                                     task.setJvmArgs(jvmArgs);
-
-                                    System.out.println("All Args: " + task.getAllJvmArgs().stream().collect(Collectors.joining(",")));
                                 }
                         );
                     }
@@ -59,9 +65,12 @@ public class JTeCGradlePlugin implements Plugin<Project> {
 
     private String prepareAgentOpts(Project project) {
         final AgentOptions agentOptions;
+        JTeCExtension extension = (JTeCExtension) project.getExtensions().findByName(JTEC);
         if (project.hasProperty("jtec.opts")) {
             System.out.println("Parameters: " + project.property("jtec.opts"));
             agentOptions = AgentOptions.fromString((String) project.property("jtec.opts"));
+        } else if (extension != null && !extension.getOptions().isEmpty()) {
+            agentOptions = AgentOptions.fromString(extension.getOptions());
         } else {
             agentOptions = AgentOptions.DEFAULT_OPTIONS;
         }

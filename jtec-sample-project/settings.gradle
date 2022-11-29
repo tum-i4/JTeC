@@ -1,0 +1,12 @@
+
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'jtec-sample-project'
+include(':junit5-project')
+
+

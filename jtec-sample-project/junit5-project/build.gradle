@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'edu.tum.sse.jtec.jtec-gradle-plugin' version '0.0.3-SNAPSHOT'
+}
+
+dependencies {
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+jtec {
+    options = "test.trace,sys.trace,cov.trace"
+}
+
+test {
+    useJUnitPlatform()
+    ignoreFailures(true)
+//  test.finalizedBy saveReport
+}
