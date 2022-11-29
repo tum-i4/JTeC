@@ -11,6 +11,4 @@ include(':jtec-core')
 include(':jtec-instrumentation')
 include(':jtec-maven-plugin')
 include(':jtec-agent')
-include('jtec-gradle-plugin')
-include('jtec-sample-gradle-project')
-
+include(':jtec-gradle-plugin')
