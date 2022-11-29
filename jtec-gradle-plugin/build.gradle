@@ -8,6 +8,9 @@ repositories {
     mavenCentral()
 }
 
+group = 'edu.tum.sse'
+version = '0.0.3-SNAPSHOT'
+
 dependencies {
     implementation 'edu.tum.sse:jtec-agent:0.0.3-SNAPSHOT'
 }
