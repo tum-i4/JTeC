@@ -36,8 +36,8 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file (will be generated here)
 
-    - name: Build & Test
-      run: mvn package -B --file pom.xml
+    - name: Build, Test, Install
+      run: mvn install -B --file pom.xml
 
     - name: Publish to GitHub Packages Apache Maven
       if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest' && matrix.java-version == '11' }}
