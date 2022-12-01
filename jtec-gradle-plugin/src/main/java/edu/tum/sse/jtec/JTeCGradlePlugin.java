@@ -37,7 +37,6 @@ public class JTeCGradlePlugin implements Plugin<Project> {
         try {
             System.out.println("Executing JTeC Gradle plugin for project " + project.getName());
             System.out.println("Out dir: " + this.outputDirectory);
-            final String preparedAgentOpts = prepareAgentOpts(project);
 
             JTeCExtension extension = project.getExtensions().create(JTEC, JTeCExtension.class);
             project.getRepositories().add(project.getRepositories().mavenLocal());
@@ -49,6 +48,7 @@ public class JTeCGradlePlugin implements Plugin<Project> {
                     {
                         p.getTasks().withType(Test.class).forEach(task ->
                                 {
+                                    final String preparedAgentOpts = prepareAgentOpts(project);
                                     final List<String> jvmArgs = task.getJvmArgs();
                                     final String newValue = String.format("-javaagent:%s=%s", agentPath, preparedAgentOpts);
                                     jvmArgs.add(newValue);

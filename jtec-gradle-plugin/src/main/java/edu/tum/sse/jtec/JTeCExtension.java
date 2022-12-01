@@ -4,7 +4,7 @@ public class JTeCExtension {
     private static final String DEFAULT_VERSION = "0.0.3-SNAPSHOT";
 
     private String version = DEFAULT_VERSION;
-    private String options;
+    private String options = "";
 
     public String getVersion(){
         return version;
