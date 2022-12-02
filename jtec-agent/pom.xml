@@ -38,9 +38,11 @@
             <plugin>
                 <!--
                 We create an uber JAR to enable using the agent as a standalone JAR.
-                To prevent interference with other versions of those dependencies,
-                we relocate all classes in their namespaces to shaded namespaces and
+                To prevent interference with other versions of dependencies,
+                we relocate all classes in their namespaces to shaded namespaces
                 which will also change the imports automatically in the source code.
+                Notably, we cannot relocate some JUnit classes as these are needed for
+                the instrumentation of test classes.
                 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
