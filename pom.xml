@@ -20,6 +20,7 @@
         <module>jtec-core</module>
         <module>jtec-agent</module>
         <module>jtec-maven-plugin</module>
+        <module>jtec-gradle-plugin</module>
     </modules>
 
     <build>

@@ -271,3 +271,7 @@ tags
 
 # Maven
 target
+
+# Gradle
+.gradle
+build

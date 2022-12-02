@@ -1,0 +1,33 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+group = 'edu.tum.sse'
+version = '0.0.3-SNAPSHOT'
+
+dependencies {
+    implementation 'edu.tum.sse:jtec-agent:0.0.3-SNAPSHOT'
+}
+
+gradlePlugin {
+    plugins {
+        jtecGradlePlugin {
+            id = 'edu.tum.sse.jtec.jtec-gradle-plugin'
+            implementationClass = 'edu.tum.sse.jtec.JTeCGradlePlugin'
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
