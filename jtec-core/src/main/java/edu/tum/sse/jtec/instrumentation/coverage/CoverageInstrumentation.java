@@ -1,13 +1,18 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
 import edu.tum.sse.jtec.instrumentation.AbstractInstrumentation;
+import edu.tum.sse.jtec.util.IOUtils;
+import edu.tum.sse.jtec.util.JSONUtils;
 import edu.tum.sse.jtec.util.ProcessUtils;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Adds coverage instrumentation at desired granularity (e.g., class-level).
@@ -81,10 +86,18 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
             coverageMonitor.registerDump(ProcessUtils.getCurrentPid());
         }
         try {
-            coverageMonitor.saveCoverage(outputPath);
+            saveCoverage(outputPath);
         } catch (final Exception exception) {
             System.err.println("Failed to dump coverage: " + exception.getMessage());
         }
+    }
+
+    private void saveCoverage(final String outputPath) throws IOException {
+        final String json = JSONUtils.toJson(coverageMonitor.getCoverageMap().getCollectedProbes());
+        final Path outputFile = Paths.get(outputPath);
+        IOUtils.createFileAndEnclosingDir(outputFile);
+        IOUtils.appendToFile(outputFile, json, true);
+        coverageMonitor.clearCoverage();
     }
 
 }

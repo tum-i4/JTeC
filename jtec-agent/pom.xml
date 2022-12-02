@@ -36,6 +36,14 @@
     <build>
         <plugins>
             <plugin>
+                <!--
+                We create an uber JAR to enable using the agent as a standalone JAR.
+                To prevent interference with other versions of dependencies,
+                we relocate all classes in their namespaces to shaded namespaces
+                which will also change the imports automatically in the source code.
+                Notably, we cannot relocate some JUnit classes as these are needed for
+                the instrumentation of test classes.
+                -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
@@ -45,6 +53,67 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>${project.groupId}:jtec-core</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>${project.groupId}:jtec-instrumentation</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>net.bytebuddy.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>com.google.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>junit</pattern>
+                                    <shadedPattern>junit.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apiguardian</pattern>
+                                    <shadedPattern>org.apiguardian.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.hamcrest</pattern>
+                                    <shadedPattern>org.hamcrest.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.opentest4j</pattern>
+                                    <shadedPattern>org.opentest4j.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>junit</pattern>
+                                    <shadedPattern>junit.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.junit</pattern>
+                                    <shadedPattern>org.junit.shaded</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.junit.platform.engine.TestSource</exclude>
+                                        <exclude>org.junit.platform.engine.support.descriptor.ClassSource</exclude>
+                                        <exclude>org.junit.platform.engine.support.descriptor.MethodSource</exclude>
+                                        <exclude>org.junit.platform.launcher.TestExecutionListener</exclude>
+                                        <exclude>org.junit.platform.launcher.TestIdentifier</exclude>
+                                        <exclude>org.junit.platform.engine.TestExecutionResult*</exclude>
+                                        <exclude>org.junit.runner.notification.RunListener</exclude>
+                                        <exclude>org.junit.runner.Description</exclude>
+                                    </excludes>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
