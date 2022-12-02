@@ -29,6 +29,12 @@
                     <include>**</include>
                   </includes>
                 </filter>
+                <filter>
+                  <artifact>${project.groupId}:jtec-instrumentation</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
               </filters>
               <relocations>
                 <relocation>
