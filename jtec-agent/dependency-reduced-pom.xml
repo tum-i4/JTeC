@@ -30,6 +30,40 @@
                   <pattern>com.google</pattern>
                   <shadedPattern>com.google.shaded</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>junit</pattern>
+                  <shadedPattern>junit.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apiguardian</pattern>
+                  <shadedPattern>org.apiguardian.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.hamcrest</pattern>
+                  <shadedPattern>org.hamcrest.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.opentest4j</pattern>
+                  <shadedPattern>org.opentest4j.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>junit</pattern>
+                  <shadedPattern>junit.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.junit</pattern>
+                  <shadedPattern>org.junit.shaded</shadedPattern>
+                  <excludes>
+                    <exclude>org.junit.platform.engine.TestSource</exclude>
+                    <exclude>org.junit.platform.engine.support.descriptor.ClassSource</exclude>
+                    <exclude>org.junit.platform.engine.support.descriptor.MethodSource</exclude>
+                    <exclude>org.junit.platform.launcher.TestExecutionListener</exclude>
+                    <exclude>org.junit.platform.launcher.TestIdentifier</exclude>
+                    <exclude>org.junit.platform.engine.TestExecutionResult*</exclude>
+                    <exclude>org.junit.runner.notification.RunListener</exclude>
+                    <exclude>org.junit.runner.Description</exclude>
+                  </excludes>
+                </relocation>
               </relocations>
             </configuration>
           </execution>

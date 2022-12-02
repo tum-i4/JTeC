@@ -86,7 +86,6 @@ public class CoverageInstrumentation extends AbstractInstrumentation<CoverageIns
             coverageMonitor.registerDump(ProcessUtils.getCurrentPid());
         }
         try {
-
             saveCoverage(outputPath);
         } catch (final Exception exception) {
             System.err.println("Failed to dump coverage: " + exception.getMessage());
