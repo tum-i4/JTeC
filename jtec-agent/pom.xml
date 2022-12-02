@@ -36,6 +36,12 @@
     <build>
         <plugins>
             <plugin>
+                <!--
+                We create an uber JAR to enable using the agent as a standalone JAR.
+                To prevent interference with other versions of those dependencies,
+                we relocate all classes in their namespaces to shaded namespaces and
+                which will also change the imports automatically in the source code.
+                -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
@@ -45,6 +51,18 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>net.bytebuddy.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>com.google.shaded</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

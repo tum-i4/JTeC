@@ -1,12 +1,5 @@
 package edu.tum.sse.jtec.instrumentation.coverage;
 
-import edu.tum.sse.jtec.util.IOUtils;
-import edu.tum.sse.jtec.util.JSONUtils;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class CoverageMonitor {
     private final CoverageMap coverageMap = new CoverageMap();
 
@@ -39,13 +32,5 @@ public class CoverageMonitor {
 
     public void registerDump(final String dumpId) {
         coverageMap.dump(dumpId);
-    }
-
-    public void saveCoverage(final String outputPath) throws IOException {
-        final String json = JSONUtils.toJson(coverageMap.getCollectedProbes());
-        final Path outputFile = Paths.get(outputPath);
-        IOUtils.createFileAndEnclosingDir(outputFile);
-        IOUtils.appendToFile(outputFile, json, true);
-        clearCoverage();
     }
 }

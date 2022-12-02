@@ -26,6 +26,21 @@
                   <pattern>net.bytebuddy</pattern>
                   <shadedPattern>net.bytebuddy.shaded</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>junit</pattern>
+                  <shadedPattern>junit.shaded</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.junit</pattern>
+                  <shadedPattern>org.junit.shaded</shadedPattern>
+                  <excludes>
+                    <exclude>org.junit.platform.launcher.TestExecutionListener</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>com.google</pattern>
+                  <shadedPattern>com.google.shaded</shadedPattern>
+                </relocation>
               </relocations>
             </configuration>
           </execution>
@@ -84,10 +99,10 @@
     </dependency>
   </dependencies>
   <properties>
+    <mockito.version>4.5.1</mockito.version>
+    <junit-platform.version>1.7.0</junit-platform.version>
     <bytebuddy.version>1.12.10</bytebuddy.version>
     <junit4.version>4.13.1</junit4.version>
-    <junit-platform.version>1.7.0</junit-platform.version>
     <junit5.version>5.7.0</junit5.version>
-    <mockito.version>4.5.1</mockito.version>
   </properties>
 </project>

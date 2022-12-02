@@ -47,7 +47,7 @@ public class AgentOptions {
     public static final String COVERAGE_EXCLUDES = "cov.excludes";
     public static final CoverageLevel DEFAULT_COVERAGE_LEVEL = CoverageLevel.CLASS;
     public static final String DEFAULT_COVERAGE_INCLUDES = ".*";
-    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache.maven|org.junit).*";
+    public static final String DEFAULT_COVERAGE_EXCLUDES = "(sun|java|jdk|com.sun|edu.tum.sse.jtec|net.bytebuddy|org.apache|org.junit|junit|com.google).*";
 
     // Pre-test hook.
     public static final String PRE_TEST_COMMAND = "init.cmd";

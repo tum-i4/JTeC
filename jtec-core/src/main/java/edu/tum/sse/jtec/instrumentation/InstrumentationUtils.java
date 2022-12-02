@@ -18,7 +18,6 @@ public class InstrumentationUtils {
     public static final String JTEC_PACKAGE = "edu.tum.sse.jtec";
 
     private static final String JTEC_INSTRUMENTATION = "jtec-instrumentation";
-
     private static final String JAR_FILE_ENDING = ".jar";
 
     /**
@@ -30,6 +29,7 @@ public class InstrumentationUtils {
         final File tempFolder;
         try {
             tempFolder = Files.createTempDirectory("agent-bootstrap").toFile();
+            tempFolder.deleteOnExit();
         } catch (final Exception e) {
             System.err.println("Cannot create temp folder for bootstrap class instrumentation");
             e.printStackTrace(System.err);
@@ -37,6 +37,7 @@ public class InstrumentationUtils {
         }
         try {
             final Path tempJarFile = Files.createTempFile(JTEC_INSTRUMENTATION, JAR_FILE_ENDING);
+            // We use the "jtec-instrumentation.jar" from the src/main/resources.
             Files.copy(ClassLoader.getSystemResourceAsStream(JTEC_INSTRUMENTATION + JAR_FILE_ENDING), tempJarFile, StandardCopyOption.REPLACE_EXISTING);
             instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(tempJarFile.toFile()));
         } catch (final IOException e) {
