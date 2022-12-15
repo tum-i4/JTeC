@@ -79,6 +79,10 @@
                                     <shadedPattern>com.google.shaded</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>com.github</pattern>
+                                    <shadedPattern>com.github.shaded</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>junit</pattern>
                                     <shadedPattern>junit.shaded</shadedPattern>
                                 </relocation>
