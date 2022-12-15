@@ -3,13 +3,12 @@ package edu.tum.sse.jtec.reporting;
 import com.github.javaparser.Range;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.*;
-import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import edu.tum.sse.jtec.util.IOUtils;
-import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -24,34 +23,43 @@ public class LCOVReportParser {
     /**
      * The root directory of the test report's project
      */
-    private File baseDir;
+    private Path baseDirectory;
 
     /**
      * Extensions of project files to consider in LCOV report
      */
-    private final String[] FILE_EXTENSIONS = {"java"};
+    private final String SOURCE_FILE_EXTENSION = ".java";
 
     /**
      * Project files to add to LCOV report
      */
-    private Collection<File> sourceFiles;
+    private Collection<Path> sourceFiles;
+
+    /**
+     * Map from class name to source file path
+     */
+    private Map<String, Path> classToSourceFile;
 
     /**
      * Regex for parsing entities into their components (package.name.Class#method()returnType)
      */
     final static Pattern entityRegex = Pattern.compile("^([^#(]*)\\.([^#(]*)(?:#(\\S*)\\(.+)?$");
 
-    public LCOVReportParser(File baseDir) {
-        setBaseDir(baseDir);
+    public LCOVReportParser(Path baseDirectory) throws IOException {
+        setBaseDirectory(baseDirectory);
     }
 
-    public File getBaseDir() {
-        return baseDir;
+    public Path getBaseDirectory() {
+        return baseDirectory;
     }
 
-    public void setBaseDir(File baseDir) {
-        this.baseDir = baseDir;
-        this.sourceFiles = FileUtils.listFiles(baseDir, FILE_EXTENSIONS, true);
+    public void setBaseDirectory(Path baseDirectory) throws IOException {
+        this.baseDirectory = baseDirectory;
+        this.sourceFiles = Files.walk(baseDirectory)
+                .filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(SOURCE_FILE_EXTENSION))
+                .collect(Collectors.toList());
+        this.classToSourceFile = getClassToSourceFilePath();
     }
 
     public LCOVReport parse(TestReport testReport) throws IOException {
@@ -73,7 +81,6 @@ public class LCOVReportParser {
                 final String fullyQualifiedClassName = packageName + "." + className;
 
                 // Find source file containing the class
-                // TODO: Build className to sourceFile mapping, query here
                 final Path sourceFile = getJavaSourceFile(fullyQualifiedClassName);
                 if (sourceFile == null)
                     continue;
@@ -114,14 +121,37 @@ public class LCOVReportParser {
     }
 
     /**
+     * Collect all (fully qualified) class names and map them to their source files.
+     * @return The Map from class name to source file path
+     * @throws IOException
+     */
+    private Map<String, Path> getClassToSourceFilePath() throws IOException {
+        Map<String, Path> classToSourceFile = new HashMap<>();
+        for (Path sourceFile : sourceFiles) {
+            final String sourceCode = IOUtils.readFromFile(sourceFile);
+            final CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
+
+            List<String> fullyQualifiedClassNames = compilationUnit
+                    .findAll(ClassOrInterfaceDeclaration.class).stream()
+                    .map(ClassOrInterfaceDeclaration::getFullyQualifiedName)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            for (String className : fullyQualifiedClassNames)
+                classToSourceFile.put(className, sourceFile);
+        }
+        return classToSourceFile;
+    }
+
+    /**
      * For each method in each source file, create an LCOV section with hit count 0 for all lines.
      * @return The list of initialized LCOV sections
      */
     private List<LCOVSection> getInitializedLcovSections() throws IOException {
         List<LCOVSection> lcovSections = new ArrayList<>();
-        for (File file : sourceFiles) {
-            final LCOVSection lcovSection = new LCOVSection("", file.getAbsolutePath());
-            final String sourceCode = IOUtils.readFromFile(file.toPath());
+        for (Path sourceFile : sourceFiles) {
+            final LCOVSection lcovSection = new LCOVSection("", sourceFile.toString());
+            final String sourceCode = IOUtils.readFromFile(sourceFile);
             final CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
 
             compilationUnit.findAll(CallableDeclaration.class)
@@ -145,9 +175,7 @@ public class LCOVReportParser {
      * @return The source file if it exists, else null
      */
     private Path getJavaSourceFile(String className) {
-        final String relativeFilePath = className.replace('.','/') + ".java";
-        final Optional<Path> sourceFile = sourceFiles.stream().map(File::toPath).filter(p -> p.endsWith(relativeFilePath)).findFirst();
-        return sourceFile.orElse(null);
+        return classToSourceFile.get(className);
     }
 
     /**
