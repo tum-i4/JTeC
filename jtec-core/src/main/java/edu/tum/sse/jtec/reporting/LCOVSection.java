@@ -7,13 +7,18 @@ import java.util.Map;
  * Section describing one source file in an LCOV report.
  */
 public class LCOVSection {
-    private String testName;
-    private String sourceFilePath;
+    private final String testName;
+    private final String sourceFilePath;
 
     /**
      * Line numbers and their execution count ("hits")
      */
     private final HashMap<Integer, Integer> lineHits = new HashMap<>();
+
+    public LCOVSection(String testName, String sourceFilePath) {
+        this.testName = testName;
+        this.sourceFilePath = sourceFilePath;
+    }
 
     public void addLineHit(int lineNum, int hitCount) {
         lineHits.put(lineNum, hitCount);

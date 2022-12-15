@@ -5,6 +5,8 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import edu.tum.sse.jtec.reporting.LCOVReport;
+import edu.tum.sse.jtec.reporting.LCOVReportParser;
 import edu.tum.sse.jtec.reporting.TestReport;
 import edu.tum.sse.jtec.reporting.TestSuite;
 import org.apache.commons.io.FileUtils;
@@ -21,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class LCOVUtils {
+    /*
     public static String toLcov(TestReport testReport, File baseDir) throws IOException {
         // TODO: Make non-static, refactor into methods
         StringBuilder lcovTestReport = new StringBuilder();
@@ -59,6 +62,12 @@ public class LCOVUtils {
             }
         }
         return lcovTestReport.toString();
+    }
+    */
+    public static String toLcov(TestReport testReport, File baseDir) throws IOException {
+        LCOVReportParser lcovReportParser = new LCOVReportParser(baseDir);
+        LCOVReport lcovReport = lcovReportParser.parse(testReport);
+        return lcovReport.toString();
     }
 
     private static Path getSourceFile(Collection<File> javaSourceFiles, String className) {
