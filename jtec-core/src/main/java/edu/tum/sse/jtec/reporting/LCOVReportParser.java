@@ -97,7 +97,7 @@ public class LCOVReportParser {
     }
 
     /**
-     * For each class in each source file, create an LCOV section with hit count 0 for all lines.
+     * For each method in each source file, create an LCOV section with hit count 0 for all lines.
      * @return The list of initializd LCOV sections
      */
     private List<LCOVSection> getInitializedLcovSections() throws IOException {
