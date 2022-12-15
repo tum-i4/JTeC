@@ -3,29 +3,28 @@ package edu.tum.sse.jtec.reporting;
 import com.github.javaparser.Range;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
-import com.github.javaparser.quality.NotNull;
 import edu.tum.sse.jtec.util.IOUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Parse a {@link TestReport} into an {@link LCOVReport}.
  */
 public class LCOVReportParser {
     /**
-     * The base directory of the test report's project
+     * The root directory of the test report's project
      */
     private File baseDir;
 
@@ -42,7 +41,7 @@ public class LCOVReportParser {
     /**
      * Regex for parsing entities into their components (package.name.Class#method()returnType)
      */
-    final static Pattern entityRegex = Pattern.compile("^([^#(]*)\\.([^#(]*)(?:#(\\S*)\\(\\S+)?$");
+    final static Pattern entityRegex = Pattern.compile("^([^#(]*)\\.([^#(]*)(?:#(\\S*)\\(.+)?$");
 
     public LCOVReportParser(File baseDir) {
         setBaseDir(baseDir);
@@ -58,7 +57,8 @@ public class LCOVReportParser {
     }
 
     public LCOVReport parse(TestReport testReport) throws IOException {
-        List<LCOVSection> lcovSections = new ArrayList<>();
+        List<LCOVSection> lcovSections = getInitializedLcovSections();
+        LCOVReport lcovReport = new LCOVReport(lcovSections);
 
         for (TestSuite testSuite : testReport.getTestSuites()) {
             for (String entity : testSuite.getCoveredEntities()) {
@@ -71,13 +71,16 @@ public class LCOVReportParser {
                 final Path sourceFile = getJavaSourceFile(fullyQualifiedClassName);
                 if (sourceFile == null)
                     continue;
+                final String sourceFilePath = sourceFile.toString();
 
-                final LCOVSection lcovSection = new LCOVSection(testSuite.getTestId(), sourceFile.toString());
                 final String sourceCode = IOUtils.readFromFile(sourceFile);
                 final CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
-
                 final ClassOrInterfaceDeclaration classDeclaration = compilationUnit.getClassByName(className).orElse(null);
                 if (classDeclaration == null)
+                    continue;
+
+                LCOVSection lcovSection = lcovReport.getLcovSection(sourceFilePath);
+                if (lcovSection == null)
                     continue;
                 final List<MethodDeclaration> methodDeclarations = (methodName != null) ? classDeclaration.getMethodsByName(methodName) : classDeclaration.getMethods();
                 for (MethodDeclaration methodDeclaration : methodDeclarations) {
@@ -88,20 +91,16 @@ public class LCOVReportParser {
                     for (int line = range.begin.line; line <= range.end.line; line++)
                         lcovSection.addLineHit(line, 1);
                 }
-                lcovSections.add(lcovSection);
             }
         }
-
-        List<LCOVSection> lcovSectionsFromSourceFiles = initLcovSectionsForSourceFiles();
-        lcovSections.addAll(lcovSectionsFromSourceFiles);
-        return new LCOVReport(lcovSections);
+        return lcovReport;
     }
 
     /**
      * For each class in each source file, create an LCOV section with hit count 0 for all lines.
      * @return The list of initializd LCOV sections
      */
-    private List<LCOVSection> initLcovSectionsForSourceFiles() throws IOException {
+    private List<LCOVSection> getInitializedLcovSections() throws IOException {
         List<LCOVSection> lcovSections = new ArrayList<>();
         for (File file : sourceFiles) {
             final LCOVSection lcovSection = new LCOVSection("", file.getAbsolutePath());

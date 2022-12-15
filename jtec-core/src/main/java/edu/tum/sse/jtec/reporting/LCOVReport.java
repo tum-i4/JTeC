@@ -1,6 +1,5 @@
 package edu.tum.sse.jtec.reporting;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public class LCOVReport {
@@ -8,6 +7,38 @@ public class LCOVReport {
 
     public LCOVReport(List<LCOVSection> lcovSections) {
         this.lcovSections = lcovSections;
+    }
+
+    public List<LCOVSection> getLcovSections() {
+        return lcovSections;
+    }
+
+    public void setLcovSections(List<LCOVSection> lcovSections) {
+        this.lcovSections = lcovSections;
+    }
+
+    /**
+     * Get the LCOV section for the given source file.
+     * @param sourceFilePath The path to the source file
+     * @return The LCOV section if it exists, else null
+     */
+    public LCOVSection getLcovSection(String sourceFilePath) {
+        return lcovSections.stream()
+                .filter(l -> l.getSourceFilePath().equals(sourceFilePath))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * Add new LCOV section if none already exists for the same source file.
+     * @param lcovSection The LCOV section to be added
+     * @return true if new section was added
+     */
+    public boolean addLcovSection(LCOVSection lcovSection) {
+        if (getLcovSection(lcovSection.getSourceFilePath()) == null) {
+            lcovSections.add(lcovSection);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -20,13 +51,5 @@ public class LCOVReport {
         for (LCOVSection section : lcovSections)
             lcovString.append(section.toString());
         return lcovString.toString();
-    }
-
-    public List<LCOVSection> getLcovSections() {
-        return lcovSections;
-    }
-
-    public void setLcovSections(List<LCOVSection> lcovSections) {
-        this.lcovSections = lcovSections;
     }
 }

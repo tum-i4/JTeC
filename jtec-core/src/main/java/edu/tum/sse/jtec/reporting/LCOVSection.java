@@ -21,13 +21,21 @@ public class LCOVSection {
     private final HashMap<Integer, String> methods = new HashMap<>();
 
     /**
-     * Execution count and names of methods (`FNDA`)
+     * Names and execution counts of methods (`FNDA`)
      */
-    private final HashMap<Integer, String> methodHits = new HashMap<>();
+    private final HashMap<String, Integer> methodHits = new HashMap<>();
 
     public LCOVSection(String testName, String sourceFilePath) {
         this.testName = testName;
         this.sourceFilePath = sourceFilePath;
+    }
+
+    public String getTestName() {
+        return testName;
+    }
+
+    public String getSourceFilePath() {
+        return sourceFilePath;
     }
 
     public void addLineHit(int lineNum, int hitCount) {
@@ -39,7 +47,7 @@ public class LCOVSection {
     }
 
     public void addMethodHit(int hitCount, String methodName) {
-        methodHits.put(hitCount, methodName);
+        methodHits.put(methodName, hitCount);
     }
 
     /**
@@ -84,9 +92,9 @@ public class LCOVSection {
             String methodName = method.getValue();
             lcovString.append("FN:").append(lineNum).append(",").append(methodName).append('\n');
         }
-        for (Map.Entry<Integer, String> methodHit : methodHits.entrySet()) {
-            int hitCount = methodHit.getKey();
-            String methodName = methodHit.getValue();
+        for (Map.Entry<String, Integer> methodHit : methodHits.entrySet()) {
+            String methodName= methodHit.getKey();
+            int hitCount = methodHit.getValue();
             lcovString.append("FNDA:").append(hitCount).append(",").append(methodName).append('\n');
         }
         lcovString.append("FNF:").append(numMethodsFound()).append('\n');
