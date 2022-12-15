@@ -13,17 +13,17 @@ public class LCOVSection {
     /**
      * Line numbers and their execution count ("hits") -> `DA`
      */
-    private final HashMap<Integer, Integer> lineHits = new HashMap<>();
+    private final Map<Integer, Integer> lineHits = new HashMap<>();
 
     /**
      * Line numbers and names of method declarations (`FN`)
      */
-    private final HashMap<Integer, String> methods = new HashMap<>();
+    private final Map<Integer, String> methods = new HashMap<>();
 
     /**
      * Names and execution counts of methods (`FNDA`)
      */
-    private final HashMap<String, Integer> methodHits = new HashMap<>();
+    private final Map<String, Integer> methodHits = new HashMap<>();
 
     public LCOVSection(String testName, String sourceFilePath) {
         this.testName = testName;
@@ -106,7 +106,7 @@ public class LCOVSection {
         }
         lcovString.append("LF:").append(numLinesFound()).append('\n');
         lcovString.append("LH:").append(numLinesHit()).append('\n');
-        lcovString.append("end_of_record\n");
+        lcovString.append("end_of_record").append('\n');
         return lcovString.toString();
     }
 }
