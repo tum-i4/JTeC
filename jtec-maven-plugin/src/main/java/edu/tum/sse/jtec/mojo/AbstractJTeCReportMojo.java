@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.mojo;
 
 import edu.tum.sse.jtec.reporting.TestReport;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +18,12 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
     final static String TEST_REPORT_JSON_FILENAME = "test-report.json";
     final static String TEST_REPORT_LCOV_FILENAME = "test-report.info";
 
+    /**
+     * JTeC option to enable generating an LCOV file for the test report.
+     */
+    @Parameter(property = "jtec.lcov", readonly = true, defaultValue = "false")
+    boolean lcovEnabled;
+
     boolean storeTestReport(TestReport testReport) throws IOException {
         Path jsonFile = outputDirectory.toPath().resolve(TEST_REPORT_JSON_FILENAME);
         Path lcovFile = outputDirectory.toPath().resolve(TEST_REPORT_LCOV_FILENAME);
@@ -30,9 +37,11 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
         final String jsonTestReport = toJson(testReport);
         createFileAndEnclosingDir(jsonFile);
         writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
-        final String lcovTestReport = toLcov(testReport, baseDirectory);
-        createFileAndEnclosingDir(lcovFile);
-        writeToFile(lcovFile, lcovTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
+        if (lcovEnabled) {
+            final String lcovTestReport = toLcov(testReport, baseDirectory);
+            createFileAndEnclosingDir(lcovFile);
+            writeToFile(lcovFile, lcovTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
+        }
         return true;
     }
 }
