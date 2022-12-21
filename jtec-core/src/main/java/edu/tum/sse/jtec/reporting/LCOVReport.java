@@ -29,19 +29,6 @@ public class LCOVReport {
     }
 
     /**
-     * Add new LCOV section if none already exists for the same source file.
-     * @param lcovSection The LCOV section to be added
-     * @return true if new section was added
-     */
-    public boolean addLcovSection(LCOVSection lcovSection) {
-        if (getLcovSection(lcovSection.getSourceFilePath()) == null) {
-            lcovSections.add(lcovSection);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Convert the LCOV report into a tracefile using the LCOV format.
      * @return The LCOV tracefile as a String
      */

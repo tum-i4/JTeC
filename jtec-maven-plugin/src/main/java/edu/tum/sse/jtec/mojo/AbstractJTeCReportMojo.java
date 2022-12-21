@@ -26,10 +26,8 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
 
     boolean storeTestReport(TestReport testReport) throws IOException {
         Path jsonFile = outputDirectory.toPath().resolve(TEST_REPORT_JSON_FILENAME);
-        Path lcovFile = outputDirectory.toPath().resolve(TEST_REPORT_LCOV_FILENAME);
         Path baseDirectory = project.getBasedir().toPath();
         Files.deleteIfExists(jsonFile);
-        Files.deleteIfExists(lcovFile);
         if (testReport.getTestSuites().size() == 0) {
             getLog().warn("No Test Suites found during report generation.");
             return false;
@@ -38,6 +36,8 @@ public abstract class AbstractJTeCReportMojo extends AbstractJTeCMojo {
         createFileAndEnclosingDir(jsonFile);
         writeToFile(jsonFile, jsonTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);
         if (lcovEnabled) {
+            Path lcovFile = outputDirectory.toPath().resolve(TEST_REPORT_LCOV_FILENAME);
+            Files.deleteIfExists(lcovFile);
             final String lcovTestReport = toLcov(testReport, baseDirectory);
             createFileAndEnclosingDir(lcovFile);
             writeToFile(lcovFile, lcovTestReport, false, StandardOpenOption.TRUNCATE_EXISTING);

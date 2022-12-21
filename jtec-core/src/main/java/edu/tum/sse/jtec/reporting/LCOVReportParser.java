@@ -59,7 +59,7 @@ public class LCOVReportParser {
                 .filter(Files::isRegularFile)
                 .filter(path -> path.toString().endsWith(SOURCE_FILE_EXTENSION))
                 .collect(Collectors.toList());
-        this.classToSourceFile = getClassToSourceFilePath();
+        this.classToSourceFile = getClassToSourceFileMap();
     }
 
     public LCOVReport parse(TestReport testReport) throws IOException {
@@ -125,7 +125,7 @@ public class LCOVReportParser {
      * @return The Map from class name to source file path
      * @throws IOException
      */
-    private Map<String, Path> getClassToSourceFilePath() throws IOException {
+    private Map<String, Path> getClassToSourceFileMap() throws IOException {
         Map<String, Path> classToSourceFile = new HashMap<>();
         for (Path sourceFile : sourceFiles) {
             final String sourceCode = IOUtils.readFromFile(sourceFile);
