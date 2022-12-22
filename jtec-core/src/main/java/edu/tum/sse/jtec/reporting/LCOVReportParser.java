@@ -69,12 +69,12 @@ public class LCOVReportParser {
         for (TestSuite testSuite : testReport.getTestSuites()) {
             for (String entity : testSuite.getCoveredEntities()) {
                 // Get package, class and method from entity; replace constructor name
-                final String[] entityComponents = getEntityComponents(entity);
-                if (entityComponents == null)
+                final Optional<String[]> entityComponents = getEntityComponents(entity);
+                if (!entityComponents.isPresent())
                     continue;
-                final String packageName = entityComponents[0];
-                final String className = entityComponents[1];
-                String tempMethodName = entityComponents[2];
+                final String packageName = entityComponents.get()[0];
+                final String className = entityComponents.get()[1];
+                String tempMethodName = entityComponents.get()[2];
                 if (tempMethodName != null && tempMethodName.equals("<init>"))
                     tempMethodName = className;
                 final String methodName = tempMethodName;
@@ -87,19 +87,19 @@ public class LCOVReportParser {
                 final String sourceFilePath = sourceFile.toString();
 
                 // Get LCOV section describing the source file
-                LCOVSection lcovSection = lcovReport.getLcovSection(sourceFilePath);
-                if (lcovSection == null)
+                Optional<LCOVSection> lcovSection = lcovReport.getLcovSection(sourceFilePath);
+                if (!lcovSection.isPresent())
                     continue;
 
                 // Get class declaration from source file
                 final String sourceCode = IOUtils.readFromFile(sourceFile);
                 final CompilationUnit compilationUnit = StaticJavaParser.parse(sourceCode);
-                final ClassOrInterfaceDeclaration classDeclaration = compilationUnit.getClassByName(className).orElse(null);
-                if (classDeclaration == null)
+                final Optional<ClassOrInterfaceDeclaration> classDeclaration = compilationUnit.getClassByName(className);
+                if (!classDeclaration.isPresent())
                     continue;
 
                 // Get either all callables (methods, constructors), or the method `methodName`.
-                List<CallableDeclaration> callableDeclarations = classDeclaration
+                List<CallableDeclaration> callableDeclarations = classDeclaration.get()
                         .findAll(CallableDeclaration.class).stream()
                         .filter((methodName != null)
                                 ? callableDeclaration -> callableDeclaration.getNameAsString().equals(methodName)
@@ -108,12 +108,12 @@ public class LCOVReportParser {
 
                 // Add method and line coverage information for callables
                 for (CallableDeclaration callableDeclaration : callableDeclarations) {
-                    final Range range = callableDeclaration.getRange().orElse(null);
-                    if (range == null)
+                    final Optional<Range> range = callableDeclaration.getRange();
+                    if (!range.isPresent())
                         continue;
-                    lcovSection.addMethodHit(1, callableDeclaration.getNameAsString());
-                    for (int line = range.begin.line; line <= range.end.line; line++)
-                        lcovSection.addLineHit(line, 1);
+                    lcovSection.get().addMethodHit(1, callableDeclaration.getNameAsString());
+                    for (int line = range.get().begin.line; line <= range.get().end.line; line++)
+                        lcovSection.get().addLineHit(line, 1);
                 }
             }
         }
@@ -156,11 +156,11 @@ public class LCOVReportParser {
 
             compilationUnit.findAll(CallableDeclaration.class)
                     .forEach(callableDeclaration -> {
-                        final Range range = callableDeclaration.getRange().orElse(null);
-                        if (range == null)
+                        final Optional<Range> range = callableDeclaration.getRange();
+                        if (!range.isPresent())
                             return;
-                        lcovSection.addMethod(range.begin.line, callableDeclaration.getNameAsString());
-                        for (int line = range.begin.line; line <= range.end.line; line++)
+                        lcovSection.addMethod(range.get().begin.line, callableDeclaration.getNameAsString());
+                        for (int line = range.get().begin.line; line <= range.get().end.line; line++)
                             lcovSection.addLineHit(line, 0);
                     }
             );
@@ -181,14 +181,16 @@ public class LCOVReportParser {
     /**
      * Extract the package name, class name, and method name from an entity string.
      * If no method name is present, use null for the method.
+     *
      * @return An array [package, class, method], or null if no match is found
      */
-    public static String[] getEntityComponents(String entity) {
+    public static Optional<String[]> getEntityComponents(String entity) {
         Matcher matcher = entityRegex.matcher(entity);
         if (matcher.matches()) {
             MatchResult result = matcher.toMatchResult();
-            return new String[] {result.group(1), result.group(2), result.group(3)};
+            String[] resultGroups = new String[]{result.group(1), result.group(2), result.group(3)};
+            return Optional.of(resultGroups);
         }
-        return null;
+        return Optional.empty();
     }
 }

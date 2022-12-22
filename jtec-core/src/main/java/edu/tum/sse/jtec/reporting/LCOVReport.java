@@ -1,6 +1,7 @@
 package edu.tum.sse.jtec.reporting;
 
 import java.util.List;
+import java.util.Optional;
 
 public class LCOVReport {
     private List<LCOVSection> lcovSections;
@@ -22,10 +23,10 @@ public class LCOVReport {
      * @param sourceFilePath The path to the source file
      * @return The LCOV section if it exists, else null
      */
-    public LCOVSection getLcovSection(String sourceFilePath) {
+    public Optional<LCOVSection> getLcovSection(String sourceFilePath) {
         return lcovSections.stream()
                 .filter(l -> l.getSourceFilePath().equals(sourceFilePath))
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     /**
