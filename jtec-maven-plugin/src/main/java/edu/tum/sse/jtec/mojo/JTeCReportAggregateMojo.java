@@ -27,7 +27,7 @@ public class JTeCReportAggregateMojo extends AbstractJTeCReportMojo {
         try {
             if (session.getCurrentProject().isExecutionRoot()) {
                 List<Path> reportPaths = session.getAllProjects().stream()
-                        .map(mavenProject -> mavenProject.getBasedir().toPath().resolve("target/jtec").resolve(TEST_REPORT_FILENAME))
+                        .map(mavenProject -> mavenProject.getBasedir().toPath().resolve("target/jtec").resolve(TEST_REPORT_JSON_FILENAME))
                         .filter(Files::exists)
                         .collect(Collectors.toList());
                 List<TestReport> testReports = reportPaths.stream()
