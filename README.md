@@ -7,6 +7,7 @@ It targets research in regression testing, such as test selection, prioritizatio
 To analyze tests beyond code coverage, JTeC also supports instrumenting APIs that open external files (e.g., `java.io`
 and `java.nio`),
 connect to sockets (e.g., `java.net.socket`), or spawn threads or processes (e.g., `java.lang`).
+Notably, JTeC thus doesn't rely on the Java [`SecurityManager`](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/SecurityManager.html), which is [outdated and will be removed in newer JDKs](https://bugs.openjdk.org/browse/JDK-8264713).
 
 ## Acknowledgments & Contributors
 
