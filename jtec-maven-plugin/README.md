@@ -54,6 +54,14 @@ of a Maven multi-module project:
 $ mvn clean verify -Djtec.opts="test.trace,sys.trace,cov.trace" jtec:report-aggregate
 ```
 
+## Updating/Merging Reports
+
+The goal `jtec:update-report` can be used to update an old test report with a new report by merging them:
+
+```shell
+$ mvn jtec:update-report -Djtec.oldReport="old-report.json" -Djtec.newReport="new-report.json" -Djtec.output="$(pwd)"
+```
+
 ## Troubleshooting
 
 In large projects, one might experience JVM shutdown initiated by Surefire before JTeC is done writing its test report to disk.
