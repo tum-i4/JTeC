@@ -1,0 +1,25 @@
+{
+  "reportId": "old-invalid-report",
+  "suites": [
+    {
+      "opened_files": [
+      ],
+      "failureCount": 0,
+      "ignoreCount": 0,
+      "runCount": 1,
+      "testId": "a.b.c.FooTest"
+    },
+    {
+      "openedFiles": [
+        "log5j.xml"
+      ],
+      "failureCount": 0,
+      "ignoreCount": 0,
+      "runCount": 1,
+      "testId": "a.b.c.BarTest"
+    }
+  ],
+  "timestamp": 123,
+  "totalDuration": 123
+}
+
