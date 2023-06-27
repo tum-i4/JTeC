@@ -27,7 +27,7 @@ Therefore, the simplest way to use JTeC in a Maven project is through the JTeC M
         <plugin>
             <groupId>edu.tum.sse</groupId>
             <artifactId>jtec-maven-plugin</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5-SNAPSHOT</version>
             <executions>
                 <execution>
                     <goals>
