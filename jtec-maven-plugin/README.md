@@ -14,7 +14,7 @@ Add plugin to Maven project:
         <plugin>
             <groupId>edu.tum.sse</groupId>
             <artifactId>jtec-maven-plugin</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <version>0.0.4</version>
             <executions>
                 <execution>
                     <goals>
