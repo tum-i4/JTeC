@@ -73,8 +73,34 @@ public class ReportMergerTest {
 
     @Test
     void shouldThrowParsingInvalidFormat() {
+        ReportMerger merger = new ReportMerger(invalidTraces, invalidTraces, true);
+        assertThrows(RuntimeException.class, merger::merge);
+    }
+
+    @Test
+    void shouldReturnOldTracesIfNewTracesAreInvalid() {
         ReportMerger merger = new ReportMerger(oldTraces, invalidTraces, true);
-        assertThrows(JsonParseException.class, merger::merge);
+        List<TestSuite> expectedTestSuites = new ArrayList<>();
+        TestSuite oldTestSuite = new TestSuite();
+        oldTestSuite.setTestId("a.b.c.FooTest");
+        oldTestSuite.setCoveredEntities(Collections.singleton("a.b.c.Foo"));
+        expectedTestSuites.add(oldTestSuite);
+        TestSuite newTestSuite = new TestSuite();
+        newTestSuite.setTestId("a.b.c.BarTest");
+        newTestSuite.setOpenedFiles(Collections.singleton("log5j.xml"));
+        expectedTestSuites.add(newTestSuite);
+        TestReport expected = new TestReport(
+                "report",
+                0,
+                0,
+                expectedTestSuites
+        );
+
+        // when
+        TestReport actual = merger.merge();
+
+        // then
+        assertTrue(testReportEquals(expected, actual), String.format("%s\n!=\n%s", toJson(expected), toJson(actual)));
     }
 
     @Test

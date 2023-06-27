@@ -1,6 +1,5 @@
 package edu.tum.sse.jtec.reporting;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,12 +39,32 @@ public class ReportMerger {
     }
 
     public TestReport merge() {
+        TestReport oldReport = null;
+        TestReport newReport = null;
+        Exception thrownException = null;
         try {
-            TestReport oldReport = fromJson(oldReportFile, TestReport.class);
-            TestReport newReport = fromJson(newReportFile, TestReport.class);
-            return mergeReports(oldReport, newReport);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to open test report file");
+            oldReport = fromJson(oldReportFile, TestReport.class);
+        } catch (Exception e) {
+            thrownException = e;
         }
+        try {
+            newReport = fromJson(newReportFile, TestReport.class);
+        } catch (Exception e) {
+            thrownException = e;
+        }
+        if (oldReport == null && newReport == null) {
+            if (thrownException != null) {
+                throw new RuntimeException(thrownException);
+            } else {
+                throw new RuntimeException();
+            }
+        }
+        if (oldReport == null) {
+            return newReport;
+        }
+        if (newReport == null) {
+            return oldReport;
+        }
+        return mergeReports(oldReport, newReport);
     }
 }
